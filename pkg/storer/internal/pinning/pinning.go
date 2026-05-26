@@ -5,22 +5,15 @@
 package pinstore
 
 import (
-	"bytes"
 	"context"
-	"encoding/binary"
 	"errors"
-	"fmt"
-	"runtime"
 
 	"github.com/ethersphere/bee/v2/pkg/encryption"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/storer/internal/transaction"
-	"golang.org/x/sync/errgroup"
 
-	"github.com/ethersphere/bee/v2/pkg/storage/storageutil"
 	"github.com/ethersphere/bee/v2/pkg/storer/internal"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/google/uuid"
 )
 
 const (
@@ -48,10 +41,7 @@ var (
 )
 
 // creates a new UUID and returns it as a byte slice
-func newUUID() []byte {
-	id := uuid.New()
-	return id[:]
-}
+func newUUID() []byte { _ = "STUB: not implemented"; return nil }
 
 // emptyKey is a 32 byte slice of zeros used to check if encryption key is set
 var emptyKey = make([]byte, 32)
@@ -68,14 +58,8 @@ type CollectionStat struct {
 // that are part of this collection. The root pin is only updated on successful close of this.
 // Calls to the Putter MUST be mutex locked to prevent concurrent upload data races.
 func NewCollection(st storage.IndexStore) (internal.PutterCloserWithReference, error) {
-	newCollectionUUID := newUUID()
-	err := st.Put(&dirtyCollection{UUID: newCollectionUUID})
-	if err != nil {
-		return nil, err
-	}
-	return &collectionPutter{
-		collection: &pinCollectionItem{UUID: newCollectionUUID},
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(internal.PutterCloserWithReference), nil
 }
 
 type collectionPutter struct {
@@ -86,263 +70,73 @@ type collectionPutter struct {
 // Put adds a chunk to the pin collection.
 // The user of the putter MUST mutex lock the call to prevent data-races across multiple upload sessions.
 func (c *collectionPutter) Put(ctx context.Context, st transaction.Store, ch swarm.Chunk) error {
+	_ = "STUB: not implemented"
 	// do not allow any Puts after putter was closed
-	if c.closed {
-		return errPutterAlreadyClosed
-	}
-
-	c.collection.Stat.Total++
-
-	// We will only care about duplicates within this collection. In order to
-	// guarantee that we dont accidentally delete common chunks across collections,
-	// a separate pinCollectionItem entry will be present for each duplicate chunk.
-	collectionChunk := &pinChunkItem{UUID: c.collection.UUID, Addr: ch.Address()}
-	found, err := st.IndexStore().Has(collectionChunk)
-	if err != nil {
-		return fmt.Errorf("pin store: failed to check chunk: %w", err)
-	}
-	if found {
-		// If we already have this chunk in the current collection, don't add it
-		// again.
-		c.collection.Stat.DupInCollection++
-		return nil
-	}
-
-	err = st.IndexStore().Put(collectionChunk)
-	if err != nil {
-		return fmt.Errorf("pin store: failed putting collection chunk: %w", err)
-	}
-
-	err = st.ChunkStore().Put(ctx, ch)
-	if err != nil {
-		return fmt.Errorf("pin store: failed putting chunk: %w", err)
-	}
-
 	return nil
 }
+
+// We will only care about duplicates within this collection. In order to
+// guarantee that we dont accidentally delete common chunks across collections,
+// a separate pinCollectionItem entry will be present for each duplicate chunk.
+
+// If we already have this chunk in the current collection, don't add it
+// again.
 
 func (c *collectionPutter) Close(st storage.IndexStore, root swarm.Address) error {
-	if root.IsZero() {
-		return errCollectionRootAddressIsZero
-	}
-
-	collection := &pinCollectionItem{Addr: root}
-	has, err := st.Has(collection)
-	if err != nil {
-		return fmt.Errorf("pin store: check previous root: %w", err)
-	}
-
-	if has {
-		return ErrDuplicatePinCollection
-	}
-
-	// Save the root pin reference.
-	c.collection.Addr = root
-	err = st.Put(c.collection)
-	if err != nil {
-		return fmt.Errorf("pin store: failed updating collection: %w", err)
-	}
-
-	err = st.Delete(&dirtyCollection{UUID: c.collection.UUID})
-	if err != nil {
-		return fmt.Errorf("pin store: failed deleting dirty collection: %w", err)
-	}
-
-	c.closed = true
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Save the root pin reference.
+
 func (c *collectionPutter) Cleanup(st transaction.Storage) error {
-	if c.closed {
-		return nil
-	}
-
-	if err := deleteCollectionChunks(context.Background(), st, c.collection.UUID); err != nil {
-		return fmt.Errorf("pin store: failed deleting collection chunks: %w", err)
-	}
-
-	err := st.Run(context.Background(), func(s transaction.Store) error {
-		return s.IndexStore().Delete(&dirtyCollection{UUID: c.collection.UUID})
-	})
-	if err != nil {
-		return fmt.Errorf("pin store: failed deleting dirty collection: %w", err)
-	}
-
-	c.closed = true
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // CleanupDirty will iterate over all the dirty collections and delete them.
-func CleanupDirty(st transaction.Storage) error {
-	dirtyCollections := make([]*dirtyCollection, 0)
-	err := st.IndexStore().Iterate(
-		storage.Query{
-			Factory:      func() storage.Item { return new(dirtyCollection) },
-			ItemProperty: storage.QueryItemID,
-		},
-		func(r storage.Result) (bool, error) {
-			di := &dirtyCollection{UUID: []byte(r.ID)}
-			dirtyCollections = append(dirtyCollections, di)
-			return false, nil
-		},
-	)
-	if err != nil {
-		return fmt.Errorf("pin store: failed iterating dirty collections: %w", err)
-	}
-
-	for _, di := range dirtyCollections {
-		err = errors.Join(err, (&collectionPutter{collection: &pinCollectionItem{UUID: di.UUID}}).Cleanup(st))
-	}
-
-	return err
-}
+func CleanupDirty(st transaction.Storage) error { _ = "STUB: not implemented"; return nil }
 
 // HasPin function will check if the address represents a valid pin collection.
 func HasPin(st storage.Reader, root swarm.Address) (bool, error) {
-	collection := &pinCollectionItem{Addr: root}
-	has, err := st.Has(collection)
-	if err != nil {
-		return false, fmt.Errorf("pin store: failed checking collection: %w", err)
-	}
-	return has, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // GetCollectionUUIDs returns all collection UUIDs from pin collections.
 func GetCollectionUUIDs(st storage.Reader) ([][]byte, error) {
-	var collectionUUIDs [][]byte
-	err := st.Iterate(storage.Query{
-		Factory: func() storage.Item { return &pinCollectionItem{} },
-	}, func(r storage.Result) (bool, error) {
-		collection := r.Entry.(*pinCollectionItem)
-		collectionUUIDs = append(collectionUUIDs, collection.UUID)
-		return false, nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("pin store: failed getting collections: %w", err)
-	}
-	return collectionUUIDs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // IsChunkPinnedInCollection checks if a chunk address is pinned under the given collection uuid.
 func IsChunkPinnedInCollection(st storage.Reader, chunkAddr swarm.Address, uuid []byte) (bool, error) {
-	chunkItem := &pinChunkItem{UUID: uuid, Addr: chunkAddr}
-	has, err := st.Has(chunkItem)
-	if err != nil {
-		return false, fmt.Errorf("pin store: failed checking chunk pin status: %w", err)
-	}
-	return has, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // Pins lists all the added pinning collections.
-func Pins(st storage.Reader) ([]swarm.Address, error) {
-	pins := make([]swarm.Address, 0)
-	err := st.Iterate(storage.Query{
-		Factory:      func() storage.Item { return new(pinCollectionItem) },
-		ItemProperty: storage.QueryItemID,
-	}, func(r storage.Result) (bool, error) {
-		addr := swarm.NewAddress([]byte(r.ID))
-		pins = append(pins, addr)
-		return false, nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("pin store: failed iterating root refs: %w", err)
-	}
-
-	return pins, nil
-}
+func Pins(st storage.Reader) ([]swarm.Address, error) { _ = "STUB: not implemented"; return nil, nil }
 
 func deleteCollectionChunks(ctx context.Context, st transaction.Storage, collectionUUID []byte) error {
-	chunksToDelete := make([]*pinChunkItem, 0)
-
-	err := st.IndexStore().Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return &pinChunkItem{UUID: collectionUUID} },
-		}, func(r storage.Result) (bool, error) {
-			addr := swarm.NewAddress([]byte(r.ID))
-			chunk := &pinChunkItem{UUID: collectionUUID, Addr: addr}
-			chunksToDelete = append(chunksToDelete, chunk)
-			return false, nil
-		},
-	)
-	if err != nil {
-		return fmt.Errorf("pin store: failed iterating collection chunks: %w", err)
-	}
-
-	eg, ctx := errgroup.WithContext(ctx)
-	eg.SetLimit(runtime.NumCPU())
-
-	for _, item := range chunksToDelete {
-		func(item *pinChunkItem) {
-			eg.Go(func() error {
-				return st.Run(ctx, func(s transaction.Store) error {
-					return errors.Join(
-						s.IndexStore().Delete(item),
-						s.ChunkStore().Delete(ctx, item.Addr),
-					)
-				})
-			})
-		}(item)
-	}
-
-	err = eg.Wait()
-	if err != nil {
-		return fmt.Errorf("pin store: failed tx deleting collection chunks: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // DeletePin will delete the root pin and all the chunks that are part of this collection.
 func DeletePin(ctx context.Context, st transaction.Storage, root swarm.Address) error {
-	collection := &pinCollectionItem{Addr: root}
-
-	err := st.IndexStore().Get(collection)
-	if err != nil {
-		return fmt.Errorf("pin store: failed getting collection: %w", err)
-	}
-
-	if err := deleteCollectionChunks(ctx, st, collection.UUID); err != nil {
-		return err
-	}
-
-	return st.Run(ctx, func(s transaction.Store) error {
-		err := s.IndexStore().Delete(collection)
-		if err != nil {
-			return fmt.Errorf("pin store: failed deleting root collection: %w", err)
-		}
-		return nil
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func IterateCollection(st storage.Reader, root swarm.Address, fn func(addr swarm.Address) (bool, error)) error {
-	collection := &pinCollectionItem{Addr: root}
-	err := st.Get(collection)
-	if err != nil {
-		return fmt.Errorf("pin store: failed getting collection: %w", err)
-	}
-
-	return st.Iterate(storage.Query{
-		Factory:      func() storage.Item { return &pinChunkItem{UUID: collection.UUID} },
-		ItemProperty: storage.QueryItemID,
-	}, func(r storage.Result) (bool, error) {
-		addr := swarm.NewAddress([]byte(r.ID))
-		stop, err := fn(addr)
-		if err != nil {
-			return true, err
-		}
-		return stop, nil
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func IterateCollectionStats(st storage.Reader, iterateFn func(st CollectionStat) (bool, error)) error {
-	return st.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return new(pinCollectionItem) },
-		},
-		func(r storage.Result) (bool, error) {
-			return iterateFn(r.Entry.(*pinCollectionItem).Stat)
-		},
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // pinCollectionSize represents the size of the pinCollectionItem
@@ -360,60 +154,20 @@ type pinCollectionItem struct {
 	Stat CollectionStat
 }
 
-func (p *pinCollectionItem) ID() string { return p.Addr.ByteString() }
+func (p *pinCollectionItem) ID() string { _ = "STUB: not implemented"; return "" }
 
-func (pinCollectionItem) Namespace() string { return "pinCollectionItem" }
+func (pinCollectionItem) Namespace() string { _ = "STUB: not implemented"; return "" }
 
-func (p *pinCollectionItem) Marshal() ([]byte, error) {
-	if p.Addr.IsZero() {
-		return nil, errInvalidPinCollectionAddr
-	}
-	if len(p.UUID) == 0 {
-		return nil, errInvalidPinCollectionUUID
-	}
-	buf := make([]byte, pinCollectionItemSize)
-	copy(buf[:encryption.ReferenceSize], p.Addr.Bytes())
-	off := encryption.ReferenceSize
-	copy(buf[off:off+uuidSize], p.UUID)
-	statBufOff := encryption.ReferenceSize + uuidSize
-	binary.LittleEndian.PutUint64(buf[statBufOff:], p.Stat.Total)
-	binary.LittleEndian.PutUint64(buf[statBufOff+8:], p.Stat.DupInCollection)
-	return buf, nil
-}
+func (p *pinCollectionItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (p *pinCollectionItem) Unmarshal(buf []byte) error {
-	if len(buf) != pinCollectionItemSize {
-		return errInvalidPinCollectionSize
-	}
-	ni := new(pinCollectionItem)
-	if bytes.Equal(buf[swarm.HashSize:encryption.ReferenceSize], emptyKey) {
-		ni.Addr = swarm.NewAddress(buf[:swarm.HashSize]).Clone()
-	} else {
-		ni.Addr = swarm.NewAddress(buf[:encryption.ReferenceSize]).Clone()
-	}
-	off := encryption.ReferenceSize
-	ni.UUID = append(make([]byte, 0, uuidSize), buf[off:off+uuidSize]...)
-	statBuf := buf[off+uuidSize:]
-	ni.Stat.Total = binary.LittleEndian.Uint64(statBuf[:8])
-	ni.Stat.DupInCollection = binary.LittleEndian.Uint64(statBuf[8:16])
-	*p = *ni
-	return nil
-}
+func (p *pinCollectionItem) Unmarshal(buf []byte) error { _ = "STUB: not implemented"; return nil }
 
 func (p *pinCollectionItem) Clone() storage.Item {
-	if p == nil {
-		return nil
-	}
-	return &pinCollectionItem{
-		Addr: p.Addr.Clone(),
-		UUID: append([]byte(nil), p.UUID...),
-		Stat: p.Stat,
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Item)
 }
 
-func (p pinCollectionItem) String() string {
-	return storageutil.JoinFields(p.Namespace(), p.ID())
-}
+func (p pinCollectionItem) String() string { _ = "STUB: not implemented"; return "" }
 
 var _ storage.Item = (*pinChunkItem)(nil)
 
@@ -424,61 +178,37 @@ type pinChunkItem struct {
 	Addr swarm.Address
 }
 
-func (p *pinChunkItem) Namespace() string { return string(p.UUID) }
+func (p *pinChunkItem) Namespace() string { _ = "STUB: not implemented"; return "" }
 
-func (p *pinChunkItem) ID() string { return p.Addr.ByteString() }
+func (p *pinChunkItem) ID() string { _ = "STUB: not implemented"; return "" }
 
 // pinChunkItem is a key-only type index. We don't need to store any value. As such
 // the serialization functions would be no-ops. A Get operation on this key is not
 // required as the key would constitute the item. Usually these type of indexes are
 // useful for key-only iterations.
-func (p *pinChunkItem) Marshal() ([]byte, error) {
-	return nil, nil
-}
+func (p *pinChunkItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (p *pinChunkItem) Unmarshal(_ []byte) error {
-	return nil
-}
+func (p *pinChunkItem) Unmarshal(_ []byte) error { _ = "STUB: not implemented"; return nil }
 
-func (p *pinChunkItem) Clone() storage.Item {
-	if p == nil {
-		return nil
-	}
-	return &pinChunkItem{
-		UUID: append([]byte(nil), p.UUID...),
-		Addr: p.Addr.Clone(),
-	}
-}
+func (p *pinChunkItem) Clone() storage.Item { _ = "STUB: not implemented"; return *new(storage.Item) }
 
-func (p pinChunkItem) String() string {
-	return storageutil.JoinFields(p.Namespace(), p.ID())
-}
+func (p pinChunkItem) String() string { _ = "STUB: not implemented"; return "" }
 
 type dirtyCollection struct {
 	UUID []byte
 }
 
-func (d *dirtyCollection) ID() string { return string(d.UUID) }
+func (d *dirtyCollection) ID() string { _ = "STUB: not implemented"; return "" }
 
-func (dirtyCollection) Namespace() string { return "dirtyCollection" }
+func (dirtyCollection) Namespace() string { _ = "STUB: not implemented"; return "" }
 
-func (d *dirtyCollection) Marshal() ([]byte, error) {
-	return nil, nil
-}
+func (d *dirtyCollection) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (d *dirtyCollection) Unmarshal(_ []byte) error {
-	return nil
-}
+func (d *dirtyCollection) Unmarshal(_ []byte) error { _ = "STUB: not implemented"; return nil }
 
 func (d *dirtyCollection) Clone() storage.Item {
-	if d == nil {
-		return nil
-	}
-	return &dirtyCollection{
-		UUID: append([]byte(nil), d.UUID...),
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Item)
 }
 
-func (d dirtyCollection) String() string {
-	return storageutil.JoinFields(d.Namespace(), d.ID())
-}
+func (d dirtyCollection) String() string { _ = "STUB: not implemented"; return "" }

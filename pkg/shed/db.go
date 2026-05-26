@@ -23,13 +23,8 @@
 package shed
 
 import (
-	"errors"
-
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
-	"github.com/syndtr/goleveldb/leveldb/opt"
-	"github.com/syndtr/goleveldb/leveldb/storage"
-	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 var (
@@ -59,140 +54,40 @@ type DB struct {
 // NewDB constructs a new DB and validates the schema
 // if it exists in database on the given path.
 // metricsPrefix is used for metrics collection for the given DB.
-func NewDB(path string, o *Options) (db *DB, err error) {
-	if o == nil {
-		o = &Options{
-			OpenFilesLimit:         defaultOpenFilesLimit,
-			BlockCacheCapacity:     defaultBlockCacheCapacity,
-			WriteBufferSize:        defaultWriteBufferSize,
-			DisableSeeksCompaction: defaultDisableSeeksCompaction,
-		}
-	}
-	var ldb *leveldb.DB
-	if path == "" {
-		ldb, err = leveldb.Open(storage.NewMemStorage(), nil)
-	} else {
-		ldb, err = leveldb.OpenFile(path, &opt.Options{
-			OpenFilesCacheCapacity: int(o.OpenFilesLimit),
-			BlockCacheCapacity:     int(o.BlockCacheCapacity),
-			WriteBuffer:            int(o.WriteBufferSize),
-			DisableSeeksCompaction: o.DisableSeeksCompaction,
-		})
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	return NewDBWrap(ldb)
-}
+func NewDB(path string, o *Options) (db *DB, err error) { _ = "STUB: not implemented"; return nil, nil }
 
 // NewDBWrap returns new DB which uses the given ldb as its underlying storage.
 // The function will panics if the given ldb is nil.
-func NewDBWrap(ldb *leveldb.DB) (db *DB, err error) {
-	if ldb == nil {
-		panic(errors.New("shed: NewDBWrap: nil ldb"))
-	}
+func NewDBWrap(ldb *leveldb.DB) (db *DB, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-	db = &DB{
-		ldb:     ldb,
-		metrics: newMetrics(),
-	}
+// Save schema with initialized default fields.
 
-	if _, err = db.getSchema(); err != nil {
-		if errors.Is(err, leveldb.ErrNotFound) {
-			// Save schema with initialized default fields.
-			if err = db.putSchema(schema{
-				Fields:  make(map[string]fieldSpec),
-				Indexes: make(map[byte]indexSpec),
-			}); err != nil {
-				return nil, err
-			}
-		} else {
-			return nil, err
-		}
-	}
-
-	// Create a quit channel for the periodic metrics collector and run it.
-	db.quit = make(chan struct{})
-
-	return db, nil
-}
+// Create a quit channel for the periodic metrics collector and run it.
 
 // Put wraps LevelDB Put method to increment metrics counter.
-func (db *DB) Put(key, value []byte) (err error) {
-	err = db.ldb.Put(key, value, nil)
-	if err != nil {
-		db.metrics.PutFailCounter.Inc()
-		return err
-	}
-	db.metrics.PutCounter.Inc()
-	return nil
-}
+func (db *DB) Put(key, value []byte) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Get wraps LevelDB Get method to increment metrics counter.
-func (db *DB) Get(key []byte) (value []byte, err error) {
-	value, err = db.ldb.Get(key, nil)
-	if err != nil {
-		if errors.Is(err, leveldb.ErrNotFound) {
-			db.metrics.GetNotFoundCounter.Inc()
-		} else {
-			db.metrics.GetFailCounter.Inc()
-		}
-		return nil, err
-	}
-	db.metrics.GetCounter.Inc()
-	return value, nil
-}
+func (db *DB) Get(key []byte) (value []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Has wraps LevelDB Has method to increment metrics counter.
-func (db *DB) Has(key []byte) (yes bool, err error) {
-	yes, err = db.ldb.Has(key, nil)
-	if err != nil {
-		db.metrics.HasFailCounter.Inc()
-		return false, err
-	}
-	db.metrics.HasCounter.Inc()
-	return yes, nil
-}
+func (db *DB) Has(key []byte) (yes bool, err error) { _ = "STUB: not implemented"; return false, nil }
 
 // Delete wraps LevelDB Delete method to increment metrics counter.
-func (db *DB) Delete(key []byte) (err error) {
-	err = db.ldb.Delete(key, nil)
-	if err != nil {
-		db.metrics.DeleteFailCounter.Inc()
-		return err
-	}
-	db.metrics.DeleteCounter.Inc()
-	return nil
-}
+func (db *DB) Delete(key []byte) (err error) { _ = "STUB: not implemented"; return nil }
 
 // NewIterator wraps LevelDB NewIterator method to increment metrics counter.
 func (db *DB) NewIterator() iterator.Iterator {
-	db.metrics.IteratorCounter.Inc()
-	return db.ldb.NewIterator(nil, nil)
+	_ = "STUB: not implemented"
+	return *new(iterator.Iterator)
 }
 
 // WriteBatch wraps LevelDB Write method to increment metrics counter.
-func (db *DB) WriteBatch(batch *leveldb.Batch) (err error) {
-	err = db.ldb.Write(batch, nil)
-	if err != nil {
-		db.metrics.WriteBatchFailCounter.Inc()
-		return err
-	}
-	db.metrics.WriteBatchCounter.Inc()
-	return nil
-}
+func (db *DB) WriteBatch(batch *leveldb.Batch) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Compact triggers a full database compaction on the underlying
 // LevelDB instance. Use with care! This can be very expensive!
-func (db *DB) Compact(start, end []byte) error {
-	r := util.Range{Start: start, Limit: end}
-	return db.ldb.CompactRange(r)
-}
+func (db *DB) Compact(start, end []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Close closes LevelDB database.
-func (db *DB) Close() (err error) {
-	close(db.quit)
-	return db.ldb.Close()
-}
+func (db *DB) Close() (err error) { _ = "STUB: not implemented"; return nil }

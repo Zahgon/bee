@@ -5,10 +5,9 @@ package pb
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
-	io "io"
 	math "math"
-	math_bits "math/bits"
+
+	proto "github.com/gogo/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,43 +25,34 @@ type AnnouncePaymentThreshold struct {
 	PaymentThreshold []byte `protobuf:"bytes,1,opt,name=PaymentThreshold,proto3" json:"PaymentThreshold,omitempty"`
 }
 
-func (m *AnnouncePaymentThreshold) Reset()         { *m = AnnouncePaymentThreshold{} }
-func (m *AnnouncePaymentThreshold) String() string { return proto.CompactTextString(m) }
-func (*AnnouncePaymentThreshold) ProtoMessage()    {}
+func (m *AnnouncePaymentThreshold) Reset()         { _ = "STUB: not implemented"; return }
+func (m *AnnouncePaymentThreshold) String() string { _ = "STUB: not implemented"; return "" }
+func (*AnnouncePaymentThreshold) ProtoMessage()    { _ = "STUB: not implemented"; return }
 func (*AnnouncePaymentThreshold) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ec4cc93d045d43d0, []int{0}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
 func (m *AnnouncePaymentThreshold) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
+	_ = "STUB: not implemented"
+	return nil
 }
+
 func (m *AnnouncePaymentThreshold) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AnnouncePaymentThreshold.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *AnnouncePaymentThreshold) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AnnouncePaymentThreshold.Merge(m, src)
-}
-func (m *AnnouncePaymentThreshold) XXX_Size() int {
-	return m.Size()
-}
-func (m *AnnouncePaymentThreshold) XXX_DiscardUnknown() {
-	xxx_messageInfo_AnnouncePaymentThreshold.DiscardUnknown(m)
-}
+
+func (m *AnnouncePaymentThreshold) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *AnnouncePaymentThreshold) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *AnnouncePaymentThreshold) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_AnnouncePaymentThreshold proto.InternalMessageInfo
 
 func (m *AnnouncePaymentThreshold) GetPaymentThreshold() []byte {
-	if m != nil {
-		return m.PaymentThreshold
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -85,230 +75,37 @@ var fileDescriptor_ec4cc93d045d43d0 = []byte{
 }
 
 func (m *AnnouncePaymentThreshold) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *AnnouncePaymentThreshold) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *AnnouncePaymentThreshold) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.PaymentThreshold) > 0 {
-		i -= len(m.PaymentThreshold)
-		copy(dAtA[i:], m.PaymentThreshold)
-		i = encodeVarintPricing(dAtA, i, uint64(len(m.PaymentThreshold)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func encodeVarintPricing(dAtA []byte, offset int, v uint64) int {
-	offset -= sovPricing(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
-func (m *AnnouncePaymentThreshold) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.PaymentThreshold)
-	if l > 0 {
-		n += 1 + l + sovPricing(uint64(l))
-	}
-	return n
+	_ = "STUB: not implemented"
+	return 0
 }
 
-func sovPricing(x uint64) (n int) {
-	return (math_bits.Len64(x|1) + 6) / 7
-}
-func sozPricing(x uint64) (n int) {
-	return sovPricing(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
+func (m *AnnouncePaymentThreshold) Size() (n int) { _ = "STUB: not implemented"; return 0 }
+
+func sovPricing(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
+
+func sozPricing(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
+
 func (m *AnnouncePaymentThreshold) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowPricing
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AnnouncePaymentThreshold: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AnnouncePaymentThreshold: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PaymentThreshold", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowPricing
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthPricing
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPricing
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PaymentThreshold = append(m.PaymentThreshold[:0], dAtA[iNdEx:postIndex]...)
-			if m.PaymentThreshold == nil {
-				m.PaymentThreshold = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipPricing(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthPricing
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthPricing
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
-func skipPricing(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowPricing
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowPricing
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowPricing
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthPricing
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupPricing
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthPricing
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
+
+func skipPricing(dAtA []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 var (
 	ErrInvalidLengthPricing        = fmt.Errorf("proto: negative length found during unmarshaling")

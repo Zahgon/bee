@@ -20,16 +20,10 @@ type entry struct {
 
 // newEntry creates a new Entry struct and returns it.
 func newEntry(reference string, metadata map[string]string) *entry {
-	return &entry{
-		Ref:  reference,
-		Meta: metadata,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (me *entry) Reference() string {
-	return me.Ref
-}
+func (me *entry) Reference() string { _ = "STUB: not implemented"; return "" }
 
-func (me *entry) Metadata() map[string]string {
-	return me.Meta
-}
+func (me *entry) Metadata() map[string]string { _ = "STUB: not implemented"; return nil }

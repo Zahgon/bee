@@ -5,8 +5,6 @@
 package blocklist
 
 import (
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/p2p"
@@ -23,12 +21,7 @@ type Blocklist struct {
 	currentTimeFn currentTimeFn
 }
 
-func NewBlocklist(store storage.StateStorer) *Blocklist {
-	return &Blocklist{
-		store:         store,
-		currentTimeFn: time.Now,
-	}
-}
+func NewBlocklist(store storage.StateStorer) *Blocklist { _ = "STUB: not implemented"; return nil }
 
 type entry struct {
 	Timestamp time.Time `json:"timestamp"`
@@ -38,105 +31,35 @@ type entry struct {
 }
 
 func (b *Blocklist) Exists(overlay swarm.Address) (bool, error) {
-	key := generateKey(overlay)
-	e, duration, err := b.get(key)
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			return false, nil
-		}
-
-		return false, err
-	}
-
-	if b.currentTimeFn().Sub(e.Timestamp) > duration && duration != 0 {
-		_ = b.store.Delete(key)
-		return false, nil
-	}
-
-	return true, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 func (b *Blocklist) Add(overlay swarm.Address, duration time.Duration, reason string, full bool) (err error) {
-	key := generateKey(overlay)
-	_, d, err := b.get(key)
-	if err != nil {
-		if !errors.Is(err, storage.ErrNotFound) {
-			return err
-		}
-	}
-
-	// if peer is already blacklisted, blacklist it for the maximum amount of time
-	if duration < d && duration != 0 || d == 0 {
-		duration = d
-	}
-
-	return b.store.Put(key, &entry{
-		Timestamp: b.currentTimeFn(),
-		Duration:  duration.String(),
-		Reason:    reason,
-		Full:      full,
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// if peer is already blacklisted, blacklist it for the maximum amount of time
 
 // Peers returns all currently blocklisted peers.
 func (b *Blocklist) Peers() ([]p2p.BlockListedPeer, error) {
-	var peers []p2p.BlockListedPeer
-	if err := b.store.Iterate(keyPrefix, func(k, v []byte) (bool, error) {
-		if !strings.HasPrefix(string(k), keyPrefix) {
-			return true, nil
-		}
-		addr, err := unmarshalKey(string(k))
-		if err != nil {
-			return true, err
-		}
-
-		entry, d, err := b.get(string(k))
-		if err != nil {
-			return true, err
-		}
-
-		if b.currentTimeFn().Sub(entry.Timestamp) > d && d != 0 {
-			// skip to the next item
-			return false, nil
-		}
-
-		p := p2p.BlockListedPeer{
-			Peer: p2p.Peer{
-				Address:  addr,
-				FullNode: entry.Full,
-			},
-			Duration: d,
-			Reason:   entry.Reason,
-		}
-		peers = append(peers, p)
-		return false, nil
-	}); err != nil {
-		return nil, err
-	}
-
-	return peers, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// skip to the next item
 
 func (b *Blocklist) get(key string) (entry, time.Duration, error) {
-	var e entry
-	err := b.store.Get(key, &e)
-	if err != nil {
-		return e, -1, err
-	}
-
-	dur, err := time.ParseDuration(e.Duration)
-	if err != nil {
-		return e, -1, err
-	}
-
-	return e, dur, nil
+	_ = "STUB: not implemented"
+	return *new(entry), *new(time.Duration), nil
 }
 
-func generateKey(overlay swarm.Address) string {
-	return keyPrefix + overlay.String()
-}
+func generateKey(overlay swarm.Address) string { _ = "STUB: not implemented"; return "" }
 
 func unmarshalKey(s string) (swarm.Address, error) {
-	addr := s[len(keyPrefix):] // trim prefix
-	return swarm.ParseHexAddress(addr)
+	_ = "STUB: not implemented"
+	return *
+	// trim prefix
+	new(swarm.Address), nil
 }

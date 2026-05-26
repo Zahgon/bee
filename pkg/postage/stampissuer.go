@@ -5,17 +5,12 @@
 package postage
 
 import (
-	"encoding/binary"
 	"errors"
-	"fmt"
 	"math/big"
-	"path"
 	"sync"
-	"time"
 
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/vmihailenco/msgpack/v5"
 )
 
 var (
@@ -44,76 +39,26 @@ type StampItem struct {
 }
 
 // ID implements the storage.Item interface.
-func (si StampItem) ID() string {
-	return fmt.Sprintf("%s/%s", string(si.BatchID), si.chunkAddress.String())
-}
+func (si StampItem) ID() string { _ = "STUB: not implemented"; return "" }
 
 // Namespace implements the storage.Item interface.
 func (si StampItem) Namespace() string {
-	return "stampItem"
+	_ = "STUB: not implemented"
+
+	// Marshal implements the storage.Item interface.
+	return ""
 }
 
-// Marshal implements the storage.Item interface.
-func (si StampItem) Marshal() ([]byte, error) {
-	switch {
-	case len(si.BatchID) != swarm.HashSize:
-		return nil, errStampItemMarshalBatchIDInvalid
-	case len(si.chunkAddress.Bytes()) != swarm.HashSize:
-		return nil, errStampItemMarshalChunkAddressInvalid
-	}
-
-	buf := make([]byte, stampItemSize+1)
-
-	l := 0
-	copy(buf[l:l+swarm.HashSize], si.BatchID)
-	l += swarm.HashSize
-	copy(buf[l:l+swarm.HashSize], si.chunkAddress.Bytes())
-	l += swarm.HashSize
-	copy(buf[l:l+swarm.StampIndexSize], si.BatchIndex)
-	l += swarm.StampIndexSize
-	copy(buf[l:l+swarm.StampTimestampSize], si.BatchTimestamp)
-
-	return buf, nil
-}
+func (si StampItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Unmarshal implements the storage.Item interface.
-func (si *StampItem) Unmarshal(bytes []byte) error {
-	if len(bytes) != stampItemSize+1 {
-		return errStampItemUnmarshalInvalidSize
-	}
-
-	ni := new(StampItem)
-
-	l := 0
-	ni.BatchID = append(make([]byte, 0, swarm.HashSize), bytes[l:l+swarm.HashSize]...)
-	l += swarm.HashSize
-	ni.chunkAddress = swarm.NewAddress(bytes[l : l+swarm.HashSize])
-	l += swarm.HashSize
-	ni.BatchIndex = append(make([]byte, 0, swarm.StampIndexSize), bytes[l:l+swarm.StampIndexSize]...)
-	l += swarm.StampIndexSize
-	ni.BatchTimestamp = append(make([]byte, 0, swarm.StampTimestampSize), bytes[l:l+swarm.StampTimestampSize]...)
-
-	*si = *ni
-	return nil
-}
+func (si *StampItem) Unmarshal(bytes []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Clone  implements the storage.Item interface.
-func (si *StampItem) Clone() storage.Item {
-	if si == nil {
-		return nil
-	}
-	return &StampItem{
-		BatchID:        append([]byte(nil), si.BatchID...),
-		chunkAddress:   si.chunkAddress.Clone(),
-		BatchIndex:     append([]byte(nil), si.BatchIndex...),
-		BatchTimestamp: append([]byte(nil), si.BatchTimestamp...),
-	}
-}
+func (si *StampItem) Clone() storage.Item { _ = "STUB: not implemented"; return *new(storage.Item) }
 
 // String implements the fmt.Stringer interface.
-func (si StampItem) String() string {
-	return path.Join(si.Namespace(), si.ID())
-}
+func (si StampItem) String() string { _ = "STUB: not implemented"; return "" }
 
 // stampIssuerData groups related StampIssuer data.
 // The data are factored out in order to make
@@ -134,17 +79,8 @@ type stampIssuerData struct {
 
 // Clone returns a deep copy of the stampIssuerData.
 func (s stampIssuerData) Clone() stampIssuerData {
-	return stampIssuerData{
-		Label:         s.Label,
-		KeyID:         s.KeyID,
-		BatchID:       append([]byte(nil), s.BatchID...),
-		BatchAmount:   new(big.Int).Set(s.BatchAmount),
-		BatchDepth:    s.BatchDepth,
-		BucketDepth:   s.BucketDepth,
-		Buckets:       append([]uint32(nil), s.Buckets...),
-		BlockNumber:   s.BlockNumber,
-		ImmutableFlag: s.ImmutableFlag,
-	}
+	_ = "STUB: not implemented"
+	return *new(stampIssuerData)
 }
 
 // StampIssuer is a local extension of a batch issuing stamps for uploads.
@@ -161,162 +97,79 @@ type StampIssuer struct {
 //
 // BucketDepth must always be smaller than batchDepth otherwise increment() panics.
 func NewStampIssuer(label, keyID string, batchID []byte, batchAmount *big.Int, batchDepth, bucketDepth uint8, blockNumber uint64, immutableFlag bool) *StampIssuer {
-	return &StampIssuer{
-		data: stampIssuerData{
-			Label:         label,
-			KeyID:         keyID,
-			BatchID:       batchID,
-			BatchAmount:   batchAmount,
-			BatchDepth:    batchDepth,
-			BucketDepth:   bucketDepth,
-			Buckets:       make([]uint32, 1<<bucketDepth),
-			BlockNumber:   blockNumber,
-			ImmutableFlag: immutableFlag,
-		},
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // increment increments the count in the correct collision
 // bucket for a newly stamped chunk with given addr address.
 // Must be mutex locked before usage.
 func (si *StampIssuer) increment(addr swarm.Address) (batchIndex []byte, batchTimestamp []byte, err error) {
-	bIdx := toBucket(si.BucketDepth(), addr)
-	bCnt := si.data.Buckets[bIdx]
-
-	if bCnt == si.BucketUpperBound() {
-		if si.ImmutableFlag() {
-			return nil, nil, ErrBucketFull
-		}
-
-		bCnt = 0
-		si.data.Buckets[bIdx] = 0
-	}
-
-	si.data.Buckets[bIdx]++
-	if si.data.Buckets[bIdx] > si.data.MaxBucketCount {
-		si.data.MaxBucketCount = si.data.Buckets[bIdx]
-	}
-
-	return indexToBytes(bIdx, bCnt), unixTime(), nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 // Label returns the label of the issuer.
-func (si *StampIssuer) Label() string {
-	return si.data.Label
-}
+func (si *StampIssuer) Label() string { _ = "STUB: not implemented"; return "" }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
-func (si *StampIssuer) MarshalBinary() ([]byte, error) {
-	return msgpack.Marshal(si.data)
-}
+func (si *StampIssuer) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
-func (si *StampIssuer) UnmarshalBinary(data []byte) error {
-	return msgpack.Unmarshal(data, &si.data)
-}
+func (si *StampIssuer) UnmarshalBinary(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Utilization returns the batch utilization in the form of
 // an integer between 0 and 4294967295. Batch fullness can be
 // calculated with: max_bucket_value / 2 ^ (batch_depth - bucket_depth)
-func (si *StampIssuer) Utilization() uint32 {
-	return si.data.MaxBucketCount
-}
+func (si *StampIssuer) Utilization() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // UtilizationRatio returns the batch fullness as a fraction in the
 // range [0, 1], computed as Utilization / 2^(BatchDepth - BucketDepth).
 // A value of 1 means the most-filled bucket is full and any further write
 // to that bucket would overflow the batch.
 func (si *StampIssuer) UtilizationRatio() float64 {
+	_ = "STUB: not implemented"
 	// A valid batch always has BatchDepth >= BucketDepth; return 0 for any
 	// other combination so the ratio stays well-defined in [0, 1].
-	if si.data.BatchDepth < si.data.BucketDepth {
-		return 0
-	}
-	return float64(si.data.MaxBucketCount) / float64(uint64(1)<<(si.data.BatchDepth-si.data.BucketDepth))
+	return 0
 }
 
 // ID returns the BatchID for this batch.
-func (si *StampIssuer) ID() []byte {
-	id := make([]byte, len(si.data.BatchID))
-	copy(id, si.data.BatchID)
-	return id
-}
+func (si *StampIssuer) ID() []byte { _ = "STUB: not implemented"; return nil }
 
 // Depth represent issued batch depth.
-func (si *StampIssuer) Depth() uint8 {
-	return si.data.BatchDepth
-}
+func (si *StampIssuer) Depth() uint8 { _ = "STUB: not implemented"; return 0 }
 
 // Amount represent issued batch amount paid.
-func (si *StampIssuer) Amount() *big.Int {
-	return si.data.BatchAmount
-}
+func (si *StampIssuer) Amount() *big.Int { _ = "STUB: not implemented"; return nil }
 
 // BucketDepth the depth of collision Buckets uniformity.
-func (si *StampIssuer) BucketDepth() uint8 {
-	return si.data.BucketDepth
-}
+func (si *StampIssuer) BucketDepth() uint8 { _ = "STUB: not implemented"; return 0 }
 
 // BucketUpperBound returns the maximum number of collisions
 // possible in a bucket given the batch's depth and bucket
 // depth.
-func (si *StampIssuer) BucketUpperBound() uint32 {
-	return 1 << (si.Depth() - si.BucketDepth())
-}
+func (si *StampIssuer) BucketUpperBound() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // BlockNumber when this batch was created.
-func (si *StampIssuer) BlockNumber() uint64 {
-	return si.data.BlockNumber
-}
+func (si *StampIssuer) BlockNumber() uint64 { _ = "STUB: not implemented"; return 0 }
 
 // ImmutableFlag immutability of the created batch.
-func (si *StampIssuer) ImmutableFlag() bool {
-	return si.data.ImmutableFlag
-}
+func (si *StampIssuer) ImmutableFlag() bool { _ = "STUB: not implemented"; return false }
 
-func (si *StampIssuer) Buckets() []uint32 {
-	si.mtx.Lock()
-	defer si.mtx.Unlock()
-	b := make([]uint32, len(si.data.Buckets))
-	copy(b, si.data.Buckets)
-	return b
-}
+func (si *StampIssuer) Buckets() []uint32 { _ = "STUB: not implemented"; return nil }
 
 // setDirty sets the dirty flag of the StampIssuer indicating it has unsaved bucket changes.
-func (si *StampIssuer) setDirty(dirty bool) {
-	si.mtx.Lock()
-	defer si.mtx.Unlock()
-	si.dirty = dirty
-}
+func (si *StampIssuer) setDirty(dirty bool) { _ = "STUB: not implemented"; return }
 
 // isDirty returns the dirty flag of the StampIssuer.
-func (si *StampIssuer) isDirty() bool {
-	si.mtx.Lock()
-	defer si.mtx.Unlock()
-	return si.dirty
-}
+func (si *StampIssuer) isDirty() bool { _ = "STUB: not implemented"; return false }
 
 // recover restores the bucket count from a stored batchIndex, used during crash recovery.
-func (si *StampIssuer) recover(batchIndex []byte) error {
-	si.mtx.Lock()
-	defer si.mtx.Unlock()
+func (si *StampIssuer) recover(batchIndex []byte) error { _ = "STUB: not implemented"; return nil }
 
-	bIdx, bCnt := BucketIndexFromBytes(batchIndex)
-	if bIdx >= uint32(len(si.data.Buckets)) {
-		return fmt.Errorf("bucket index %d out of bounds", bIdx)
-	}
-
-	// bCnt is the collision count WHEN the stamp was issued,
-	// meaning the bucket count has already reached AT LEAST bCnt + 1
-	if si.data.Buckets[bIdx] <= bCnt {
-		si.data.Buckets[bIdx] = bCnt + 1
-
-		if si.data.Buckets[bIdx] > si.data.MaxBucketCount {
-			si.data.MaxBucketCount = si.data.Buckets[bIdx]
-		}
-	}
-	return nil
-}
+// bCnt is the collision count WHEN the stamp was issued,
+// meaning the bucket count has already reached AT LEAST bCnt + 1
 
 // StampIssuerItem is a storage.Item implementation for StampIssuer.
 type StampIssuerItem struct {
@@ -324,95 +177,50 @@ type StampIssuerItem struct {
 }
 
 // NewStampIssuerItem creates a new StampIssuerItem.
-func NewStampIssuerItem(ID []byte) *StampIssuerItem {
-	return &StampIssuerItem{
-		Issuer: &StampIssuer{
-			data: stampIssuerData{
-				BatchID: ID,
-			},
-		},
-	}
-}
+func NewStampIssuerItem(ID []byte) *StampIssuerItem { _ = "STUB: not implemented"; return nil }
 
 // ID is the batch ID.
-func (s *StampIssuerItem) ID() string {
-	return string(s.Issuer.ID())
-}
+func (s *StampIssuerItem) ID() string { _ = "STUB: not implemented"; return "" }
 
 // Namespace returns the storage namespace for a stampIssuer.
-func (s *StampIssuerItem) Namespace() string {
-	return "StampIssuerItem"
-}
+func (s *StampIssuerItem) Namespace() string { _ = "STUB: not implemented"; return "" }
 
 // Marshal marshals the StampIssuerItem into a byte slice.
-func (s *StampIssuerItem) Marshal() ([]byte, error) {
-	return s.Issuer.MarshalBinary()
-}
+func (s *StampIssuerItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Unmarshal unmarshals a byte slice into a StampIssuerItem.
-func (s *StampIssuerItem) Unmarshal(bytes []byte) error {
-	issuer := new(StampIssuer)
-	err := issuer.UnmarshalBinary(bytes)
-	if err != nil {
-		return err
-	}
-	s.Issuer = issuer
-	return nil
-}
+func (s *StampIssuerItem) Unmarshal(bytes []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Clone returns a clone of StampIssuerItem.
 func (s *StampIssuerItem) Clone() storage.Item {
-	if s == nil {
-		return nil
-	}
-	return &StampIssuerItem{
-		Issuer: &StampIssuer{
-			data: s.Issuer.data.Clone(),
-		},
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Item)
 }
 
 // String returns the string representation of a StampIssuerItem.
-func (s StampIssuerItem) String() string {
-	return path.Join(s.Namespace(), s.ID())
-}
+func (s StampIssuerItem) String() string { _ = "STUB: not implemented"; return "" }
 
 var _ storage.Item = (*StampIssuerItem)(nil)
 
 // toBucket calculates the index of the collision bucket for a swarm address
 // bucket index := collision bucket depth number of bits as bigendian uint32
-func toBucket(depth uint8, addr swarm.Address) uint32 {
-	return binary.BigEndian.Uint32(addr.Bytes()[:4]) >> (32 - depth)
-}
+func toBucket(depth uint8, addr swarm.Address) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // indexToBytes creates an uint64 index from
 // - bucket index (neighbourhood index, uint32 <2^depth, bytes 2-4)
 // - and the within-bucket index (uint32 <2^(batchdepth-bucketdepth), bytes 5-8)
-func indexToBytes(bucket, index uint32) []byte {
-	buf := make([]byte, IndexSize)
-	binary.BigEndian.PutUint32(buf, bucket)
-	binary.BigEndian.PutUint32(buf[4:], index)
-	return buf
-}
+func indexToBytes(bucket, index uint32) []byte { _ = "STUB: not implemented"; return nil }
 
 // BucketIndexFromBytes returns bucket index and within-bucket index from supplied bytes.
 func BucketIndexFromBytes(buf []byte) (bucket, index uint32) {
-	index64 := IndexFromBytes(buf)
-	return uint32(index64 >> 32), uint32(index64)
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 // IndexFromBytes returns uint64 value from supplied bytes
-func IndexFromBytes(buf []byte) uint64 {
-	return binary.BigEndian.Uint64(buf)
-}
+func IndexFromBytes(buf []byte) uint64 { _ = "STUB: not implemented"; return 0 }
 
-func unixTime() []byte {
-	buf := make([]byte, 8)
-	binary.BigEndian.PutUint64(buf, uint64(time.Now().UnixNano()))
-	return buf
-}
+func unixTime() []byte { _ = "STUB: not implemented"; return nil }
 
 // TimestampFromBytes returns uint64 value from supplied bytes
-func TimestampFromBytes(buf []byte) uint64 {
-	return binary.BigEndian.Uint64(buf)
-}
+func TimestampFromBytes(buf []byte) uint64 { _ = "STUB: not implemented"; return 0 }

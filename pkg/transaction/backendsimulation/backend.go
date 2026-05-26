@@ -7,7 +7,6 @@ package backendsimulation
 import (
 	"context"
 	"errors"
-	"maps"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum"
@@ -45,111 +44,85 @@ type Option interface {
 
 type optionFunc func(*simulatedBackend)
 
-func (f optionFunc) apply(r *simulatedBackend) { f(r) }
+func (f optionFunc) apply(r *simulatedBackend) { _ = "STUB: not implemented"; return }
 
-func WithBlocks(blocks ...Block) Option {
-	return optionFunc(func(sb *simulatedBackend) {
-		sb.blocks = blocks
-	})
-}
+func WithBlocks(blocks ...Block) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 func New(options ...Option) transaction.Backend {
-	m := &simulatedBackend{
-		receipts: make(map[common.Hash]*types.Receipt),
-		noncesAt: make(map[AccountAtKey]uint64),
-
-		blockNumber: 0,
-	}
-	for _, opt := range options {
-		opt.apply(m)
-	}
-
-	return m
+	_ = "STUB: not implemented"
+	return *new(transaction.Backend)
 }
 
-func (m *simulatedBackend) advanceBlock() {
-	if m.step >= uint64(len(m.blocks)) {
-		return
-	}
-	block := m.blocks[m.step]
-	m.step++
-
-	m.blockNumber = block.Number
-
-	if block.Receipts != nil {
-		maps.Copy(m.receipts, block.Receipts)
-	}
-
-	if block.NoncesAt != nil {
-		maps.Copy(m.noncesAt, block.NoncesAt)
-	}
-}
+func (m *simulatedBackend) advanceBlock() { _ = "STUB: not implemented"; return }
 
 func (*simulatedBackend) CallContract(ctx context.Context, call ethereum.CallMsg, blockNumber *big.Int) ([]byte, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) PendingNonceAt(ctx context.Context, account common.Address) (uint64, error) {
-	return 0, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *simulatedBackend) SuggestedFeeAndTip(ctx context.Context, gasPrice *big.Int, boostPercent int) (*big.Int, *big.Int, error) {
-	return nil, nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (m *simulatedBackend) EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
-	return 0, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *simulatedBackend) SendTransaction(ctx context.Context, tx *types.Transaction) error {
-	return ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (*simulatedBackend) FilterLogs(ctx context.Context, query ethereum.FilterQuery) ([]types.Log, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) TransactionReceipt(ctx context.Context, txHash common.Hash) (*types.Receipt, error) {
-	receipt, ok := m.receipts[txHash]
-	if ok {
-		return receipt, nil
-	} else {
-		return nil, ethereum.NotFound
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) TransactionByHash(ctx context.Context, hash common.Hash) (tx *types.Transaction, isPending bool, err error) {
-	return nil, false, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, false, nil
 }
 
 func (m *simulatedBackend) BlockNumber(ctx context.Context) (uint64, error) {
-	m.advanceBlock()
-	return m.blockNumber, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *simulatedBackend) HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) BalanceAt(ctx context.Context, address common.Address, block *big.Int) (*big.Int, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) NonceAt(ctx context.Context, account common.Address, blockNumber *big.Int) (uint64, error) {
-	nonce, ok := m.noncesAt[AccountAtKey{Account: account, BlockNumber: blockNumber.Uint64()}]
-	if ok {
-		return nonce, nil
-	} else {
-		return 0, nil
-	}
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (m *simulatedBackend) SuggestGasTipCap(ctx context.Context) (*big.Int, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *simulatedBackend) ChainID(ctx context.Context) (*big.Int, error) {
-	return nil, ErrNotImplemented
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (m *simulatedBackend) Close() {}
+func (m *simulatedBackend) Close() { _ = "STUB: not implemented"; return }

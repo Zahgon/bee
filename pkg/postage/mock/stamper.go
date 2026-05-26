@@ -13,15 +13,18 @@ type mockStamper struct{}
 
 // NewStamper returns anew new mock stamper.
 func NewStamper() postage.Stamper {
-	return &mockStamper{}
+	_ = "STUB: not implemented"
+	return *
+
+	// Stamp implements the Stamper interface. It returns an empty postage stamp.
+	new(postage.Stamper)
 }
 
-// Stamp implements the Stamper interface. It returns an empty postage stamp.
 func (mockStamper) Stamp(_, _ swarm.Address) (*postage.Stamp, error) {
-	return &postage.Stamp{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
+
+	// Stamp implements the Stamper interface. It returns an empty postage stamp.
 }
 
-// Stamp implements the Stamper interface. It returns an empty postage stamp.
-func (mockStamper) BatchId() []byte {
-	return nil
-}
+func (mockStamper) BatchId() []byte { _ = "STUB: not implemented"; return nil }

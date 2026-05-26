@@ -5,7 +5,6 @@
 package cache
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -14,25 +13,6 @@ type metrics struct {
 	CacheMiss prometheus.Counter
 }
 
-func newMetrics() metrics {
-	subsystem := "storage_cache"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		CacheHit: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "cache_hit",
-			Help:      "Total cache hits.",
-		}),
-		CacheMiss: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "cache_miss",
-			Help:      "Total cache misses.",
-		}),
-	}
-}
-
-func (c *Cache) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(c.metrics)
-}
+func (c *Cache) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

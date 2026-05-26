@@ -5,7 +5,6 @@
 package sharky
 
 import (
-	"io"
 	"sync"
 )
 
@@ -20,25 +19,10 @@ type slots struct {
 	limboWG sync.WaitGroup  // wait for the limbo writes to in chan after the quit is closed
 }
 
-func newSlots(file sharkyFile, wg *sync.WaitGroup) *slots {
-	return &slots{
-		file: file,
-		in:   make(chan uint32),
-		out:  make(chan uint32),
-		wg:   wg,
-	}
-}
+func newSlots(file sharkyFile, wg *sync.WaitGroup) *slots { _ = "STUB: not implemented"; return nil }
 
 // load inits the slots from file, called after init
-func (sl *slots) load() (err error) {
-	sl.data, err = io.ReadAll(sl.file)
-	if err != nil {
-		return err
-	}
-	sl.size = uint32(len(sl.data) * 8)
-	sl.head = sl.next(0)
-	return err
-}
+func (sl *slots) load() (err error) { _ = "STUB: not implemented"; return nil }
 
 // save persists the free slot bitvector on disk (without closing).
 // slots only ever grow (extend is the only mutation), so sl.data is always >=
@@ -46,89 +30,36 @@ func (sl *slots) load() (err error) {
 // safe: no stale tail bytes can survive. Truncate(0) is intentionally absent
 // because truncating before the write creates a crash window where the file is
 // empty; removing it eliminates that vulnerability.
-func (sl *slots) save() error {
-	if _, err := sl.file.Seek(0, 0); err != nil {
-		return err
-	}
-	if _, err := sl.file.Write(sl.data); err != nil {
-		return err
-	}
-	return sl.file.Sync()
-}
+func (sl *slots) save() error { _ = "STUB: not implemented"; return nil }
 
 // extend adapts the slots to an extended size shard
 // extensions are bytewise: can only be multiples of 8 bits
-func (sl *slots) extend(n int) {
-	sl.size += uint32(n) * 8
-	for range n {
-		sl.data = append(sl.data, 0xff)
-	}
-}
+func (sl *slots) extend(n int) { _ = "STUB: not implemented"; return }
 
 // next returns the lowest free slot after start.
-func (sl *slots) next(start uint32) uint32 {
-	for i := start; i < sl.size; i++ {
-		if sl.data[i/8]&(1<<(i%8)) > 0 {
-			return i
-		}
-	}
-	return sl.size
-}
+func (sl *slots) next(start uint32) uint32 { _ = "STUB: not implemented"; return 0 }
 
 // push inserts a free slot.
-func (sl *slots) push(i uint32) {
-	if sl.head > i {
-		sl.head = i
-	}
-	sl.data[i/8] |= 1 << (i % 8)
-}
+func (sl *slots) push(i uint32) { _ = "STUB: not implemented"; return }
 
 // pop returns the lowest available free slot.
-func (sl *slots) pop() uint32 {
-	head := sl.head
-	if head == sl.size {
-		sl.extend(1)
-	}
-	sl.data[head/8] &= ^(1 << (head % 8))
-	sl.head = sl.next(head + 1)
-	return head
-}
+func (sl *slots) pop() uint32 { _ = "STUB: not implemented"; return 0 }
 
 // forever loop processing.
 func (sl *slots) process(quit chan struct{}) {
-	var head uint32     // the currently pending next free slots
-	var out chan uint32 // nullable output channel, need to pop a free slot when nil
-	for {
-		// if out is nil, need to pop a new head unless quitting
-		if out == nil && quit != nil {
-			// if read a free slot to head, switch on case 0 by assigning out channel
-			head = sl.pop()
-			out = sl.out
-		}
-
-		select {
-		// listen to released slots and append one to the slots
-		case slot, more := <-sl.in:
-			if !more {
-				return
-			}
-			sl.push(slot)
-
-			// let out channel capture the free slot and set out to nil to pop a new free slot
-		case out <- head:
-			out = nil
-
-			// quit is effective only after all initiated releases are received
-		case <-quit:
-			if out != nil {
-				sl.push(head)
-				out = nil
-			}
-			quit = nil
-			sl.wg.Go(func() {
-				sl.limboWG.Wait()
-				close(sl.in)
-			})
-		}
-	}
+	_ = "STUB: not implemented"
+	// the currently pending next free slots
+	return
 }
+
+// nullable output channel, need to pop a free slot when nil
+
+// if out is nil, need to pop a new head unless quitting
+
+// if read a free slot to head, switch on case 0 by assigning out channel
+
+// listen to released slots and append one to the slots
+
+// let out channel capture the free slot and set out to nil to pop a new free slot
+
+// quit is effective only after all initiated releases are received

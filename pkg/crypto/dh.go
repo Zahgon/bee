@@ -6,7 +6,6 @@ package crypto
 
 import (
 	"crypto/ecdsa"
-	"errors"
 )
 
 // DH is an interface allowing to generate shared keys for public key
@@ -21,18 +20,18 @@ type defaultDH struct {
 
 // NewDH returns an ECDH shared secret key generation seeded with in-memory private key
 func NewDH(key *ecdsa.PrivateKey) DH {
-	return &defaultDH{key}
+	_ = "STUB: not implemented"
+	return *
+
+	// SharedKey creates ECDH shared secret using the in-memory key as private key and the given public key
+	// and hashes it with the salt to return the shared key
+	// safety warning: this method is not meant to be exposed as it does not validate private and public keys
+	// are  on the same curve
+	new(DH)
 }
 
-// SharedKey creates ECDH shared secret using the in-memory key as private key and the given public key
-// and hashes it with the salt to return the shared key
-// safety warning: this method is not meant to be exposed as it does not validate private and public keys
-// are  on the same curve
 func (dh *defaultDH) SharedKey(pub *ecdsa.PublicKey, salt []byte) ([]byte, error) {
+	_ = "STUB: not implemented"
 	//nolint:staticcheck // SA1019: ecdsa fields are deprecated, but secp256k1 is not supported by crypto/ecdh
-	x, _ := pub.ScalarMult(pub.X, pub.Y, dh.key.D.Bytes())
-	if x == nil {
-		return nil, errors.New("shared secret is point at infinity")
-	}
-	return LegacyKeccak256(append(x.Bytes(), salt...))
+	return nil, nil
 }

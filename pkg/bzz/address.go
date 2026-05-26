@@ -8,15 +8,8 @@
 package bzz
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/binary"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"slices"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethersphere/bee/v2/pkg/crypto"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 
@@ -45,178 +38,43 @@ type addressJSON struct {
 }
 
 func NewAddress(signer crypto.Signer, underlays []ma.Multiaddr, overlay swarm.Address, networkID uint64, nonce []byte) (*Address, error) {
-	underlaysBinary := SerializeUnderlays(underlays)
-
-	signature, err := signer.Sign(generateSignData(underlaysBinary, overlay.Bytes(), networkID))
-	if err != nil {
-		return nil, err
-	}
-
-	return &Address{
-		Underlays: underlays,
-		Overlay:   overlay,
-		Signature: signature,
-		Nonce:     nonce,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ParseAddress(underlay, overlay, signature, nonce []byte, validateOverlay bool, networkID uint64) (*Address, error) {
-	recoveredPK, err := crypto.Recover(signature, generateSignData(underlay, overlay, networkID))
-	if err != nil {
-		return nil, ErrInvalidAddress
-	}
-
-	if validateOverlay {
-		recoveredOverlay, err := crypto.NewOverlayAddress(*recoveredPK, networkID, nonce)
-		if err != nil {
-			return nil, ErrInvalidAddress
-		}
-		if !bytes.Equal(recoveredOverlay.Bytes(), overlay) {
-			return nil, ErrInvalidAddress
-		}
-	}
-
-	multiUnderlays, err := DeserializeUnderlays(underlay)
-	if err != nil {
-		return nil, fmt.Errorf("deserialize underlays: %w: %w", ErrInvalidAddress, err)
-	}
-
-	if len(multiUnderlays) == 0 {
-		// no underlays sent
-		return nil, ErrInvalidAddress
-	}
-
-	ethAddress, err := crypto.NewEthereumAddress(*recoveredPK)
-	if err != nil {
-		return nil, fmt.Errorf("extract blockchain address: %w: %w", err, ErrInvalidAddress)
-	}
-
-	return &Address{
-		Underlays:       multiUnderlays,
-		Overlay:         swarm.NewAddress(overlay),
-		Signature:       signature,
-		Nonce:           nonce,
-		EthereumAddress: ethAddress,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// no underlays sent
 
 func generateSignData(underlay, overlay []byte, networkID uint64) []byte {
-	networkIDBytes := make([]byte, 8)
-	binary.BigEndian.PutUint64(networkIDBytes, networkID)
-	signData := append([]byte("bee-handshake-"), underlay...)
-	signData = append(signData, overlay...)
-	return append(signData, networkIDBytes...)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (a *Address) Equal(b *Address) bool {
-	if a == nil || b == nil {
-		return a == b
-	}
+func (a *Address) Equal(b *Address) bool { _ = "STUB: not implemented"; return false }
 
-	return a.Overlay.Equal(b.Overlay) && AreUnderlaysEqual(a.Underlays, b.Underlays) && bytes.Equal(a.Signature, b.Signature) && bytes.Equal(a.Nonce, b.Nonce)
-}
+func AreUnderlaysEqual(a, b []ma.Multiaddr) bool { _ = "STUB: not implemented"; return false }
 
-func AreUnderlaysEqual(a, b []ma.Multiaddr) bool {
-	if len(a) != len(b) {
-		return false
-	}
+func (a *Address) MarshalJSON() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	used := make([]bool, len(b))
-	for i := range len(a) {
-		found := false
-		for j := range len(b) {
-			if used[j] {
-				continue
-			}
-			if a[i].Equal(b[j]) {
-				used[j] = true
-				found = true
-				break
-			}
-		}
-		if !found {
-			return false
-		}
-	}
-	return true
-}
+// select the underlay address for backward compatibility
 
-func (a *Address) MarshalJSON() ([]byte, error) {
-	if len(a.Underlays) == 0 {
-		return nil, fmt.Errorf("no underlays for %s", a.Overlay)
-	}
+func (a *Address) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
-	// select the underlay address for backward compatibility
-	var underlay string
-	if v := SelectBestAdvertisedAddress(a.Underlays, nil); v != nil {
-		underlay = v.String()
-	}
+// append the underlay for backward compatibility
 
-	return json.Marshal(&addressJSON{
-		Overlay:   a.Overlay.String(),
-		Underlay:  underlay,
-		Underlays: a.underlaysAsStrings(),
-		Signature: base64.StdEncoding.EncodeToString(a.Signature),
-		Nonce:     common.Bytes2Hex(a.Nonce),
-	})
-}
-
-func (a *Address) UnmarshalJSON(b []byte) error {
-	v := &addressJSON{}
-	err := json.Unmarshal(b, v)
-	if err != nil {
-		return err
-	}
-
-	addr, err := swarm.ParseHexAddress(v.Overlay)
-	if err != nil {
-		return err
-	}
-
-	a.Overlay = addr
-
-	// append the underlay for backward compatibility
-	if !slices.Contains(v.Underlays, v.Underlay) {
-		v.Underlays = append(v.Underlays, v.Underlay)
-	}
-
-	multiaddrs, err := parseMultiaddrs(v.Underlays)
-	if err != nil {
-		return err
-	}
-
-	a.Underlays = multiaddrs
-	a.Signature, err = base64.StdEncoding.DecodeString(v.Signature)
-	a.Nonce = common.Hex2Bytes(v.Nonce)
-	return err
-}
-
-func (a *Address) String() string {
-	return fmt.Sprintf("[Underlay: %v, Overlay %v, Signature %x, Transaction %x]", a.underlaysAsStrings(), a.Overlay, a.Signature, a.Nonce)
-}
+func (a *Address) String() string { _ = "STUB: not implemented"; return "" }
 
 // ShortString returns shortened versions of bzz address in a format: [Overlay, Underlay]
 // It can be used for logging
-func (a *Address) ShortString() string {
-	return fmt.Sprintf("[Overlay: %s, Underlays: %v]", a.Overlay.String(), a.underlaysAsStrings())
-}
+func (a *Address) ShortString() string { _ = "STUB: not implemented"; return "" }
 
-func (a *Address) underlaysAsStrings() []string {
-	underlays := make([]string, len(a.Underlays))
-	for i, underlay := range a.Underlays {
-		underlays[i] = underlay.String()
-	}
-	return underlays
-}
+func (a *Address) underlaysAsStrings() []string { _ = "STUB: not implemented"; return nil }
 
 func parseMultiaddrs(addrs []string) ([]ma.Multiaddr, error) {
-	multiAddrs := make([]ma.Multiaddr, len(addrs))
-	for i, addr := range addrs {
-		multiAddr, err := ma.NewMultiaddr(addr)
-		if err != nil {
-			return nil, err
-		}
-		multiAddrs[i] = multiAddr
-	}
-	return multiAddrs, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

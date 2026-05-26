@@ -10,7 +10,6 @@ import (
 
 	"github.com/ethersphere/bee/v2/pkg/file/pipeline"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
 var errInvalidData = errors.New("store: invalid data")
@@ -24,24 +23,13 @@ type storeWriter struct {
 // NewStoreWriter returns a storeWriter. It just writes the given data
 // to a given storage.Putter.
 func NewStoreWriter(ctx context.Context, l storage.Putter, next pipeline.ChainWriter) pipeline.ChainWriter {
-	return &storeWriter{ctx: ctx, l: l, next: next}
+	_ = "STUB: not implemented"
+	return *new(pipeline.ChainWriter)
 }
 
 func (w *storeWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
-	if p.Ref == nil || p.Data == nil {
-		return errInvalidData
-	}
-	err := w.l.Put(w.ctx, swarm.NewChunk(swarm.NewAddress(p.Ref), p.Data))
-	if err != nil {
-		return err
-	}
-	if w.next == nil {
-		return nil
-	}
-
-	return w.next.ChainWrite(p)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (w *storeWriter) Sum() ([]byte, error) {
-	return w.next.Sum()
-}
+func (w *storeWriter) Sum() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

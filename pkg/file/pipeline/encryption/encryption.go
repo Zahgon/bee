@@ -15,26 +15,16 @@ type encryptionWriter struct {
 }
 
 func NewEncryptionWriter(encrypter encryption.ChunkEncrypter, next pipeline.ChainWriter) pipeline.ChainWriter {
-	return &encryptionWriter{
-		next: next,
-		enc:  encrypter,
-	}
+	_ = "STUB: not implemented"
+	return *new(pipeline.ChainWriter)
 }
 
 // Write assumes that the span is prepended to the actual data before the write !
 func (e *encryptionWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
-	key, encryptedSpan, encryptedData, err := e.enc.EncryptChunk(p.Data)
-	if err != nil {
-		return err
-	}
-	c := make([]byte, len(encryptedSpan)+len(encryptedData))
-	copy(c[:8], encryptedSpan)
-	copy(c[8:], encryptedData)
-	p.Data = c // replace the verbatim data with the encrypted data
-	p.Key = key
-	return e.next.ChainWrite(p)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (e *encryptionWriter) Sum() ([]byte, error) {
-	return e.next.Sum()
-}
+// replace the verbatim data with the encrypted data
+
+func (e *encryptionWriter) Sum() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

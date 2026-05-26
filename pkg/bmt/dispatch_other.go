@@ -8,16 +8,10 @@ package bmt
 
 // NewPool returns a BMT pool. On this platform only the goroutine implementation
 // is compiled in, so SIMDOptIn() is ignored.
-func NewPool(c *Conf) Pool {
-	return newGoroutinePool(c)
-}
+func NewPool(c *Conf) Pool { _ = "STUB: not implemented"; return *new(Pool) }
 
 // NewHasher returns a standalone (non-pooled) BMT hasher.
-func NewHasher() Hasher {
-	return newGoroutineHasher()
-}
+func NewHasher() Hasher { _ = "STUB: not implemented"; return *new(Hasher) }
 
 // NewPrefixHasher returns a standalone BMT hasher with the given prefix.
-func NewPrefixHasher(prefix []byte) Hasher {
-	return newGoroutinePrefixHasher(prefix)
-}
+func NewPrefixHasher(prefix []byte) Hasher { _ = "STUB: not implemented"; return *new(Hasher) }

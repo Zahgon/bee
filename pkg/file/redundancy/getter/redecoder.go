@@ -6,7 +6,6 @@ package getter
 
 import (
 	"context"
-	"errors"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/storage"
@@ -28,34 +27,23 @@ type ReDecoder struct {
 // NewReDecoder creates a new ReDecoder instance with the provided fetcher and recovery factory.
 // The recovery decoder will only be created if needed (when network fetch fails).
 func NewReDecoder(fetcher storage.Getter, recovery Recovery, logger log.Logger) *ReDecoder {
-	return &ReDecoder{
-		fetcher:  fetcher,
-		recovery: recovery,
-		logger:   logger,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Get implements the storage.Getter interface.
 // It first attempts to fetch the chunk directly from the network.
 // If that fails with ErrNotFound, it then creates the recovery decoder and attempts to recover the chunk.
 func (rd *ReDecoder) Get(ctx context.Context, addr swarm.Address) (swarm.Chunk, error) {
+	_ = "STUB: not implemented"
 	// First try to get the chunk directly from the network
-	chunk, err := rd.fetcher.Get(ctx, addr)
-	if err == nil {
-		return chunk, nil
-	}
-
-	// Only attempt recovery if the chunk was not found
-	if !errors.Is(err, storage.ErrNotFound) {
-		return nil, err
-	}
-
-	// Log that we're falling back to recovery
-	rd.logger.Debug("chunk not found in network, creating recovery decoder", "address", addr)
-
-	// Create the recovery decoder on demand
-	recovery := rd.recovery()
-
-	// Attempt to recover the chunk
-	return recovery.Get(ctx, addr)
+	return *new(swarm.Chunk), nil
 }
+
+// Only attempt recovery if the chunk was not found
+
+// Log that we're falling back to recovery
+
+// Create the recovery decoder on demand
+
+// Attempt to recover the chunk

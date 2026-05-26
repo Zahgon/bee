@@ -17,9 +17,6 @@
 package shed
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/syndtr/goleveldb/leveldb"
 )
 
@@ -33,41 +30,19 @@ type StructField struct {
 // NewStructField returns a new StructField.
 // It validates its name and type against the database schema.
 func (db *DB) NewStructField(name string) (f StructField, err error) {
-	key, err := db.schemaFieldKey(name, "struct-rlp")
-	if err != nil {
-		return f, fmt.Errorf("get schema key: %w", err)
-	}
-	return StructField{
-		db:  db,
-		key: key,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(StructField), nil
 }
 
 // Get unmarshals data from the database to a provided val.
 // If the data is not found leveldb.ErrNotFound is returned.
-func (f StructField) Get(val any) (err error) {
-	b, err := f.db.Get(f.key)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, val)
-}
+func (f StructField) Get(val any) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Put marshals provided val and saves it to the database.
-func (f StructField) Put(val any) (err error) {
-	b, err := json.Marshal(val)
-	if err != nil {
-		return err
-	}
-	return f.db.Put(f.key, b)
-}
+func (f StructField) Put(val any) (err error) { _ = "STUB: not implemented"; return nil }
 
 // PutInBatch marshals provided val and puts it into the batch.
 func (f StructField) PutInBatch(batch *leveldb.Batch, val any) (err error) {
-	b, err := json.Marshal(val)
-	if err != nil {
-		return err
-	}
-	batch.Put(f.key, b)
+	_ = "STUB: not implemented"
 	return nil
 }

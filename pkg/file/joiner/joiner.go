@@ -8,17 +8,11 @@ package joiner
 import (
 	"context"
 	"errors"
-	"io"
 	"sync"
-	"sync/atomic"
 
-	"github.com/ethersphere/bee/v2/pkg/bmt"
-	"github.com/ethersphere/bee/v2/pkg/encryption"
-	"github.com/ethersphere/bee/v2/pkg/encryption/store"
 	"github.com/ethersphere/bee/v2/pkg/file"
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy/getter"
-	"github.com/ethersphere/bee/v2/pkg/replicas"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 	"golang.org/x/sync/errgroup"
@@ -49,177 +43,61 @@ type decoderCache struct {
 
 // NewDecoderCache creates a new decoder cache
 func NewDecoderCache(g storage.Getter, p storage.Putter, conf getter.Config) *decoderCache {
-	return &decoderCache{
-		fetcher: g,
-		putter:  p,
-		cache:   make(map[string]storage.Getter),
-		config:  conf,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func fingerprint(addrs []swarm.Address) string {
-	h := swarm.NewHasher()
-	for _, addr := range addrs {
-		_, _ = h.Write(addr.Bytes())
-	}
-	return string(h.Sum(nil))
-}
+func fingerprint(addrs []swarm.Address) string { _ = "STUB: not implemented"; return "" }
 
 // createRemoveCallback returns a function that handles the cleanup after a recovery attempt
 func (g *decoderCache) createRemoveCallback(key string) func(error) {
-	return func(err error) {
-		g.mu.Lock()
-		defer g.mu.Unlock()
-		if err != nil {
-			// signals that a new getter is needed to reattempt to recover the data
-			delete(g.cache, key)
-		} else {
-			// signals that the chunks were fetched/recovered/cached so a future getter is not needed
-			// The nil value indicates a successful recovery
-			g.cache[key] = nil
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// signals that a new getter is needed to reattempt to recover the data
+
+// signals that the chunks were fetched/recovered/cached so a future getter is not needed
+// The nil value indicates a successful recovery
 
 // GetOrCreate returns a decoder for the given chunk address
 func (g *decoderCache) GetOrCreate(addrs []swarm.Address, shardCnt int) storage.Getter {
+	_ = "STUB: not implemented"
 	// since a recovery decoder is not allowed, simply return the underlying netstore
-	if g.config.Strict && g.config.Strategy == getter.NONE {
-		return g.fetcher
-	}
-
-	if len(addrs) == shardCnt {
-		return g.fetcher
-	}
-
-	key := fingerprint(addrs)
-	g.mu.Lock()
-	defer g.mu.Unlock()
-	d, ok := g.cache[key]
-	if ok {
-		if d == nil {
-			// The nil value indicates a previous successful recovery
-			// Create a new decoder but only use it as fallback if network fetch fails
-			decoderCallback := g.createRemoveCallback(key)
-
-			// Create a factory function that will instantiate the decoder only when needed
-			recovery := func() storage.Getter {
-				g.config.Logger.Debug("lazy-creating recovery decoder after fetch failed", "key", key)
-				g.mu.Lock()
-				defer g.mu.Unlock()
-				d, ok := g.cache[key]
-				if ok && d != nil {
-					return d
-				}
-				d = getter.New(addrs, shardCnt, g.fetcher, g.putter, decoderCallback, g.config)
-				g.cache[key] = d
-				return d
-			}
-
-			return getter.NewReDecoder(g.fetcher, recovery, g.config.Logger)
-		}
-		return d
-	}
-
-	removeCallback := g.createRemoveCallback(key)
-	d = getter.New(addrs, shardCnt, g.fetcher, g.putter, removeCallback, g.config)
-	g.cache[key] = d
-	return d
+	return *new(storage.Getter)
 }
+
+// The nil value indicates a previous successful recovery
+// Create a new decoder but only use it as fallback if network fetch fails
+
+// Create a factory function that will instantiate the decoder only when needed
 
 // New creates a new Joiner. A Joiner provides Read, Seek and Size functionalities.
 func New(ctx context.Context, g storage.Getter, putter storage.Putter, address swarm.Address, rLevel redundancy.Level) (file.Joiner, int64, error) {
+	_ = "STUB: not implemented"
 	// retrieve the root chunk to read the total data length the be retrieved
-	rootChunkGetter := store.New(g)
-	if rLevel != redundancy.NONE {
-		rootChunkGetter = store.New(replicas.NewGetter(g, rLevel))
-	}
-	rootChunk, err := rootChunkGetter.Get(ctx, address)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	return NewJoiner(ctx, g, putter, address, rootChunk)
+	return *new(file.Joiner), 0, nil
 }
 
 // NewJoiner creates a new Joiner with the already fetched root chunk.
 // A Joiner provides Read, Seek and Size functionalities.
 func NewJoiner(ctx context.Context, g storage.Getter, putter storage.Putter, address swarm.Address, rootChunk swarm.Chunk) (file.Joiner, int64, error) {
-	chunkData := rootChunk.Data()
-	rootData := chunkData[swarm.SpanSize:]
-	refLength := len(address.Bytes())
-	encryption := refLength == encryption.ReferenceSize
-	rLevel, span := chunkToSpan(chunkData)
-	rootParity := 0
-	maxBranching := swarm.ChunkSize / refLength
-	spanFn := func(data []byte) (redundancy.Level, int64) {
-		return 0, int64(bmt.LengthFromSpan(data[:swarm.SpanSize]))
-	}
-	conf, err := getter.NewConfigFromContext(ctx, getter.DefaultConfig)
-	if err != nil {
-		return nil, 0, err
-	}
-	// override stuff if root chunk has redundancy
-	if rLevel != redundancy.NONE {
-		_, parities := file.ReferenceCount(uint64(span), rLevel, encryption)
-		rootParity = parities
-
-		spanFn = chunkToSpan
-		if encryption {
-			maxBranching = rLevel.GetMaxEncShards()
-		} else {
-			maxBranching = rLevel.GetMaxShards()
-		}
-	} else {
-		// if root chunk has no redundancy, strategy is ignored and set to DATA and strict is set to true
-		conf.Strategy = getter.DATA
-		conf.Strict = true
-	}
-
-	j := &joiner{
-		addr:         rootChunk.Address(),
-		refLength:    refLength,
-		ctx:          ctx,
-		decoders:     NewDecoderCache(g, putter, conf),
-		span:         span,
-		rootData:     rootData,
-		rootParity:   rootParity,
-		maxBranching: maxBranching,
-		chunkToSpan:  spanFn,
-	}
-
-	return j, span, nil
+	_ = "STUB: not implemented"
+	return *new(file.Joiner), 0, nil
 }
+
+// override stuff if root chunk has redundancy
+
+// if root chunk has no redundancy, strategy is ignored and set to DATA and strict is set to true
 
 // Read is called by the consumer to retrieve the joined data.
 // It must be called with a buffer equal to the maximum chunk size.
-func (j *joiner) Read(b []byte) (n int, err error) {
-	read, err := j.ReadAt(b, j.off)
-	if err != nil && !errors.Is(err, io.EOF) {
-		return read, err
-	}
-
-	j.off += int64(read)
-	return read, err
-}
+func (j *joiner) Read(b []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (j *joiner) ReadAt(buffer []byte, off int64) (read int, err error) {
+	_ = "STUB: not implemented"
 	// since offset is int64 and swarm spans are uint64 it means we cannot seek beyond int64 max value
-	if off >= j.span {
-		return 0, io.EOF
-	}
-
-	readLen := min(int64(cap(buffer)), j.span-off)
-	var bytesRead int64
-	var eg errgroup.Group
-	j.readAtOffset(buffer, j.rootData, 0, j.span, off, 0, readLen, &bytesRead, j.rootParity, &eg)
-
-	err = eg.Wait()
-	if err != nil {
-		return 0, err
-	}
-
-	return int(atomic.LoadInt64(&bytesRead)), nil
+	return 0, nil
 }
 
 var ErrMalformedTrie = errors.New("malformed tree")
@@ -231,87 +109,24 @@ func (j *joiner) readAtOffset(
 	parity int,
 	eg *errgroup.Group,
 ) {
+	_ = "STUB: not implemented"
 	// we are at a leaf data chunk
-	if subTrieSize <= int64(len(data)) {
-		dataOffsetStart := off - cur
-		dataOffsetEnd := dataOffsetStart + bytesToRead
-
-		if lenDataToCopy := int64(len(data)) - dataOffsetStart; bytesToRead > lenDataToCopy {
-			dataOffsetEnd = dataOffsetStart + lenDataToCopy
-		}
-
-		bs := data[dataOffsetStart:dataOffsetEnd]
-		n := copy(b[bufferOffset:bufferOffset+int64(len(bs))], bs)
-		atomic.AddInt64(bytesRead, int64(n))
-		return
-	}
-	pSize, err := file.ChunkPayloadSize(data)
-	if err != nil {
-		eg.Go(func() error {
-			return err
-		})
-		return
-	}
-
-	addrs, shardCnt := file.ChunkAddresses(data[:pSize], parity, j.refLength)
-	g := store.New(j.decoders.GetOrCreate(addrs, shardCnt))
-	for cursor := 0; cursor < len(data); cursor += j.refLength {
-		if bytesToRead == 0 {
-			break
-		}
-
-		// fast forward the cursor
-		sec := j.subtrieSection(cursor, pSize, parity, subTrieSize)
-		if cur+sec <= off {
-			cur += sec
-			continue
-		}
-
-		// if we are here it means that we are within the bounds of the data we need to read
-		addr := swarm.NewAddress(data[cursor : cursor+j.refLength])
-
-		subtrieSpan := sec
-		subtrieSpanLimit := sec
-
-		currentReadSize := subtrieSpan - (off - cur) // the size of the subtrie, minus the offset from the start of the trie
-		// upper bound alignments
-		currentReadSize = min(currentReadSize, bytesToRead)
-		currentReadSize = min(currentReadSize, subtrieSpan)
-
-		func(address swarm.Address, b []byte, cur, subTrieSize, off, bufferOffset, bytesToRead, subtrieSpanLimit int64) {
-			eg.Go(func() error {
-				ch, err := g.Get(j.ctx, addr)
-				if err != nil {
-					return err
-				}
-
-				chunkData := ch.Data()[8:]
-				subtrieLevel, subtrieSpan := j.chunkToSpan(ch.Data())
-				_, subtrieParity := file.ReferenceCount(uint64(subtrieSpan), subtrieLevel, j.refLength == encryption.ReferenceSize)
-
-				if subtrieSpan > subtrieSpanLimit {
-					return ErrMalformedTrie
-				}
-
-				j.readAtOffset(b, chunkData, cur, subtrieSpan, off, bufferOffset, currentReadSize, bytesRead, subtrieParity, eg)
-				return nil
-			})
-		}(addr, b, cur, subtrieSpan, off, bufferOffset, currentReadSize, subtrieSpanLimit)
-
-		bufferOffset += currentReadSize
-		bytesToRead -= currentReadSize
-		cur += subtrieSpan
-		off = cur
-	}
+	return
 }
+
+// fast forward the cursor
+
+// if we are here it means that we are within the bounds of the data we need to read
+
+// the size of the subtrie, minus the offset from the start of the trie
+// upper bound alignments
 
 // getShards returns the effective reference number respective to the intermediate chunk payload length and its parities
-func (j *joiner) getShards(payloadSize, parities int) int {
-	return (payloadSize - parities*swarm.HashSize) / j.refLength
-}
+func (j *joiner) getShards(payloadSize, parities int) int { _ = "STUB: not implemented"; return 0 }
 
 // brute-forces the subtrie size for each of the sections in this intermediate chunk
 func (j *joiner) subtrieSection(startIdx, payloadSize, parities int, subtrieSize int64) int64 {
+	_ = "STUB: not implemented"
 	// assume we have a trie of size `y` then we can assume that all of
 	// the forks except for the last one on the right are of equal size
 	// this is due to how the splitter wraps levels.
@@ -319,25 +134,13 @@ func (j *joiner) subtrieSection(startIdx, payloadSize, parities int, subtrieSize
 	// y = (refs - 1) * x + l
 	// where y is the size of the subtrie, refs are the number of references
 	// x is constant (the brute forced value) and l is the size of the last subtrie
-	var (
-		refs       = int64(j.getShards(payloadSize, parities)) // how many effective references in the intermediate chunk
-		branching  = int64(j.maxBranching)                     // branching factor is chunkSize divided by reference length
-		branchSize = int64(swarm.ChunkSize)
-	)
-	for {
-		whatsLeft := subtrieSize - (branchSize * (refs - 1))
-		if whatsLeft <= branchSize {
-			break
-		}
-		branchSize *= branching
-	}
-
-	// handle last branch edge case
-	if startIdx == int(refs-1)*j.refLength {
-		return subtrieSize - (refs-1)*branchSize
-	}
-	return branchSize
+	return 0
 }
+
+// how many effective references in the intermediate chunk
+// branching factor is chunkSize divided by reference length
+
+// handle last branch edge case
 
 var (
 	errWhence = errors.New("seek: invalid whence")
@@ -345,106 +148,33 @@ var (
 )
 
 func (j *joiner) Seek(offset int64, whence int) (int64, error) {
-	switch whence {
-	case 0:
-		offset += 0
-	case 1:
-		offset += j.off
-	case 2:
-
-		offset = j.span - offset
-		if offset < 0 {
-			return 0, io.EOF
-		}
-	default:
-		return 0, errWhence
-	}
-
-	if offset < 0 {
-		return 0, errOffset
-	}
-	if offset > j.span {
-		return 0, io.EOF
-	}
-	j.off = offset
-	return offset, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (j *joiner) IterateChunkAddresses(fn swarm.AddressIterFunc) error {
+	_ = "STUB: not implemented"
 	// report root address
-	err := fn(j.addr)
-	if err != nil {
-		return err
-	}
-
-	return j.processChunkAddresses(j.ctx, fn, j.rootData, j.span, j.rootParity)
-}
-
-func (j *joiner) processChunkAddresses(ctx context.Context, fn swarm.AddressIterFunc, data []byte, subTrieSize int64, parity int) error {
-	// we are at a leaf data chunk
-	if subTrieSize <= int64(len(data)) {
-		return nil
-	}
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-
-	eSize, err := file.ChunkPayloadSize(data)
-	if err != nil {
-		return err
-	}
-	addrs, shardCnt := file.ChunkAddresses(data[:eSize], parity, j.refLength)
-	g := store.New(j.decoders.GetOrCreate(addrs, shardCnt))
-	for i, addr := range addrs {
-		if err := fn(addr); err != nil {
-			return err
-		}
-		cursor := i * swarm.HashSize
-		if j.refLength == encryption.ReferenceSize {
-			cursor += swarm.HashSize * min(i, shardCnt)
-		}
-		sec := j.subtrieSection(cursor, eSize, parity, subTrieSize)
-		if sec <= swarm.ChunkSize {
-			continue
-		}
-
-		if j.refLength == encryption.ReferenceSize && i < shardCnt {
-			addr = swarm.NewAddress(data[cursor : cursor+swarm.HashSize*2])
-		}
-
-		// not a shard
-		if i >= shardCnt {
-			continue
-		}
-
-		ch, err := g.Get(ctx, addr)
-		if err != nil {
-			return err
-		}
-
-		chunkData := ch.Data()[8:]
-		subtrieLevel, subtrieSpan := j.chunkToSpan(ch.Data())
-		_, parities := file.ReferenceCount(uint64(subtrieSpan), subtrieLevel, j.refLength != swarm.HashSize)
-
-		err = j.processChunkAddresses(ctx, fn, chunkData, subtrieSpan, parities)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
-func (j *joiner) Size() int64 {
-	return j.span
+func (j *joiner) processChunkAddresses(ctx context.Context, fn swarm.AddressIterFunc, data []byte, subTrieSize int64, parity int) error {
+	_ = "STUB: not implemented"
+	// we are at a leaf data chunk
+	return nil
 }
 
-// chunkToSpan returns redundancy level and span value
-// in the types that the package uses
+// not a shard
+
+func (j *joiner) Size() int64 {
+	_ = "STUB: not implemented"
+
+	// chunkToSpan returns redundancy level and span value
+	// in the types that the package uses
+	return 0
+}
+
 func chunkToSpan(data []byte) (redundancy.Level, int64) {
-	level, spanBytes := redundancy.DecodeSpan(data[:swarm.SpanSize])
-	return level, int64(bmt.LengthFromSpan(spanBytes))
+	_ = "STUB: not implemented"
+	return *new(redundancy.Level), 0
 }

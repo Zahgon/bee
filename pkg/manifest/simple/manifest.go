@@ -6,10 +6,7 @@ package simple
 
 import (
 	"encoding"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
 	"sync"
 )
 
@@ -50,87 +47,30 @@ type manifest struct {
 }
 
 // NewManifest creates a new Manifest struct and returns a pointer to it.
-func NewManifest() Manifest {
-	return &manifest{
-		Entries: make(map[string]*entry),
-	}
-}
+func NewManifest() Manifest { _ = "STUB: not implemented"; return *new(Manifest) }
 
-func notFound(path string) error {
-	return fmt.Errorf("entry on '%s': %w", path, ErrNotFound)
-}
+func notFound(path string) error { _ = "STUB: not implemented"; return nil }
 
 func (m *manifest) Add(path, entry string, metadata map[string]string) error {
-	if path == "" {
-		return ErrEmptyPath
-	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	m.Entries[path] = newEntry(entry, metadata)
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (m *manifest) Remove(path string) error {
-	if path == "" {
-		return ErrEmptyPath
-	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	delete(m.Entries, path)
-
-	return nil
-}
+func (m *manifest) Remove(path string) error { _ = "STUB: not implemented"; return nil }
 
 func (m *manifest) Lookup(path string) (Entry, error) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	entry, ok := m.Entries[path]
-	if !ok {
-		return nil, notFound(path)
-	}
-
-	// return a copy to prevent external modification
-	return newEntry(entry.Reference(), entry.Metadata()), nil
+	_ = "STUB: not implemented"
+	return *new(Entry), nil
 }
 
-func (m *manifest) HasPrefix(path string) bool {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+// return a copy to prevent external modification
 
-	for k := range m.Entries {
-		if strings.HasPrefix(k, path) {
-			return true
-		}
-	}
+func (m *manifest) HasPrefix(path string) bool { _ = "STUB: not implemented"; return false }
 
-	return false
-}
-
-func (m *manifest) Length() int {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	return len(m.Entries)
-}
+func (m *manifest) Length() int { _ = "STUB: not implemented"; return 0 }
 
 // MarshalBinary implements encoding.BinaryMarshaler.
-func (m *manifest) MarshalBinary() ([]byte, error) {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	return json.Marshal(m)
-}
+func (m *manifest) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
-func (m *manifest) UnmarshalBinary(b []byte) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	return json.Unmarshal(b, m)
-}
+func (m *manifest) UnmarshalBinary(b []byte) error { _ = "STUB: not implemented"; return nil }

@@ -7,14 +7,10 @@ package pricing
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math/big"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/p2p"
-	"github.com/ethersphere/bee/v2/pkg/p2p/protobuf"
-	"github.com/ethersphere/bee/v2/pkg/pricing/pb"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -52,60 +48,18 @@ type Service struct {
 }
 
 func New(streamer p2p.Streamer, logger log.Logger, paymentThreshold, lightPaymentThreshold, minThreshold *big.Int) *Service {
-	return &Service{
-		streamer:              streamer,
-		logger:                logger.WithName(loggerName).Register(),
-		paymentThreshold:      paymentThreshold,
-		lightPaymentThreshold: lightPaymentThreshold,
-		minPaymentThreshold:   minThreshold,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Service) Protocol() p2p.ProtocolSpec {
-	return p2p.ProtocolSpec{
-		Name:    protocolName,
-		Version: protocolVersion,
-		StreamSpecs: []p2p.StreamSpec{
-			{
-				Name:    streamName,
-				Handler: s.handler,
-			},
-		},
-		ConnectIn:  s.init,
-		ConnectOut: s.init,
-	}
+	_ = "STUB: not implemented"
+	return *new(p2p.ProtocolSpec)
 }
 
 func (s *Service) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) (err error) {
-	loggerV1 := s.logger.V(1).Register()
-
-	r := protobuf.NewReader(stream)
-	defer func() {
-		if err != nil {
-			_ = stream.Reset()
-		} else {
-			_ = stream.FullClose()
-		}
-	}()
-
-	var req pb.AnnouncePaymentThreshold
-	if err := r.ReadMsgWithContext(ctx, &req); err != nil {
-		s.logger.Debug("could not receive payment threshold and/or price table announcement from peer", "peer_address", p.Address)
-		return fmt.Errorf("read request from peer %v: %w", p.Address, err)
-	}
-
-	paymentThreshold := big.NewInt(0).SetBytes(req.PaymentThreshold)
-	loggerV1.Debug("received payment threshold announcement from peer", "peer_address", p.Address, "payment_threshold", paymentThreshold)
-
-	if paymentThreshold.Cmp(s.minPaymentThreshold) < 0 {
-		loggerV1.Debug("payment threshold from peer too small, need at least min payment threshold", "peer_address", p.Address, "payment_threshold", paymentThreshold, "min_payment_threshold", s.minPaymentThreshold)
-		return p2p.NewDisconnectError(ErrThresholdTooLow)
-	}
-
-	if paymentThreshold.Cmp(big.NewInt(0)) == 0 {
-		return err
-	}
-	return s.paymentThresholdObserver.NotifyPaymentThreshold(p.Address, paymentThreshold)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Service) init(ctx context.Context, p p2p.Peer) error {
@@ -123,33 +77,12 @@ func (s *Service) init(ctx context.Context, p p2p.Peer) error {
 
 // AnnouncePaymentThreshold announces the payment threshold to per
 func (s *Service) AnnouncePaymentThreshold(ctx context.Context, peer swarm.Address, paymentThreshold *big.Int) error {
-	loggerV1 := s.logger.V(1).Register()
-
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	stream, err := s.streamer.NewStream(ctx, peer, nil, protocolName, protocolVersion, streamName)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			_ = stream.Reset()
-		} else {
-			stream.FullClose()
-		}
-	}()
-
-	loggerV1.Debug("sending payment threshold announcement to peer", "peer_address", peer, "payment_threshold", paymentThreshold)
-	w := protobuf.NewWriter(stream)
-	err = w.WriteMsgWithContext(ctx, &pb.AnnouncePaymentThreshold{
-		PaymentThreshold: paymentThreshold.Bytes(),
-	})
-
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetPaymentThresholdObserver sets the PaymentThresholdObserver to be used when receiving a new payment threshold
 func (s *Service) SetPaymentThresholdObserver(observer PaymentThresholdObserver) {
-	s.paymentThresholdObserver = observer
+	_ = "STUB: not implemented"
+	return
 }

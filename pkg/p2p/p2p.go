@@ -9,7 +9,6 @@ package p2p
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"time"
 
@@ -23,9 +22,7 @@ import (
 type ReachabilityStatus network.Reachability
 
 // String implements the fmt.Stringer interface.
-func (rs ReachabilityStatus) String() string {
-	return network.Reachability(rs).String()
-}
+func (rs ReachabilityStatus) String() string { _ = "STUB: not implemented"; return "" }
 
 const (
 	ReachabilityStatusUnknown = ReachabilityStatus(network.ReachabilityUnknown)
@@ -37,17 +34,7 @@ const (
 type NetworkStatus int
 
 // String implements the fmt.Stringer interface.
-func (ns NetworkStatus) String() string {
-	str := [...]string{
-		NetworkStatusUnknown:     "Unknown",
-		NetworkStatusAvailable:   "Available",
-		NetworkStatusUnavailable: "Unavailable",
-	}
-	if ns < 0 || int(ns) >= len(str) {
-		return "(unrecognized)"
-	}
-	return str[ns]
-}
+func (ns NetworkStatus) String() string { _ = "STUB: not implemented"; return "" }
 
 const (
 	NetworkStatusUnknown     NetworkStatus = 0
@@ -227,7 +214,8 @@ const (
 // NewSwarmStreamName constructs a libp2p compatible stream name out of
 // protocol name and version and stream name.
 func NewSwarmStreamName(protocol, version, stream string) string {
-	return "/swarm/" + protocol + "/" + version + "/" + stream
+	_ = "STUB: not implemented"
+	return ""
 }
 
 type ChunkDeliveryError struct {
@@ -235,26 +223,16 @@ type ChunkDeliveryError struct {
 }
 
 // Error implements the error interface.
-func (e *ChunkDeliveryError) Error() string {
-	return fmt.Sprintf("delivery of chunk failed: %s", e.msg)
-}
+func (e *ChunkDeliveryError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // NewChunkDeliveryError is a convenience constructor for ChunkDeliveryError.
-func NewChunkDeliveryError(msg string) error {
-	return &ChunkDeliveryError{msg: msg}
-}
+func NewChunkDeliveryError(msg string) error { _ = "STUB: not implemented"; return nil }
 
 // FilterBee260CompatibleUnderlays select a single underlay to pass if
 // bee260compatibility is true. Otherwise it passes the unmodified underlays
 // slice. This function can be safely removed when bee version 2.6.0 is
 // deprecated.
 func FilterBee260CompatibleUnderlays(bee260compatibility bool, underlays []ma.Multiaddr) []ma.Multiaddr {
-	if !bee260compatibility {
-		return underlays
-	}
-	underlay := bzz.SelectBestAdvertisedAddress(underlays, nil)
-	if underlay == nil {
-		return underlays
-	}
-	return []ma.Multiaddr{underlay}
+	_ = "STUB: not implemented"
+	return nil
 }

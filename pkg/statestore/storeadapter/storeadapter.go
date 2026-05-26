@@ -5,14 +5,7 @@
 package storeadapter
 
 import (
-	"encoding"
-	"encoding/json"
-	"fmt"
-	"strings"
-
 	"github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/migration"
-	"github.com/ethersphere/bee/v2/pkg/storage/storageutil"
 )
 
 // stateStoreNamespace is the namespace used for state storage.
@@ -30,70 +23,32 @@ type proxyItem struct {
 
 // ID implements Item interface.
 func (pi *proxyItem) ID() string {
-	return pi.key
+	_ = "STUB: not implemented"
+
+	// Namespace implements Item interface.
+	return ""
 }
 
-// Namespace implements Item interface.
 func (pi *proxyItem) Namespace() string {
-	return pi.ns
+	_ = "STUB: not implemented"
+
+	// Marshal implements Item interface.
+	return ""
 }
 
-// Marshal implements Item interface.
-func (pi *proxyItem) Marshal() ([]byte, error) {
-	if pi == nil || pi.obj == nil {
-		return nil, nil
-	}
-
-	switch m := pi.obj.(type) {
-	case encoding.BinaryMarshaler:
-		return m.MarshalBinary()
-	case storage.Marshaler:
-		return m.Marshal()
-	}
-	return json.Marshal(pi.obj)
-}
+func (pi *proxyItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Unmarshal implements Item interface.
-func (pi *proxyItem) Unmarshal(data []byte) error {
-	if pi == nil || pi.obj == nil {
-		return nil
-	}
-
-	switch m := pi.obj.(type) {
-	case encoding.BinaryUnmarshaler:
-		return m.UnmarshalBinary(data)
-	case storage.Unmarshaler:
-		return m.Unmarshal(data)
-	}
-	return json.Unmarshal(data, &pi.obj)
-}
+func (pi *proxyItem) Unmarshal(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Clone implements Item interface.
-func (pi *proxyItem) Clone() storage.Item {
-	if pi == nil {
-		return nil
-	}
-
-	obj := pi.obj
-	if cloner, ok := pi.obj.(storage.Cloner); ok {
-		obj = cloner.Clone()
-	}
-	return &proxyItem{
-		ns:  pi.ns,
-		key: pi.key,
-		obj: obj,
-	}
-}
+func (pi *proxyItem) Clone() storage.Item { _ = "STUB: not implemented"; return *new(storage.Item) }
 
 // String implements Item interface.
-func (pi proxyItem) String() string {
-	return storageutil.JoinFields(pi.Namespace(), pi.ID())
-}
+func (pi proxyItem) String() string { _ = "STUB: not implemented"; return "" }
 
 // newProxyItem creates a new proxyItem.
-func newProxyItem(key string, obj any) *proxyItem {
-	return &proxyItem{ns: stateStoreNamespace, key: key, obj: obj}
-}
+func newProxyItem(key string, obj any) *proxyItem { _ = "STUB: not implemented"; return nil }
 
 var _ storage.Item = (*rawItem)(nil)
 
@@ -104,31 +59,10 @@ type rawItem struct {
 }
 
 // Marshal implements Item interface.
-func (ri *rawItem) Marshal() ([]byte, error) {
-	if ri == nil || ri.proxyItem == nil || ri.obj == nil {
-		return nil, nil
-	}
-
-	if buf, ok := ri.obj.([]byte); ok {
-		return buf, nil
-	}
-
-	return ri.proxyItem.Marshal()
-}
+func (ri *rawItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Unmarshal implements Item interface.
-func (ri *rawItem) Unmarshal(data []byte) error {
-	if ri == nil || ri.proxyItem == nil || ri.obj == nil || len(data) == 0 {
-		return nil
-	}
-
-	if buf, ok := ri.obj.([]byte); ok {
-		ri.obj = append(buf[:0], data...)
-		return nil
-	}
-
-	return ri.proxyItem.Unmarshal(data)
-}
+func (ri *rawItem) Unmarshal(data []byte) error { _ = "STUB: not implemented"; return nil }
 
 var (
 	_ storage.StateStorer        = (*StateStorerAdapter)(nil)
@@ -141,116 +75,46 @@ type StateStorerAdapter struct {
 }
 
 // Close implements StateStorer interface.
-func (s *StateStorerAdapter) Close() error {
-	return s.storage.Close()
-}
+func (s *StateStorerAdapter) Close() error { _ = "STUB: not implemented"; return nil }
 
 // Get implements StateStorer interface.
 func (s *StateStorerAdapter) Get(key string, obj any) (err error) {
-	return s.storage.Get(newProxyItem(key, obj))
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Put implements StateStorer interface.
 func (s *StateStorerAdapter) Put(key string, obj any) (err error) {
-	return s.storage.Put(newProxyItem(key, obj))
-}
-
-// Delete implements StateStorer interface.
-func (s *StateStorerAdapter) Delete(key string) (err error) {
-	return s.storage.Delete(newProxyItem(key, nil))
-}
-
-// Iterate implements StateStorer interface.
-func (s *StateStorerAdapter) Iterate(prefix string, iterFunc storage.StateIterFunc) (err error) {
-	return s.storage.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return &rawItem{newProxyItem("", []byte(nil))} },
-			Prefix:  prefix,
-		},
-		func(res storage.Result) (stop bool, err error) {
-			key := []byte(prefix + res.ID)
-			val, err := res.Entry.(*rawItem).Marshal()
-			if err != nil {
-				return false, err
-			}
-			return iterFunc(key, val)
-		},
-	)
-}
-
-func (s *StateStorerAdapter) Nuke() error {
-	var (
-		prefixesToPreserve = []string{
-			"non-mineable-overlay",
-			"overlayV2_nonce",
-			"pseudosettle",
-			"accounting",
-			"swap",
-		}
-		keys []string
-		err  error
-	)
-
-	keys, err = s.collectKeysExcept(prefixesToPreserve)
-	if err != nil {
-		return fmt.Errorf("collect keys except: %w", err)
-	}
-	return s.deleteKeys(keys)
-}
-
-func (s *StateStorerAdapter) ClearForHopping() error {
-	var (
-		prefixesToPreserve = []string{
-			"swap_chequebook", // to not redeploy chequebook contract
-			"batchstore",      // avoid unnecessary syncing
-			"transaction",     // to not resync blockchain transactions
-		}
-		keys []string
-		err  error
-	)
-
-	keys, err = s.collectKeysExcept(prefixesToPreserve)
-	if err != nil {
-		return fmt.Errorf("collect keys except: %w", err)
-	}
-	return s.deleteKeys(keys)
-}
-
-func (s *StateStorerAdapter) collectKeysExcept(prefixesToPreserve []string) (keys []string, err error) {
-	if err := s.Iterate("", func(k, v []byte) (bool, error) {
-		stk := string(k)
-		has := false
-		for _, v := range prefixesToPreserve {
-			if strings.HasPrefix(stk, v) {
-				has = true
-				break
-			}
-		}
-		if !has {
-			keys = append(keys, stk)
-		}
-		return false, nil
-	}); err != nil {
-		return nil, err
-	}
-	return keys, nil
-}
-
-func (s *StateStorerAdapter) deleteKeys(keys []string) error {
-	for _, v := range keys {
-		err := s.Delete(v)
-		if err != nil {
-			return fmt.Errorf("deleting key %s: %w", v, err)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// Delete implements StateStorer interface.
+func (s *StateStorerAdapter) Delete(key string) (err error) { _ = "STUB: not implemented"; return nil }
+
+// Iterate implements StateStorer interface.
+func (s *StateStorerAdapter) Iterate(prefix string, iterFunc storage.StateIterFunc) (err error) {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func (s *StateStorerAdapter) Nuke() error { _ = "STUB: not implemented"; return nil }
+
+func (s *StateStorerAdapter) ClearForHopping() error { _ = "STUB: not implemented"; return nil }
+
+// to not redeploy chequebook contract
+// avoid unnecessary syncing
+// to not resync blockchain transactions
+
+func (s *StateStorerAdapter) collectKeysExcept(prefixesToPreserve []string) (keys []string, err error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (s *StateStorerAdapter) deleteKeys(keys []string) error { _ = "STUB: not implemented"; return nil }
+
 // NewStateStorerAdapter creates a new StateStorerAdapter.
 func NewStateStorerAdapter(storage storage.Store) (*StateStorerAdapter, error) {
-	err := migration.Migrate(storage, "migration", allSteps(storage))
-	if err != nil {
-		return nil, err
-	}
-	return &StateStorerAdapter{storage: storage}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

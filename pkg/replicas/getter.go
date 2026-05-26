@@ -10,10 +10,8 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -43,104 +41,35 @@ type getter struct {
 
 // NewGetter is the getter constructor
 func NewGetter(g storage.Getter, level redundancy.Level) storage.Getter {
-	return &getter{Getter: g, level: level}
+	_ = "STUB: not implemented"
+	return *new(storage.Getter)
 }
 
 // Get makes the getter satisfy the storage.Getter interface
 func (g *getter) Get(ctx context.Context, addr swarm.Address) (ch swarm.Chunk, err error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	// channel that the results (retrieved chunks) are gathered to from concurrent
-	// workers each fetching a replica
-	resultC := make(chan swarm.Chunk)
-	// errc collects the errors
-	errc := make(chan error, 17)
-	var errs error
-	errcnt := 0
-
-	// concurrently call to retrieve chunk using original CAC address
-	g.wg.Go(func() {
-		ch, err := g.Getter.Get(ctx, addr)
-		if err != nil {
-			errc <- err
-			return
-		}
-
-		select {
-		case resultC <- ch:
-		case <-ctx.Done():
-		}
-	})
-	// counters
-	n := 0      // counts the replica addresses tried
-	target := 2 // the number of replicas attempted to download in this batch
-	total := g.level.GetReplicaCount()
-
-	//
-	rr := newReplicator(addr, g.level)
-	next := rr.c
-	var wait <-chan time.Time // nil channel to disable case
-	// addresses used are doubling each period of search expansion
-	// (at intervals of RetryInterval)
-	ticker := time.NewTicker(RetryInterval)
-	defer ticker.Stop()
-	for level := uint8(0); level <= uint8(g.level); {
-		select {
-		// at least one chunk is retrieved, cancel the rest and return early
-		case chunk := <-resultC:
-			cancel()
-			return chunk, nil
-
-		case err = <-errc:
-			errs = errors.Join(errs, err)
-			errcnt++
-			if errcnt > total {
-				return nil, errors.Join(ErrSwarmageddon, errs)
-			}
-
-			// ticker switches on the address channel
-		case <-wait:
-			wait = nil
-			next = rr.c
-			level++
-			target = 1 << level
-			n = 0
-			continue
-
-			// getting the addresses in order
-		case so := <-next:
-			if so == nil {
-				next = nil
-				continue
-			}
-
-			g.wg.Go(func() {
-				ch, err := g.Getter.Get(ctx, swarm.NewAddress(so.addr))
-				if err != nil {
-					errc <- err
-					return
-				}
-
-				soc, err := soc.FromChunk(ch)
-				if err != nil {
-					errc <- err
-					return
-				}
-
-				select {
-				case resultC <- soc.WrappedChunk():
-				case <-ctx.Done():
-				}
-			})
-			n++
-			if n < target {
-				continue
-			}
-			next = nil
-			wait = ticker.C
-		}
-	}
-
-	return nil, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
+
+// channel that the results (retrieved chunks) are gathered to from concurrent
+// workers each fetching a replica
+
+// errc collects the errors
+
+// concurrently call to retrieve chunk using original CAC address
+
+// counters
+// counts the replica addresses tried
+// the number of replicas attempted to download in this batch
+
+//
+
+// nil channel to disable case
+// addresses used are doubling each period of search expansion
+// (at intervals of RetryInterval)
+
+// at least one chunk is retrieved, cancel the rest and return early
+
+// ticker switches on the address channel
+
+// getting the addresses in order

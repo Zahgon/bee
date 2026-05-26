@@ -7,9 +7,7 @@ package feeds
 import (
 	"context"
 
-	"github.com/ethersphere/bee/v2/pkg/cac"
 	"github.com/ethersphere/bee/v2/pkg/crypto"
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -29,32 +27,17 @@ type Putter struct {
 
 // NewPutter constructs a feed Putter
 func NewPutter(putter storage.Putter, signer crypto.Signer, topic []byte) (*Putter, error) {
-	owner, err := signer.EthereumAddress()
-	if err != nil {
-		return nil, err
-	}
-	feed := New(topic, owner)
-	return &Putter{putter, signer, feed}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Put pushes an update to the feed through the chunk stores
 func (u *Putter) Put(ctx context.Context, i Index, payload []byte) error {
-	id, err := u.Feed.Update(i).Id()
-	if err != nil {
-		return err
-	}
-	cac, err := toChunk(payload)
-	if err != nil {
-		return err
-	}
-	s := soc.New(id, cac)
-	ch, err := s.Sign(u.signer)
-	if err != nil {
-		return err
-	}
-	return u.putter.Put(ctx, ch)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func toChunk(payload []byte) (swarm.Chunk, error) {
-	return cac.New(payload)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }

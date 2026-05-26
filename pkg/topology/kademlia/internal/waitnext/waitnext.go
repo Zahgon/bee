@@ -23,52 +23,20 @@ type WaitNext struct {
 	sync.Mutex
 }
 
-func New() *WaitNext {
-	return &WaitNext{
-		next: make(map[string]*next),
-	}
-}
+func New() *WaitNext { _ = "STUB: not implemented"; return nil }
 
 func (r *WaitNext) Set(addr swarm.Address, tryAfter time.Time, attempts int) {
-	r.Lock()
-	defer r.Unlock()
-
-	r.next[addr.ByteString()] = &next{tryAfter: tryAfter, failedAttempts: attempts}
+	_ = "STUB: not implemented"
+	return
 }
 
 func (r *WaitNext) SetTryAfter(addr swarm.Address, tryAfter time.Time) {
-	r.Lock()
-	defer r.Unlock()
-
-	if info, ok := r.next[addr.ByteString()]; ok {
-		info.tryAfter = tryAfter
-	} else {
-		r.next[addr.ByteString()] = &next{tryAfter: tryAfter}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
-func (r *WaitNext) Waiting(addr swarm.Address) bool {
-	r.Lock()
-	defer r.Unlock()
+func (r *WaitNext) Waiting(addr swarm.Address) bool { _ = "STUB: not implemented"; return false }
 
-	info, ok := r.next[addr.ByteString()]
-	return ok && time.Now().Before(info.tryAfter)
-}
+func (r *WaitNext) Attempts(addr swarm.Address) int { _ = "STUB: not implemented"; return 0 }
 
-func (r *WaitNext) Attempts(addr swarm.Address) int {
-	r.Lock()
-	defer r.Unlock()
-
-	if info, ok := r.next[addr.ByteString()]; ok {
-		return info.failedAttempts
-	}
-
-	return 0
-}
-
-func (r *WaitNext) Remove(addr swarm.Address) {
-	r.Lock()
-	defer r.Unlock()
-
-	delete(r.next, addr.ByteString())
-}
+func (r *WaitNext) Remove(addr swarm.Address) { _ = "STUB: not implemented"; return }

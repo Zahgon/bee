@@ -29,24 +29,15 @@ type Proof struct {
 // Sum zero-pads any unwritten sections (so every leaf section in the BMT is
 // populated and Proof paths are reconstructible), then computes the BMT root
 // and appends it to b. Shadows the promoted goroutineHasher.Sum.
-func (p *Prover) Sum(b []byte) []byte {
-	for i := p.size; i < p.maxSize; i += len(zerosection) {
-		_, _ = p.Write(zerosection)
-	}
-	return p.goroutineHasher.Sum(b)
-}
+func (p *Prover) Sum(b []byte) []byte { _ = "STUB: not implemented"; return nil }
 
 // NewProver returns a Prover backed by a freshly allocated goroutine-based
 // BMT hasher, independent of the SIMD opt-in flag.
-func NewProver() *Prover {
-	return &Prover{goroutineHasher: newGoroutineHasher()}
-}
+func NewProver() *Prover { _ = "STUB: not implemented"; return nil }
 
 // NewPrefixProver is NewProver with an optional keccak prefix prepended to every
 // BMT node hash. Also goroutine-backed regardless of SIMDOptIn.
-func NewPrefixProver(prefix []byte) *Prover {
-	return &Prover{goroutineHasher: newGoroutinePrefixHasher(prefix)}
-}
+func NewPrefixProver(prefix []byte) *Prover { _ = "STUB: not implemented"; return nil }
 
 // ProverPool is a pool of goroutine-backed Provers. Ignores SIMDOptIn by design.
 type ProverPool interface {
@@ -56,6 +47,4 @@ type ProverPool interface {
 
 // NewProverPool returns a pool of goroutine-backed Provers, independent of
 // SIMDOptIn. See Prover for the rationale.
-func NewProverPool(c *Conf) ProverPool {
-	return newGoroutineProverPool(c)
-}
+func NewProverPool(c *Conf) ProverPool { _ = "STUB: not implemented"; return *new(ProverPool) }

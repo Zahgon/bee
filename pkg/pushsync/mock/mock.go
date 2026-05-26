@@ -16,13 +16,13 @@ type mock struct {
 }
 
 func New(sendChunk func(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error)) pushsync.PushSyncer {
-	return &mock{sendChunk: sendChunk}
+	_ = "STUB: not implemented"
+	return *new(pushsync.PushSyncer)
 }
 
 func (s *mock) PushChunkToClosest(ctx context.Context, chunk swarm.Chunk) (*pushsync.Receipt, error) {
-	return s.sendChunk(ctx, chunk)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *mock) Close() error {
-	return nil
-}
+func (s *mock) Close() error { _ = "STUB: not implemented"; return nil }

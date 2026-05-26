@@ -6,7 +6,6 @@ package libp2p
 
 import (
 	"errors"
-	"io"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/p2p"
@@ -26,50 +25,23 @@ type stream struct {
 	metrics         metrics
 }
 
-func newStream(s network.Stream, metrics metrics) *stream {
-	return &stream{Stream: s, metrics: metrics}
-}
+func newStream(s network.Stream, metrics metrics) *stream { _ = "STUB: not implemented"; return nil }
 
-func (s *stream) Headers() p2p.Headers {
-	return s.headers
-}
+func (s *stream) Headers() p2p.Headers { _ = "STUB: not implemented"; return *new(p2p.Headers) }
 
-func (s *stream) ResponseHeaders() p2p.Headers {
-	return s.responseHeaders
-}
+func (s *stream) ResponseHeaders() p2p.Headers { _ = "STUB: not implemented"; return *new(p2p.Headers) }
 
-func (s *stream) Reset() error {
-	defer s.metrics.StreamResetCount.Inc()
-	return s.Stream.Reset()
-}
+func (s *stream) Reset() error { _ = "STUB: not implemented"; return nil }
 
-func (s *stream) FullClose() error {
-	defer s.metrics.ClosedStreamCount.Inc()
-	// close the stream to make sure it is gc'd
-	defer s.Close()
+func (s *stream) FullClose() error { _ = "STUB: not implemented"; return nil }
 
-	if err := s.CloseWrite(); err != nil {
-		_ = s.Stream.Reset()
-		return err
-	}
+// close the stream to make sure it is gc'd
 
-	// So we don't wait forever
-	_ = s.SetDeadline(time.Now().Add(closeDeadline))
+// So we don't wait forever
 
-	// We *have* to observe the EOF. Otherwise, we leak the stream.
-	// Now, technically, we should do this *before*
-	// returning from SendMessage as the message
-	// hasn't really been sent yet until we see the
-	// EOF but we don't actually *know* what
-	// protocol the other side is speaking.
-	n, err := s.Read([]byte{0})
-	if n > 0 || err == nil {
-		_ = s.Stream.Reset()
-		return errExpectedEof
-	}
-	if !errors.Is(err, io.EOF) {
-		_ = s.Stream.Reset()
-		return err
-	}
-	return nil
-}
+// We *have* to observe the EOF. Otherwise, we leak the stream.
+// Now, technically, we should do this *before*
+// returning from SendMessage as the message
+// hasn't really been sent yet until we see the
+// EOF but we don't actually *know* what
+// protocol the other side is speaking.

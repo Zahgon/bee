@@ -6,8 +6,6 @@ package factory
 
 import (
 	"github.com/ethersphere/bee/v2/pkg/feeds"
-	"github.com/ethersphere/bee/v2/pkg/feeds/epochs"
-	"github.com/ethersphere/bee/v2/pkg/feeds/sequence"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 )
 
@@ -16,16 +14,11 @@ type factory struct {
 }
 
 func New(getter storage.Getter) feeds.Factory {
-	return &factory{getter}
+	_ = "STUB: not implemented"
+	return *new(feeds.Factory)
 }
 
 func (f *factory) NewLookup(t feeds.Type, feed *feeds.Feed) (feeds.Lookup, error) {
-	switch t {
-	case feeds.Sequence:
-		return sequence.NewAsyncFinder(f.Getter, feed), nil
-	case feeds.Epoch:
-		return epochs.NewAsyncFinder(f.Getter, feed), nil
-	}
-
-	return nil, feeds.ErrFeedTypeNotFound
+	_ = "STUB: not implemented"
+	return *new(feeds.Lookup), nil
 }

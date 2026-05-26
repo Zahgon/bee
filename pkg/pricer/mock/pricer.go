@@ -13,17 +13,11 @@ type MockPricer struct {
 	price     uint64
 }
 
-func NewMockService(price, peerPrice uint64) *MockPricer {
-	return &MockPricer{
-		peerPrice: peerPrice,
-		price:     price,
-	}
-}
+func NewMockService(price, peerPrice uint64) *MockPricer { _ = "STUB: not implemented"; return nil }
 
 func (pricer *MockPricer) PeerPrice(peer, chunk swarm.Address) uint64 {
-	return pricer.peerPrice
+	_ = "STUB: not implemented"
+	return 0
 }
 
-func (pricer *MockPricer) Price(chunk swarm.Address) uint64 {
-	return pricer.price
-}
+func (pricer *MockPricer) Price(chunk swarm.Address) uint64 { _ = "STUB: not implemented"; return 0 }

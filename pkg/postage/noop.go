@@ -18,35 +18,45 @@ var ErrChainDisabled = errors.New("chain disabled")
 // NoOpBatchStore is a placeholder implementation for postage.Storer
 type NoOpBatchStore struct{}
 
-func (b *NoOpBatchStore) SetBatchExpiryHandler(BatchExpiryHandler) {}
-
-func (b *NoOpBatchStore) Get([]byte) (*Batch, error) { return nil, ErrChainDisabled }
-
-func (b *NoOpBatchStore) Exists([]byte) (bool, error) { return false, nil }
-
-func (b *NoOpBatchStore) Iterate(func(*Batch) (bool, error)) error { return nil }
-
-func (b *NoOpBatchStore) Save(*Batch) error { return nil }
-
-func (b *NoOpBatchStore) Update(*Batch, *big.Int, uint8) error { return nil }
-
-func (b *NoOpBatchStore) GetChainState() *ChainState {
-	return &ChainState{
-		TotalAmount:  new(big.Int),
-		CurrentPrice: new(big.Int),
-	}
+func (b *NoOpBatchStore) SetBatchExpiryHandler(BatchExpiryHandler) {
+	_ = "STUB: not implemented"
+	return
 }
 
-func (b *NoOpBatchStore) PutChainState(*ChainState) error { return nil }
+func (b *NoOpBatchStore) Get([]byte) (*Batch, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (b *NoOpBatchStore) Radius() uint8 { return 0 }
+func (b *NoOpBatchStore) Exists([]byte) (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
-func (b *NoOpBatchStore) IsWithinStorageRadius(swarm.Address) bool { return false }
+func (b *NoOpBatchStore) Iterate(func(*Batch) (bool, error)) error {
+	_ = "STUB: not implemented"
+	return nil
+}
 
-func (b *NoOpBatchStore) StorageRadius() uint8 { return 0 }
+func (b *NoOpBatchStore) Save(*Batch) error { _ = "STUB: not implemented"; return nil }
 
-func (b *NoOpBatchStore) SetStorageRadius(func(uint8) uint8) error { return nil }
+func (b *NoOpBatchStore) Update(*Batch, *big.Int, uint8) error {
+	_ = "STUB: not implemented"
+	return nil
+}
 
-func (b *NoOpBatchStore) Commitment() (uint64, error) { return 0, nil }
+func (b *NoOpBatchStore) GetChainState() *ChainState { _ = "STUB: not implemented"; return nil }
 
-func (b *NoOpBatchStore) Reset() error { return nil }
+func (b *NoOpBatchStore) PutChainState(*ChainState) error { _ = "STUB: not implemented"; return nil }
+
+func (b *NoOpBatchStore) Radius() uint8 { _ = "STUB: not implemented"; return 0 }
+
+func (b *NoOpBatchStore) IsWithinStorageRadius(swarm.Address) bool {
+	_ = "STUB: not implemented"
+	return false
+}
+
+func (b *NoOpBatchStore) StorageRadius() uint8 { _ = "STUB: not implemented"; return 0 }
+
+func (b *NoOpBatchStore) SetStorageRadius(func(uint8) uint8) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+func (b *NoOpBatchStore) Commitment() (uint64, error) { _ = "STUB: not implemented"; return 0, nil }
+
+func (b *NoOpBatchStore) Reset() error { _ = "STUB: not implemented"; return nil }

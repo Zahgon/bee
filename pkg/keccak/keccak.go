@@ -36,36 +36,24 @@
 // would work on its own in an all-same-length call.
 package keccak
 
-import "encoding/hex"
-
 // Hash256 represents a 32-byte Keccak-256 hash
 type Hash256 [32]byte
 
 // HexString returns the hash as a hexadecimal string
-func (h Hash256) HexString() string {
-	return hex.EncodeToString(h[:])
-}
+func (h Hash256) HexString() string { _ = "STUB: not implemented"; return "" }
 
 // HasAVX512 reports whether the CPU supports AVX-512 (F + VL) and the
 // AVX-512 code path is available.
 func HasAVX512() bool {
-	return hasAVX512
+	_ = "STUB: not implemented"
+
+	// HasSIMD reports whether any SIMD-accelerated Keccak path is available
+	// (AVX2 or AVX-512).
+	return false
 }
 
-// HasSIMD reports whether any SIMD-accelerated Keccak path is available
-// (AVX2 or AVX-512).
-func HasSIMD() bool {
-	return hasAVX2 || hasAVX512
-}
+func HasSIMD() bool { _ = "STUB: not implemented"; return false }
 
 // BatchWidth returns the SIMD batch width: 8 for AVX-512, 4 for AVX2, or 0
 // if no SIMD acceleration is available.
-func BatchWidth() int {
-	if hasAVX512 {
-		return 8
-	}
-	if hasAVX2 {
-		return 4
-	}
-	return 0
-}
+func BatchWidth() int { _ = "STUB: not implemented"; return 0 }

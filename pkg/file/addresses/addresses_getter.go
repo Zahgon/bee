@@ -19,14 +19,11 @@ type addressesGetterStore struct {
 // NewGetter creates a new proxy storage.Getter which calls provided function
 // for each chunk address processed.
 func NewGetter(getter storage.Getter, fn swarm.AddressIterFunc) storage.Getter {
-	return &addressesGetterStore{getter, fn}
+	_ = "STUB: not implemented"
+	return *new(storage.Getter)
 }
 
 func (s *addressesGetterStore) Get(ctx context.Context, addr swarm.Address) (swarm.Chunk, error) {
-	ch, err := s.getter.Get(ctx, addr)
-	if err != nil {
-		return nil, err
-	}
-
-	return ch, s.fn(ch.Address())
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }

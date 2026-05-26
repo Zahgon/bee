@@ -5,7 +5,6 @@
 package pseudosettle
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -21,49 +20,6 @@ type metrics struct {
 	SentPseudoSettlementsErrors     prometheus.Counter
 }
 
-func newMetrics() metrics {
-	subsystem := "pseudosettle"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		TotalReceivedPseudoSettlements: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "total_received_pseudosettlements",
-			Help:      "Amount of time settlements received from peers (income of the node)",
-		}),
-		TotalSentPseudoSettlements: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "total_sent_pseudosettlements",
-			Help:      "Amount of  of time settlements sent to peers (costs paid by the node)",
-		}),
-		ReceivedPseudoSettlements: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "received_pseudosettlements",
-			Help:      "Number of time settlements received from peers",
-		}),
-		SentPseudoSettlements: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "sent_pseudosettlements",
-			Help:      "Number of time settlements sent to peers",
-		}),
-		ReceivedPseudoSettlementsErrors: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "received_pseudosettlements_errors",
-			Help:      "Errors of time settlements received from peers",
-		}),
-		SentPseudoSettlementsErrors: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "sent_pseudosettlements_errorss",
-			Help:      "Errors of time settlements sent to peers",
-		}),
-	}
-}
-
-func (s *Service) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(s.metrics)
-}
+func (s *Service) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

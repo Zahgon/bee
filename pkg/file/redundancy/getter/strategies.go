@@ -6,7 +6,6 @@ package getter
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
@@ -53,79 +52,35 @@ var DefaultConfig = Config{
 
 // NewConfigFromContext returns a new Config based on the context
 func NewConfigFromContext(ctx context.Context, def Config) (conf Config, err error) {
-	var ok bool
-	conf = def
-	e := func(s string) error {
-		return fmt.Errorf("error setting %s from context", s)
-	}
-	if val := ctx.Value(strategyKey{}); val != nil {
-		conf.Strategy, ok = val.(Strategy)
-		if !ok {
-			return conf, e("strategy")
-		}
-	}
-	if val := ctx.Value(modeKey{}); val != nil {
-		conf.Strict, ok = val.(bool)
-		if !ok {
-			return conf, e("fallback mode")
-		}
-	}
-	if val := ctx.Value(fetchTimeoutKey{}); val != nil {
-		conf.FetchTimeout, ok = val.(time.Duration)
-		if !ok {
-			return conf, e("fetcher timeout")
-		}
-	}
-	if val := ctx.Value(loggerKey{}); val != nil {
-		conf.Logger, ok = val.(log.Logger)
-		if !ok {
-			return conf, e("strategy timeout")
-		}
-	}
-
-	return conf, nil
+	_ = "STUB: not implemented"
+	return *new(Config), nil
 }
 
 // SetStrategy sets the strategy for the retrieval
 func SetStrategy(ctx context.Context, s Strategy) context.Context {
-	return context.WithValue(ctx, strategyKey{}, s)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // SetStrict sets the strict mode for the retrieval
 func SetStrict(ctx context.Context, strict bool) context.Context {
-	return context.WithValue(ctx, modeKey{}, strict)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // SetFetchTimeout sets the timeout for each fetch
 func SetFetchTimeout(ctx context.Context, timeout time.Duration) context.Context {
-	return context.WithValue(ctx, fetchTimeoutKey{}, timeout)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 func SetLogger(ctx context.Context, l log.Logger) context.Context {
-	return context.WithValue(ctx, loggerKey{}, l)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // SetConfigInContext sets the config params in the context
 func SetConfigInContext(ctx context.Context, s *Strategy, fallbackmode *bool, fetchTimeout *string, logger log.Logger) (context.Context, error) {
-	if s != nil {
-		ctx = SetStrategy(ctx, *s)
-	}
-
-	if fallbackmode != nil {
-		ctx = SetStrict(ctx, !(*fallbackmode))
-	}
-
-	if fetchTimeout != nil {
-		dur, err := time.ParseDuration(*fetchTimeout)
-		if err != nil {
-			return nil, err
-		}
-		ctx = SetFetchTimeout(ctx, dur)
-	}
-
-	if logger != nil {
-		ctx = SetLogger(ctx, logger)
-	}
-
-	return ctx, nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }

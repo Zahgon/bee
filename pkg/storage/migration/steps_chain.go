@@ -6,14 +6,4 @@ package migration
 
 // NewStepsChain returns new StepFn which combines all supplied StepFn
 // into single StepFn.
-func NewStepsChain(steps ...StepFn) StepFn {
-	return func() error {
-		for _, stepFn := range steps {
-			if err := stepFn(); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-}
+func NewStepsChain(steps ...StepFn) StepFn { _ = "STUB: not implemented"; return *new(StepFn) }

@@ -6,8 +6,6 @@ package sharky
 
 import (
 	"context"
-	"encoding/binary"
-	"fmt"
 	"io"
 )
 
@@ -21,35 +19,18 @@ type Location struct {
 	Length uint16
 }
 
-func (l Location) String() string {
-	return fmt.Sprintf("shard: %d, slot: %d, length: %d", l.Shard, l.Slot, l.Length)
-}
+func (l Location) String() string { _ = "STUB: not implemented"; return "" }
 
 // MarshalBinary returns byte representation of location
-func (l *Location) MarshalBinary() ([]byte, error) {
-	b := make([]byte, LocationSize)
-	b[0] = l.Shard
-	binary.LittleEndian.PutUint32(b[1:5], l.Slot)
-	binary.LittleEndian.PutUint16(b[5:], l.Length)
-	return b, nil
-}
+func (l *Location) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // UnmarshalBinary constructs the location from byte representation
-func (l *Location) UnmarshalBinary(buf []byte) error {
-	l.Shard = buf[0]
-	l.Slot = binary.LittleEndian.Uint32(buf[1:5])
-	l.Length = binary.LittleEndian.Uint16(buf[5:])
-	return nil
-}
+func (l *Location) UnmarshalBinary(buf []byte) error { _ = "STUB: not implemented"; return nil }
 
 // LocationFromBinary is a helper to construct a Location object from byte representation
 func LocationFromBinary(buf []byte) (Location, error) {
-	l := new(Location)
-	err := l.UnmarshalBinary(buf)
-	if err != nil {
-		return Location{}, err
-	}
-	return *l, nil
+	_ = "STUB: not implemented"
+	return *new(Location), nil
 }
 
 // sharkyFile defines the minimal interface that is required for a file type for it to
@@ -96,106 +77,49 @@ type shard struct {
 }
 
 // forever loop processing
-func (sh *shard) process() {
-	var writes chan write
-	var slot uint32
-	defer func() {
-		// this condition checks if an slot is in limbo (popped but not used for write op)
-		if writes != nil {
-			sh.slots.limboWG.Go(func() {
-				sh.slots.in <- slot
-			})
-		}
-	}()
-	free := sh.slots.out
+func (sh *shard) process() { _ = "STUB: not implemented"; return }
 
-	for {
-		select {
-		case op := <-sh.reads:
-			select {
-			case sh.errc <- sh.read(op):
-			case <-op.ctx.Done():
-				// since the goroutine in the Read method can quit
-				// on shutdown, we need to make sure that we can actually
-				// write to the channel, since a shutdown is possible in
-				// theory between after the point that the context is cancelled
-				select {
-				case sh.errc <- op.ctx.Err():
-				case <-sh.quit:
-					// since the Read method respects the quit channel
-					// we can safely quit here without writing to the channel
-					return
-				}
-			case <-sh.quit:
-				return
-			}
+// this condition checks if an slot is in limbo (popped but not used for write op)
 
-			// only enabled if there is a free slot previously popped
-		case op := <-writes:
-			op.res <- sh.write(op.buf, slot)
-			free = sh.slots.out // re-enable popping a free slot next time we can write
-			writes = nil        // disable popping a write operation until there is a free slot
+// since the goroutine in the Read method can quit
+// on shutdown, we need to make sure that we can actually
+// write to the channel, since a shutdown is possible in
+// theory between after the point that the context is cancelled
 
-			// pop a free slot
-		case slot = <-free:
-			// only if there is one can we pop a chunk to write otherwise keep back pressure on writes
-			// effectively enforcing another shard to be chosen
-			writes = sh.writes // enable popping a write operation
-			free = nil         // disabling getting a new slot until a write is actually done
+// since the Read method respects the quit channel
+// we can safely quit here without writing to the channel
 
-		case <-sh.quit:
-			return
-		}
-	}
-}
+// only enabled if there is a free slot previously popped
+
+// re-enable popping a free slot next time we can write
+// disable popping a write operation until there is a free slot
+
+// pop a free slot
+
+// only if there is one can we pop a chunk to write otherwise keep back pressure on writes
+// effectively enforcing another shard to be chosen
+// enable popping a write operation
+// disabling getting a new slot until a write is actually done
 
 // close closes the shard:
 // wait for pending operations to finish then saves free slots and blobs on disk
-func (sh *shard) close() error {
-	sh.slots.wg.Wait()
-	if err := sh.slots.save(); err != nil {
-		return err
-	}
-	if err := sh.slots.file.Close(); err != nil {
-		return err
-	}
-	return sh.file.Close()
-}
+func (sh *shard) close() error { _ = "STUB: not implemented"; return nil }
 
 // offset calculates the offset from the slot
 // this is possible since all blobs are of fixed size
-func (sh *shard) offset(slot uint32) int64 {
-	return int64(slot) * int64(sh.maxDataSize)
-}
+func (sh *shard) offset(slot uint32) int64 { _ = "STUB: not implemented"; return 0 }
 
 // read reads loc.Length bytes to the buffer from the blob slot loc.Slot
-func (sh *shard) read(r read) error {
-	n, err := sh.file.ReadAt(r.buf, sh.offset(r.slot))
-	if err != nil {
-		return fmt.Errorf("read %d: %w", n, err)
-	}
-	return nil
-}
+func (sh *shard) read(r read) error { _ = "STUB: not implemented"; return nil }
 
 // write writes loc.Length bytes to the buffer from the blob slot loc.Slot
 func (sh *shard) write(buf []byte, slot uint32) entry {
-	n, err := sh.file.WriteAt(buf, sh.offset(slot))
-	return entry{
-		loc: Location{
-			Shard:  sh.index,
-			Slot:   slot,
-			Length: uint16(n),
-		},
-		err: err,
-	}
+	_ = "STUB: not implemented"
+	return *new(entry)
 }
 
 // release frees the slot allowing new entry to overwrite
 func (sh *shard) release(ctx context.Context, slot uint32) error {
-	select {
-	case sh.slots.in <- slot:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

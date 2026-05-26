@@ -22,11 +22,10 @@ type Conf struct {
 }
 
 // NewConf returns a new Conf for the given segment count and pool capacity.
-func NewConf(segmentCount, capacity int) *Conf {
-	return &Conf{SegmentCount: segmentCount, Capacity: capacity}
-}
+func NewConf(segmentCount, capacity int) *Conf { _ = "STUB: not implemented"; return nil }
 
 // NewConfWithPrefix is like NewConf but with an optional prefix prepended to every hash operation.
 func NewConfWithPrefix(prefix []byte, segmentCount, capacity int) *Conf {
-	return &Conf{SegmentCount: segmentCount, Capacity: capacity, Prefix: prefix}
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -16,33 +16,25 @@ type Service struct {
 	deduct *big.Int
 }
 
-func New(rate, deduct *big.Int) Service {
-	return Service{
-		rate:   rate,
-		deduct: deduct,
-	}
-}
+func New(rate, deduct *big.Int) Service { _ = "STUB: not implemented"; return *new(Service) }
 
-func (s Service) Start() {
-}
+func (s Service) Start() { _ = "STUB: not implemented"; return }
 
 func (s Service) GetPrice(ctx context.Context) (*big.Int, *big.Int, error) {
-	return s.rate, s.deduct, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (s Service) CurrentRates() (exchangeRate, deduction *big.Int, err error) {
-	return s.rate, s.deduct, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
-func (s Service) Close() error {
-	return nil
-}
+func (s Service) Close() error { _ = "STUB: not implemented"; return nil }
 
 func DiscoverPriceOracleAddress(chainID int64) (priceOracleAddress common.Address, found bool) {
-	return common.Address{}, false
+	_ = "STUB: not implemented"
+	return *new(common.Address), false
 }
 
-func (s *Service) SetValues(rate, deduct *big.Int) {
-	s.rate = rate
-	s.deduct = deduct
-}
+func (s *Service) SetValues(rate, deduct *big.Int) { _ = "STUB: not implemented"; return }

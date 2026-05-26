@@ -5,10 +5,7 @@
 package mock
 
 import (
-	"fmt"
-
 	"github.com/ethersphere/bee/v2/pkg/resolver"
-	"github.com/ethersphere/bee/v2/pkg/resolver/client/ens"
 )
 
 // Assure mock Resolver implements the Resolver interface.
@@ -25,34 +22,23 @@ type Option func(*Resolver)
 
 // NewResolver will create a new mock Resolver.
 func NewResolver(opts ...Option) resolver.Interface {
-	r := &Resolver{}
+	_ = "STUB: not implemented"
 
 	// Apply all options.
-	for _, o := range opts {
-		o(r)
-	}
-
-	return r
+	return *new(resolver.Interface)
 }
 
 // WithResolveFunc will override the Resolve function implementation.
 func WithResolveFunc(f func(string) (resolver.Address, error)) Option {
-	return func(r *Resolver) {
-		r.resolveFunc = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // Resolve implements the Resolver interface.
 func (r *Resolver) Resolve(name string) (resolver.Address, error) {
-	if r.resolveFunc != nil {
-		return r.resolveFunc(name)
-	}
-	return resolver.Address{}, fmt.Errorf("resolveFunc: %w", ens.ErrNotImplemented)
+	_ = "STUB: not implemented"
+	return *new(resolver.Address), nil
 }
 
 // Close implements the Resolver interface.
-func (r *Resolver) Close() error {
-	r.IsClosed = true
-
-	return nil
-}
+func (r *Resolver) Close() error { _ = "STUB: not implemented"; return nil }

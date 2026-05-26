@@ -26,40 +26,21 @@ var (
 )
 
 func MakeSettlementHeaders(exchangeRate, deduction *big.Int) p2p.Headers {
-	return p2p.Headers{
-		exchangeRateFieldName: exchangeRate.Bytes(),
-		deductionFieldName:    deduction.Bytes(),
-	}
+	_ = "STUB: not implemented"
+	return *new(p2p.Headers)
 }
 
 func ParseSettlementResponseHeaders(receivedHeaders p2p.Headers) (exchange, deduction *big.Int, err error) {
-	exchangeRate, err := ParseExchangeHeader(receivedHeaders)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	deduction, err = ParseDeductionHeader(receivedHeaders)
-	if err != nil {
-		return exchangeRate, nil, err
-	}
-
-	return exchangeRate, deduction, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func ParseExchangeHeader(receivedHeaders p2p.Headers) (*big.Int, error) {
-	if receivedHeaders[exchangeRateFieldName] == nil {
-		return nil, ErrNoExchangeHeader
-	}
-
-	exchange := new(big.Int).SetBytes(receivedHeaders[exchangeRateFieldName])
-	return exchange, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func ParseDeductionHeader(receivedHeaders p2p.Headers) (*big.Int, error) {
-	if receivedHeaders[deductionFieldName] == nil {
-		return nil, ErrNoDeductionHeader
-	}
-
-	deduced := new(big.Int).SetBytes(receivedHeaders[deductionFieldName])
-	return deduced, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

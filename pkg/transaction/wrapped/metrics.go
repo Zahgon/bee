@@ -5,7 +5,6 @@
 package wrapped
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -28,105 +27,6 @@ type metrics struct {
 	ChainIDCalls                  prometheus.Counter
 }
 
-func newMetrics() metrics {
-	subsystem := "eth_backend"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		TotalRPCCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "total_rpc_calls",
-			Help:      "Count of rpc calls",
-		}),
-		TotalRPCErrors: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "total_rpc_errors",
-			Help:      "Count of rpc errors",
-		}),
-		TransactionCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_transaction",
-			Help:      "Count of eth_getTransaction rpc calls",
-		}),
-		TransactionReceiptCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_transaction_receipt",
-			Help:      "Count of eth_getTransactionReceipt rpc errors",
-		}),
-		BlockHeaderAsBlockNumberCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_block_header_as_block_number",
-			Help:      "Count of eth_getBlockByNumber for getting block number rpc calls",
-		}),
-		BlockHeaderCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_block_header",
-			Help:      "Count of eth_getBlockByNumber (header only) calls",
-		}),
-		BalanceCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_balance",
-			Help:      "Count of eth_getBalance rpc calls",
-		}),
-		NonceAtCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_nonce_at",
-			Help:      "Count of eth_getTransactionCount (pending false) rpc calls",
-		}),
-		PendingNonceCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_pending_nonce_at",
-			Help:      "Count of eth_getTransactionCount (pending true) rpc calls",
-		}),
-		CallContractCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_eth_call",
-			Help:      "Count of eth_call rpc calls",
-		}),
-		SuggestGasTipCapCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_suggest_gas_tip_cap",
-			Help:      "Count of eth_maxPriorityFeePerGas rpc calls",
-		}),
-		EstimateGasCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_estimate_gasprice",
-			Help:      "Count of eth_estimateGas rpc calls",
-		}),
-		SendTransactionCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_send_transaction",
-			Help:      "Count of eth_sendRawTransaction rpc calls",
-		}),
-		FilterLogsCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_filter_logs",
-			Help:      "Count of eth_getLogs rpc calls",
-		}),
-		ChainIDCalls: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "calls_chain_id",
-			Help:      "Count of eth_chainId rpc calls",
-		}),
-	}
-}
-
-func (b *wrappedBackend) Metrics() []prometheus.Collector {
-	collectors := m.PrometheusCollectorsFromFields(b.metrics)
-	collectors = append(collectors, b.blockNumberCache.Collectors()...)
-	return collectors
-}
+func (b *wrappedBackend) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

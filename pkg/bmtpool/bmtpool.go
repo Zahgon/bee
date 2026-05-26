@@ -45,27 +45,16 @@ func init() {
 // after CLI flag parsing and before the first external Get, so that
 // --use-simd-hashing takes effect and no in-flight hashers are referencing the
 // old pool's tree. The Prover pool is intentionally not rebuilt.
-func Rebuild() {
-	p := bmt.NewPool(bmt.NewConf(swarm.BmtBranches, Capacity))
-	instance.Store(&p)
-}
+func Rebuild() { _ = "STUB: not implemented"; return }
 
 // Get a bmt Hasher instance. Instances are reset before being returned to the caller.
-func Get() bmt.Hasher {
-	return (*instance.Load()).Get()
-}
+func Get() bmt.Hasher { _ = "STUB: not implemented"; return *new(bmt.Hasher) }
 
 // Put a bmt Hasher back into the pool.
-func Put(h bmt.Hasher) {
-	(*instance.Load()).Put(h)
-}
+func Put(h bmt.Hasher) { _ = "STUB: not implemented"; return }
 
 // GetProver returns a goroutine-backed Prover from the global prover pool.
-func GetProver() *bmt.Prover {
-	return proverInstance.GetProver()
-}
+func GetProver() *bmt.Prover { _ = "STUB: not implemented"; return nil }
 
 // PutProver returns a Prover to the global prover pool for reuse.
-func PutProver(p *bmt.Prover) {
-	proverInstance.PutProver(p)
-}
+func PutProver(p *bmt.Prover) { _ = "STUB: not implemented"; return }

@@ -9,20 +9,12 @@ package api
 import (
 	"context"
 	"crypto/ecdsa"
-	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
-	"math"
-	"math/big"
 	"net/http"
-	"reflect"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
-	"unicode/utf8"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethersphere/bee/v2/pkg/accesscontrol"
@@ -30,10 +22,8 @@ import (
 	"github.com/ethersphere/bee/v2/pkg/crypto"
 	"github.com/ethersphere/bee/v2/pkg/feeds"
 	"github.com/ethersphere/bee/v2/pkg/file/pipeline"
-	"github.com/ethersphere/bee/v2/pkg/file/pipeline/builder"
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
 	"github.com/ethersphere/bee/v2/pkg/gsoc"
-	"github.com/ethersphere/bee/v2/pkg/jsonhttp"
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/p2p"
 	"github.com/ethersphere/bee/v2/pkg/pingpong"
@@ -41,9 +31,6 @@ import (
 	"github.com/ethersphere/bee/v2/pkg/postage/postagecontract"
 	"github.com/ethersphere/bee/v2/pkg/pss"
 	"github.com/ethersphere/bee/v2/pkg/resolver"
-	"github.com/ethersphere/bee/v2/pkg/resolver/client/ens"
-	"github.com/ethersphere/bee/v2/pkg/resolver/multiresolver"
-	"github.com/ethersphere/bee/v2/pkg/sctx"
 	"github.com/ethersphere/bee/v2/pkg/settlement"
 	"github.com/ethersphere/bee/v2/pkg/settlement/swap"
 	"github.com/ethersphere/bee/v2/pkg/settlement/swap/chequebook"
@@ -61,7 +48,6 @@ import (
 	"github.com/ethersphere/bee/v2/pkg/transaction"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-	"github.com/hashicorp/go-multierror"
 	"github.com/prometheus/client_golang/prometheus"
 	"golang.org/x/sync/semaphore"
 )
@@ -223,22 +209,13 @@ type Service struct {
 	isWarmingUp   bool
 }
 
-func (s *Service) SetP2P(p2p p2p.DebugService) {
-	if s != nil {
-		s.p2p = p2p
-	}
-}
+func (s *Service) SetP2P(p2p p2p.DebugService) { _ = "STUB: not implemented"; return }
 
-func (s *Service) SetSwarmAddress(addr *swarm.Address) {
-	if s != nil {
-		s.overlay = addr
-	}
-}
+func (s *Service) SetSwarmAddress(addr *swarm.Address) { _ = "STUB: not implemented"; return }
 
 func (s *Service) SetRedistributionAgent(redistributionAgent *storageincentives.Agent) {
-	if s != nil {
-		s.redistributionAgent = redistributionAgent
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 type Options struct {
@@ -284,246 +261,63 @@ func New(
 	cors []string,
 	stamperStore storage.Store,
 ) *Service {
-	s := new(Service)
-
-	s.CORSAllowedOrigins = cors
-	s.beeMode = beeMode
-	s.logger = logger.WithName(loggerName).Register()
-	s.loggerV1 = s.logger.V(1).Register()
-	s.chequebookEnabled = chequebookEnabled
-	s.swapEnabled = swapEnabled
-	s.publicKey = publicKey
-	s.pssPublicKey = pssPublicKey
-	s.ethereumAddress = ethereumAddress
-	s.transaction = transaction
-	s.batchStore = batchStore
-	s.chainBackend = chainBackend
-	s.metricsRegistry = newDebugMetrics()
-	s.preMapHooks = map[string]func(v string) (string, error){
-		"decBase64url": func(v string) (string, error) {
-			buf, err := base64.URLEncoding.DecodeString(v)
-			return string(buf), err
-		},
-		"decHex": func(v string) (string, error) {
-			buf, err := hex.DecodeString(v)
-			return string(buf), err
-		},
-	}
-	s.validate = validator.New()
-	s.validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get(mapStructureTagName), ",", 2)[0]
-		if name == "-" {
-			return ""
-		}
-		return name
-	})
-	s.setupValidation()
-	s.stamperStore = stamperStore
-
-	for _, v := range whitelistedWithdrawalAddress {
-		s.whitelistedWithdrawalAddress = append(s.whitelistedWithdrawalAddress, common.HexToAddress(v))
-	}
-
-	return s
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Configure will create a and initialize a new API service.
 func (s *Service) Configure(signer crypto.Signer, tracer *tracing.Tracer, o Options, e ExtraOptions, chainID int64, erc20 erc20.Service) {
-	s.signer = signer
-	s.Options = o
-	s.tracer = tracer
-	s.metrics = newMetrics()
-
-	s.quit = make(chan struct{})
-
-	s.storer = e.Storer
-	s.resolver = e.Resolver
-	s.pss = e.Pss
-	s.gsoc = e.Gsoc
-	s.feedFactory = e.FeedFactory
-	s.post = e.Post
-	s.accesscontrol = e.AccessControl
-	s.postageContract = e.PostageContract
-	s.steward = e.Steward
-	s.stakingContract = e.Staking
-
-	s.pingpong = e.Pingpong
-	s.topologyDriver = e.TopologyDriver
-	s.accounting = e.Accounting
-	s.chequebook = e.Chequebook
-	s.swap = e.Swap
-	s.lightNodes = e.LightNodes
-	s.pseudosettle = e.Pseudosettle
-	s.blockTime = e.BlockTime
-
-	s.statusSem = semaphore.NewWeighted(1)
-	s.postageSem = semaphore.NewWeighted(1)
-	s.stakingSem = semaphore.NewWeighted(1)
-	s.cashOutChequeSem = semaphore.NewWeighted(1)
-
-	s.chainID = chainID
-	s.erc20Service = erc20
-	s.syncStatus = e.SyncStatus
-
-	s.statusService = e.NodeStatus
-
-	s.preMapHooks["resolve"] = func(v string) (string, error) {
-		switch addr, err := s.resolveNameOrAddress(v); {
-		case err == nil:
-			return addr.String(), nil
-		case errors.Is(err, ens.ErrNotImplemented):
-			return v, nil
-		default:
-			return "", err
-		}
-	}
-
-	s.pinIntegrity = e.PinIntegrity
+	_ = "STUB: not implemented"
+	return
 }
 
-func (s *Service) SetProbe(probe *Probe) {
-	s.probe = probe
-}
+func (s *Service) SetProbe(probe *Probe) { _ = "STUB: not implemented"; return }
 
 func (s *Service) SetIsWarmingUp(v bool) {
-	s.isWarmingUp = v
+	_ = "STUB: not implemented"
+
+	// Close hangs up running websockets on shutdown.
+	return
 }
 
-// Close hangs up running websockets on shutdown.
-func (s *Service) Close() error {
-	s.logger.Info("api shutting down")
-	close(s.quit)
-
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		s.wsWg.Wait()
-	}()
-
-	select {
-	case <-done:
-	case <-time.After(1 * time.Second):
-		return errors.New("api shutting down with open websockets")
-	}
-
-	return nil
-}
+func (s *Service) Close() error { _ = "STUB: not implemented"; return nil }
 
 // getOrCreateSessionID attempts to get the session if an tag id is supplied, and returns an error
 // if it does not exist. If no id is supplied, it will attempt to create a new session and return it.
 func (s *Service) getOrCreateSessionID(tagUid uint64) (uint64, error) {
-	var (
-		tag storer.SessionInfo
-		err error
-	)
-	// if tag ID is not supplied, create a new tag
-	if tagUid == 0 {
-		tag, err = s.storer.NewSession()
-	} else {
-		tag, err = s.storer.Session(tagUid)
-	}
-	return tag.TagID, err
+	_ = "STUB: not implemented"
+	return 0, nil
 }
+
+// if tag ID is not supplied, create a new tag
 
 func (s *Service) resolveNameOrAddress(str string) (swarm.Address, error) {
+	_ = "STUB: not implemented"
 	// Try and mapStructure the name as a bzz address.
-	addr, err := swarm.ParseHexAddress(str)
-	if err == nil {
-		s.loggerV1.Debug("resolve name: parsing bzz address successful", "string", str, "address", addr)
-		return addr, nil
-	}
-
-	// If no resolver is not available, return an error.
-	if s.resolver == nil {
-		return swarm.ZeroAddress, errNoResolver
-	}
-
-	// Try and resolve the name using the provided resolver.
-	s.logger.Debug("resolve name: attempting to resolve string to address", "string", str)
-	addr, err = s.resolver.Resolve(str)
-	if err == nil {
-		s.loggerV1.Debug("resolve name: address resolved successfully", "string", str, "address", addr)
-		return addr, nil
-	}
-
-	if errors.Is(err, multiresolver.ErrResolverService) || errors.Is(err, resolver.ErrServiceNotAvailable) {
-		return swarm.ZeroAddress, err
-	}
-
-	return swarm.ZeroAddress, fmt.Errorf("%w: %w", errInvalidNameOrAddress, err)
+	return *new(swarm.Address), nil
 }
+
+// If no resolver is not available, return an error.
+
+// Try and resolve the name using the provided resolver.
 
 func (s *Service) newTracingHandler(spanName string) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx, err := s.tracer.WithContextFromHTTPHeaders(r.Context(), r.Header)
-			if err != nil && !errors.Is(err, tracing.ErrContextNotFound) {
-				s.logger.Debug("extract tracing context failed", "span_name", spanName, "error", err)
-				// ignore
-			}
-
-			span, _, ctx := s.tracer.StartSpanFromContext(ctx, spanName, s.logger)
-			defer span.Finish()
-
-			err = s.tracer.AddContextHTTPHeader(ctx, r.Header)
-			if err != nil {
-				s.logger.Debug("inject tracing context failed", "span_name", spanName, "error", err)
-				// ignore
-			}
-
-			h.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *Service) contentLengthMetricMiddleware() func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			now := time.Now()
-			h.ServeHTTP(w, r)
-			switch r.Method {
-			case http.MethodGet:
-				hdr := w.Header().Get(ContentLengthHeader)
-				if hdr == "" {
-					s.logger.Debug("content length header not found")
-					return
-				}
+// ignore
 
-				contentLength, err := strconv.Atoi(hdr)
-				if err != nil {
-					s.logger.Debug("int conversion failed", "content_length", hdr, "error", err)
-					return
-				}
-				if contentLength > 0 {
-					s.metrics.ContentApiDuration.WithLabelValues(strconv.FormatInt(toFileSizeBucket(int64(contentLength)), 10), r.Method).Observe(time.Since(now).Seconds())
-				}
-			case http.MethodPost:
-				if r.ContentLength > 0 {
-					s.metrics.ContentApiDuration.WithLabelValues(strconv.FormatInt(toFileSizeBucket(r.ContentLength), 10), r.Method).Observe(time.Since(now).Seconds())
-				}
-			}
-		})
-	}
+// ignore
+
+func (s *Service) contentLengthMetricMiddleware() func(h http.Handler) http.Handler {
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Service) downloadSpeedMetricMiddleware(endpoint string) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			h.ServeHTTP(w, r)
-
-			rw, ok := w.(*responseWriter)
-			if !ok {
-				return
-			}
-			if rw.Status() != http.StatusOK {
-				return
-			}
-
-			speed := float64(rw.size) / time.Since(start).Seconds()
-			s.metrics.DownloadSpeed.WithLabelValues(endpoint).Observe(speed)
-		})
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // observeUploadSpeed measures the speed of the upload and sets appropriate
@@ -531,92 +325,25 @@ func (s *Service) downloadSpeedMetricMiddleware(endpoint string) func(h http.Han
 // side of handler. This functions is not in a form of a middleware to more
 // directly pass the deferred flag.
 func (s *Service) observeUploadSpeed(w http.ResponseWriter, r *http.Request, start time.Time, endpoint string, deferred bool) {
-	rw, ok := w.(*responseWriter)
-	if !ok {
-		return
-	}
-
-	if rw.Status() != http.StatusOK && rw.Status() != http.StatusCreated {
-		return
-	}
-
-	mode := "direct"
-	if deferred {
-		mode = "deferred"
-	}
-
-	speed := float64(r.ContentLength) / time.Since(start).Seconds()
-	s.metrics.UploadSpeed.WithLabelValues(endpoint, mode).Observe(speed)
+	_ = "STUB: not implemented"
+	return
 }
 
 // gasConfigMiddleware can be used by the APIs that allow block chain transactions to set
 // gas price and gas limit through the HTTP API headers.
 func (s *Service) gasConfigMiddleware(handlerName string) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			logger := s.logger.WithName(handlerName).Build()
-
-			headers := struct {
-				GasPrice *big.Int `map:"Gas-Price"`
-				GasLimit uint64   `map:"Gas-Limit"`
-			}{}
-			if response := s.mapStructure(r.Header, &headers); response != nil {
-				response("invalid header params", logger, w)
-				return
-			}
-			ctx := r.Context()
-			ctx = sctx.SetGasPrice(ctx, headers.GasPrice)
-			ctx = sctx.SetGasLimit(ctx, headers.GasLimit)
-
-			h.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // corsHandler sets CORS headers to HTTP response if allowed origins are configured.
 func (s *Service) corsHandler(h http.Handler) http.Handler {
-	allowedHeaders := []string{
-		"User-Agent", "Accept", "X-Requested-With", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Accept-Ranges", "Content-Encoding",
-		AuthorizationHeader, AcceptEncodingHeader, ContentTypeHeader, ContentDispositionHeader, RangeHeader, OriginHeader,
-		SwarmTagHeader, SwarmPinHeader, SwarmEncryptHeader, SwarmIndexDocumentHeader, SwarmErrorDocumentHeader, SwarmCollectionHeader,
-		SwarmPostageBatchIdHeader, SwarmPostageStampHeader, SwarmDeferredUploadHeader, SwarmRedundancyLevelHeader,
-		SwarmRedundancyStrategyHeader, SwarmRedundancyFallbackModeHeader, SwarmChunkRetrievalTimeoutHeader, SwarmLookAheadBufferSizeHeader,
-		SwarmFeedIndexHeader, SwarmFeedIndexNextHeader, SwarmSocSignatureHeader, SwarmOnlyRootChunk, GasPriceHeader, GasLimitHeader, ImmutableHeader,
-		SwarmActHeader, SwarmActTimestampHeader, SwarmActPublisherHeader, SwarmActHistoryAddressHeader,
-	}
-	allowedHeadersStr := strings.Join(allowedHeaders, ", ")
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if o := r.Header.Get(OriginHeader); o != "" && s.checkOrigin(r) {
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Allow-Origin", o)
-			w.Header().Set("Access-Control-Allow-Headers", allowedHeadersStr)
-			w.Header().Set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST, PUT, DELETE")
-			w.Header().Set("Access-Control-Max-Age", "3600")
-		}
-		h.ServeHTTP(w, r)
-	})
+	_ = "STUB: not implemented"
+	return *new(http.Handler)
 }
 
 // checkOrigin returns true if the origin is not set or is equal to the request host.
-func (s *Service) checkOrigin(r *http.Request) bool {
-	origin := r.Header[OriginHeader]
-	if len(origin) == 0 {
-		return true
-	}
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
-	}
-	hosts := append(s.CORSAllowedOrigins, scheme+"://"+r.Host)
-	for _, v := range hosts {
-		if equalASCIIFold(origin[0], v) || v == "*" {
-			return true
-		}
-	}
-
-	return false
-}
+func (s *Service) checkOrigin(r *http.Request) bool { _ = "STUB: not implemented"; return false }
 
 // validationError is a custom error type for validation errors.
 type validationError struct {
@@ -626,128 +353,20 @@ type validationError struct {
 }
 
 // Error implements the error interface.
-func (e *validationError) Error() string {
-	return fmt.Sprintf("`%s=%v`: %v", e.Entry, e.Value, e.Cause)
-}
+func (e *validationError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // mapStructure maps the input into output struct and validates the output.
 // It's a helper method for the handlers, which reduces the chattiness
 // of the code.
 func (s *Service) mapStructure(input, output any) func(string, log.Logger, http.ResponseWriter) {
+	_ = "STUB: not implemented"
 	// response unifies the response format for parsing and validation errors.
-	response := func(err error) func(string, log.Logger, http.ResponseWriter) {
-		return func(msg string, logger log.Logger, w http.ResponseWriter) {
-			var merr *multierror.Error
-			if !errors.As(err, &merr) {
-				logger.Debug("mapping and validation failed", "error", err)
-				logger.Error(err, "mapping and validation failed")
-				jsonhttp.InternalServerError(w, err)
-				return
-			}
-
-			logger.Debug(msg, "error", err)
-			logger.Error(err, msg)
-
-			resp := jsonhttp.StatusResponse{
-				Message: msg,
-				Code:    http.StatusBadRequest,
-			}
-			hasServiceUnavailable := false
-			for _, err := range merr.Errors {
-				if errors.Is(err, resolver.ErrServiceNotAvailable) {
-					hasServiceUnavailable = true
-					resp.Reasons = append(resp.Reasons, jsonhttp.Reason{
-						Field: "address",
-						Error: err.Error(),
-					})
-					continue
-				}
-				var perr *parseError
-				if errors.As(err, &perr) {
-					resp.Reasons = append(resp.Reasons, jsonhttp.Reason{
-						Field: perr.Entry,
-						Error: perr.Cause.Error(),
-					})
-					continue
-				}
-				var verr *validationError
-				if errors.As(err, &verr) {
-					resp.Reasons = append(resp.Reasons, jsonhttp.Reason{
-						Field: verr.Entry,
-						Error: verr.Cause.Error(),
-					})
-				}
-			}
-
-			if hasServiceUnavailable {
-				resp.Message = "service unavailable"
-				resp.Code = http.StatusServiceUnavailable
-				jsonhttp.ServiceUnavailable(w, resp)
-			} else {
-				jsonhttp.BadRequest(w, resp)
-			}
-		}
-	}
-
-	if err := mapStructure(input, output, s.preMapHooks); err != nil {
-		return response(err)
-	}
-
-	if err := s.validate.Struct(output); err != nil {
-		var errs validator.ValidationErrors
-		if !errors.As(err, &errs) {
-			return response(err)
-		}
-
-		vErrs := &multierror.Error{ErrorFormat: flattenErrorsFormat}
-		for _, err := range errs {
-			val := err.Value()
-			switch v := err.Value().(type) {
-			case []byte:
-				val = string(v)
-			}
-			var cause error
-			if msgFn, ok := s.customValidationMessages[err.Tag()]; ok {
-				cause = msgFn(err)
-			} else {
-				cause = fmt.Errorf("want %s:%s", err.Tag(), err.Param())
-			}
-			vErrs = multierror.Append(vErrs,
-				&validationError{
-					Entry: strings.ToLower(err.Field()),
-					Value: val,
-					Cause: cause,
-				})
-		}
-		return response(vErrs.ErrorOrNil())
-	}
-
 	return nil
 }
 
 // equalASCIIFold returns true if s is equal to t with ASCII case folding as
 // defined in RFC 4790.
-func equalASCIIFold(s, t string) bool {
-	for s != "" && t != "" {
-		sr, size := utf8.DecodeRuneInString(s)
-		s = s[size:]
-		tr, size := utf8.DecodeRuneInString(t)
-		t = t[size:]
-		if sr == tr {
-			continue
-		}
-		if 'A' <= sr && sr <= 'Z' {
-			sr = sr + 'a' - 'A'
-		}
-		if 'A' <= tr && tr <= 'Z' {
-			tr = tr + 'a' - 'A'
-		}
-		if sr != tr {
-			return false
-		}
-	}
-	return s == t
-}
+func equalASCIIFold(s, t string) bool { _ = "STUB: not implemented"; return false }
 
 type putterOptions struct {
 	BatchID  []byte
@@ -763,113 +382,46 @@ type putterSessionWrapper struct {
 }
 
 func (p *putterSessionWrapper) Put(ctx context.Context, chunk swarm.Chunk) error {
-	idAddress, err := storage.IdentityAddress(chunk)
-	if err != nil {
-		return err
-	}
-
-	stamp, err := p.stamper.Stamp(chunk.Address(), idAddress)
-	if err != nil {
-		return err
-	}
-	return p.PutterSession.Put(ctx, chunk.WithStamp(stamp))
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *putterSessionWrapper) Done(ref swarm.Address) error {
-	return errors.Join(p.PutterSession.Done(ref), p.save())
-}
+func (p *putterSessionWrapper) Done(ref swarm.Address) error { _ = "STUB: not implemented"; return nil }
 
-func (p *putterSessionWrapper) Cleanup() error {
-	return errors.Join(p.PutterSession.Cleanup(), p.save())
-}
+func (p *putterSessionWrapper) Cleanup() error { _ = "STUB: not implemented"; return nil }
 
 func (s *Service) getStamper(batchID []byte) (postage.Stamper, func() error, error) {
-	exists, err := s.batchStore.Exists(batchID)
-	if err != nil {
-		return nil, nil, fmt.Errorf("batch exists: %w", err)
-	}
-
-	issuer, save, err := s.post.GetStampIssuer(batchID)
-	if err != nil {
-		return nil, nil, fmt.Errorf("stamp issuer: %w", err)
-	}
-
-	if usable := exists && s.post.IssuerUsable(issuer); !usable {
-		return nil, nil, errBatchUnusable
-	}
-
-	return postage.NewStamper(s.stamperStore, issuer, s.signer), save, nil
+	_ = "STUB: not implemented"
+	return *new(postage.Stamper), nil, nil
 }
 
 func (s *Service) newStamperPutter(ctx context.Context, opts putterOptions) (storer.PutterSession, error) {
-	stamper, save, err := s.getStamper(opts.BatchID)
-	if err != nil {
-		return nil, fmt.Errorf("get stamper: %w", err)
-	}
-
-	var session storer.PutterSession
-	if opts.Deferred || opts.Pin {
-		session, err = s.storer.Upload(ctx, opts.Pin, opts.TagID)
-	} else {
-		session = s.storer.DirectUpload()
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("failed creating session: %w", err)
-	}
-
-	return &putterSessionWrapper{
-		PutterSession: session,
-		stamper:       stamper,
-		save:          save,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(storer.PutterSession), nil
 }
 
 func (s *Service) newStampedPutter(ctx context.Context, opts putterOptions, stamp *postage.Stamp) (storer.PutterSession, error) {
-	storedBatch, err := s.batchStore.Get(stamp.BatchID())
-	if err != nil {
-		return nil, errInvalidPostageBatch
-	}
-
-	return s.newStampedPutterWithBatch(ctx, opts, stamp, storedBatch)
+	_ = "STUB: not implemented"
+	return *new(storer.PutterSession), nil
 }
 
 // newStampedPutterWithBatch creates a stamped putter using a pre-fetched batch.
 // This avoids the database lookup when batch info is already cached.
 func (s *Service) newStampedPutterWithBatch(ctx context.Context, opts putterOptions, stamp *postage.Stamp, storedBatch *postage.Batch) (storer.PutterSession, error) {
-	var session storer.PutterSession
-	var err error
-	if opts.Deferred || opts.Pin {
-		session, err = s.storer.Upload(ctx, opts.Pin, opts.TagID)
-		if err != nil {
-			return nil, fmt.Errorf("failed creating session: %w", err)
-		}
-	} else {
-		session = s.storer.DirectUpload()
-	}
-
-	stamper := postage.NewPresignedStamper(stamp, storedBatch.Owner)
-
-	return &putterSessionWrapper{
-		PutterSession: session,
-		stamper:       stamper,
-		save:          func() error { return nil },
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(storer.PutterSession), nil
 }
 
 type pipelineFunc func(context.Context, io.Reader) (swarm.Address, error)
 
 func requestPipelineFn(s storage.Putter, encrypt bool, rLevel redundancy.Level) pipelineFunc {
-	return func(ctx context.Context, r io.Reader) (swarm.Address, error) {
-		pipe := builder.NewPipelineBuilder(ctx, s, encrypt, rLevel)
-		return builder.FeedPipeline(ctx, pipe, r)
-	}
+	_ = "STUB: not implemented"
+	return *new(pipelineFunc)
 }
 
 func requestPipelineFactory(ctx context.Context, s storage.Putter, encrypt bool, rLevel redundancy.Level) func() pipeline.Interface {
-	return func() pipeline.Interface {
-		return builder.NewPipelineBuilder(ctx, s, encrypt, rLevel)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type cleanupOnErrWriter struct {
@@ -879,44 +431,17 @@ type cleanupOnErrWriter struct {
 }
 
 func (r *cleanupOnErrWriter) WriteHeader(statusCode int) {
+	_ = "STUB: not implemented"
 	// if there is an error status returned, cleanup.
-	if statusCode >= http.StatusBadRequest {
-		err := r.onErr()
-		if err != nil {
-			r.logger.Debug("failed cleaning up", "err", err)
-		}
-	}
-	r.ResponseWriter.WriteHeader(statusCode)
+	return
 }
 
 // CalculateNumberOfChunks calculates the number of chunks in an arbitrary
 // content length.
 func CalculateNumberOfChunks(contentLength int64, isEncrypted bool) int64 {
-	if contentLength <= swarm.ChunkSize {
-		return 1
-	}
-	branchingFactor := swarm.Branches
-	if isEncrypted {
-		branchingFactor = swarm.EncryptedBranches
-	}
-
-	dataChunks := math.Ceil(float64(contentLength) / float64(swarm.ChunkSize))
-	totalChunks := dataChunks
-	intermediate := dataChunks / float64(branchingFactor)
-
-	for intermediate > 1 {
-		totalChunks += math.Ceil(intermediate)
-		intermediate = intermediate / float64(branchingFactor)
-	}
-
-	return int64(totalChunks) + 1
+	_ = "STUB: not implemented"
+	return 0
 }
 
 // defaultUploadMethod returns true for deferred when the deferred header is not present.
-func defaultUploadMethod(deferred *bool) bool {
-	if deferred == nil {
-		return true
-	}
-
-	return *deferred
-}
+func defaultUploadMethod(deferred *bool) bool { _ = "STUB: not implemented"; return false }

@@ -24,18 +24,15 @@ type FixedPricer struct {
 
 // NewFixedPricer returns a new FixedPricer with a given price.
 func NewFixedPricer(overlay swarm.Address, poPrice uint64) *FixedPricer {
-	return &FixedPricer{
-		overlay: overlay,
-		poPrice: poPrice,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // PeerPrice implements Pricer.
 func (pricer *FixedPricer) PeerPrice(peer, chunk swarm.Address) uint64 {
-	return uint64(swarm.MaxPO-swarm.Proximity(peer.Bytes(), chunk.Bytes())+1) * pricer.poPrice
+	_ = "STUB: not implemented"
+	return 0
 }
 
 // Price implements Pricer.
-func (pricer *FixedPricer) Price(chunk swarm.Address) uint64 {
-	return pricer.PeerPrice(pricer.overlay, chunk)
-}
+func (pricer *FixedPricer) Price(chunk swarm.Address) uint64 { _ = "STUB: not implemented"; return 0 }

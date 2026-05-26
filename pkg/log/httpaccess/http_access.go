@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/tracing"
@@ -17,74 +16,18 @@ import (
 // NewHTTPAccessSuppressLogHandler creates a
 // handler that will suppress access log messages.
 func NewHTTPAccessSuppressLogHandler() func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if rr, ok := w.(*responseRecorder); ok {
-				w = rr.ResponseWriter
-			}
-			h.ServeHTTP(w, r)
-		})
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // NewHTTPAccessLogHandler creates a handler that
 // will log a message after a request has been served.
 func NewHTTPAccessLogHandler(logger log.Logger, tracer *tracing.Tracer, message string) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			rr, ok := w.(*responseRecorder)
-			if !ok { // No need to layer on another responseRecorder.
-				rr = &responseRecorder{ResponseWriter: w}
-			}
-
-			now := time.Now()
-			h.ServeHTTP(rr, r)
-			if logger.Verbosity() < log.VerbosityInfo {
-				return
-			}
-			duration := time.Since(now)
-
-			ctx, _ := tracer.WithContextFromHTTPHeaders(r.Context(), r.Header)
-
-			logger := tracing.NewLoggerWithTraceID(ctx, logger)
-
-			status := rr.status
-			if status == 0 {
-				status = http.StatusOK
-			}
-
-			ip, _, err := net.SplitHostPort(r.RemoteAddr)
-			if err != nil {
-				ip = r.RemoteAddr
-			}
-
-			fields := []any{
-				"ip", ip,
-				"method", r.Method,
-				"host", r.Host,
-				"uri", r.RequestURI,
-				"proto", r.Proto,
-				"status", status,
-				"size", rr.size,
-				"duration", duration,
-			}
-			if v := r.Referer(); v != "" {
-				fields = append(fields, "referrer", v)
-			}
-			if v := r.UserAgent(); v != "" {
-				fields = append(fields, "user-agent", v)
-			}
-			if v := r.Header.Get("X-Forwarded-For"); v != "" {
-				fields = append(fields, "x-forwarded-for", v)
-			}
-			if v := r.Header.Get("X-Real-Ip"); v != "" {
-				fields = append(fields, "x-real-ip", v)
-			}
-
-			logger.WithValues(fields...).Build().Debug(message)
-		})
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// No need to layer on another responseRecorder.
 
 // responseRecorder is an implementation of
 // http.ResponseWriter that records various metrics.
@@ -97,38 +40,30 @@ type responseRecorder struct {
 }
 
 // Write implements http.ResponseWriter.
-func (rr *responseRecorder) Write(b []byte) (int, error) {
-	size, err := rr.ResponseWriter.Write(b)
-	rr.size += size
-	return size, err
-}
+func (rr *responseRecorder) Write(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // WriteHeader implements http.ResponseWriter.
-func (rr *responseRecorder) WriteHeader(s int) {
-	rr.ResponseWriter.WriteHeader(s)
-	if rr.status == 0 {
-		rr.status = s
-	}
-}
+func (rr *responseRecorder) WriteHeader(s int) { _ = "STUB: not implemented"; return }
 
 // CloseNotify implements http.CloseNotifier.
 func (rr *responseRecorder) CloseNotify() <-chan bool {
+	_ = "STUB: not implemented"
 	// staticcheck SA1019 CloseNotifier interface is required by gorilla compress handler.
 	// nolint:staticcheck
-	return rr.ResponseWriter.(http.CloseNotifier).CloseNotify()
+	return nil
 }
 
 // Hijack implements http.Hijacker.
 func (rr *responseRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
-	return rr.ResponseWriter.(http.Hijacker).Hijack()
+	_ = "STUB: not implemented"
+	return *new(net.Conn), nil, nil
 }
 
 // Flush implements http.Flusher.
-func (rr *responseRecorder) Flush() {
-	rr.ResponseWriter.(http.Flusher).Flush()
-}
+func (rr *responseRecorder) Flush() { _ = "STUB: not implemented"; return }
 
 // Push implements http.Pusher.
 func (rr *responseRecorder) Push(target string, opts *http.PushOptions) error {
-	return rr.ResponseWriter.(http.Pusher).Push(target, opts)
+	_ = "STUB: not implemented"
+	return nil
 }

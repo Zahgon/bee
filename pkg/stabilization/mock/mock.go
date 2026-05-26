@@ -8,20 +8,11 @@ type subscriber struct {
 	stable bool
 }
 
-func NewSubscriber(stable bool) *subscriber {
-	return &subscriber{
-		stable: stable,
-	}
-}
+func NewSubscriber(stable bool) *subscriber { _ = "STUB: not implemented"; return nil }
 
 func (s *subscriber) Subscribe() (<-chan struct{}, func()) {
-	c := make(chan struct{})
-	if s.stable {
-		close(c)
-	}
-	return c, func() {}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *subscriber) IsStabilized() bool {
-	return s.stable
-}
+func (s *subscriber) IsStabilized() bool { _ = "STUB: not implemented"; return false }

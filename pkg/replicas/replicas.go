@@ -37,14 +37,8 @@ type replicator struct {
 
 // newReplicator replicator constructor
 func newReplicator(addr swarm.Address, rLevel redundancy.Level) *replicator {
-	rr := &replicator{
-		addr:   addr.Bytes(),
-		sizes:  redundancy.GetReplicaCounts(),
-		c:      make(chan *replica, 16),
-		rLevel: rLevel,
-	}
-	go rr.replicas()
-	return rr
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // replica of the mined SOC chunk (address) that serve as replicas
@@ -54,61 +48,26 @@ type replica struct {
 
 // replicate returns a replica params structure seeded with a byte of entropy as argument
 func (rr *replicator) replicate(i uint8) (sp *replica) {
+	_ = "STUB: not implemented"
 	// change the last byte of the address to create SOC ID
-	id := make([]byte, 32)
-	copy(id, rr.addr)
-	id[0] = i
-	// calculate SOC address for potential replica
-	h := swarm.NewHasher()
-	_, _ = h.Write(id)
-	_, _ = h.Write(swarm.ReplicasOwner)
-	return &replica{h.Sum(nil), id}
+	return nil
 }
+
+// calculate SOC address for potential replica
 
 // replicas enumerates replica parameters (SOC ID) pushing it in a channel given as argument
 // the order of replicas is so that addresses are always maximally dispersed
 // in successive sets of addresses.
 // I.e., the binary tree representing the new addresses prefix bits up to depth is balanced
-func (rr *replicator) replicas() {
-	defer close(rr.c)
-	n := 0
-	for i := uint8(0); n < rr.rLevel.GetReplicaCount() && i < 255; i++ {
-		// create soc replica (ID and address using constant owner)
-		// the soc is added to neighbourhoods of depths in the closed interval [from...to]
-		r := rr.replicate(i)
-		d, m := rr.add(r, rr.rLevel)
-		if d == 0 {
-			continue
-		}
-		for m, r = range rr.queue[n:] {
-			if r == nil {
-				break
-			}
-			rr.c <- r
-		}
-		n += m
-	}
-}
+func (rr *replicator) replicas() { _ = "STUB: not implemented"; return }
+
+// create soc replica (ID and address using constant owner)
+// the soc is added to neighbourhoods of depths in the closed interval [from...to]
 
 // add inserts the soc replica into a replicator so that addresses are balanced
 func (rr *replicator) add(r *replica, rLevel redundancy.Level) (depth int, rank int) {
-	if rLevel == redundancy.NONE {
-		return 0, 0
-	}
-	nh := nh(rLevel, r.addr)
-	if rr.exist[nh] {
-		return 0, 0
-	}
-	rr.exist[nh] = true
-	l, o := rr.add(r, rLevel.Decrement())
-	d := uint8(rLevel) - 1
-	if l == 0 {
-		o = rr.sizes[d]
-		rr.sizes[d]++
-		rr.queue[o] = r
-		l = rLevel.GetReplicaCount()
-	}
-	return l, o
+	_ = "STUB: not implemented"
+	return 0, 0
 }
 
 // UTILS
@@ -118,7 +77,4 @@ var replicaIndexBases = [5]int{0, 2, 6, 14}
 
 // nh returns the lookup key based on the redundancy level
 // to be used as index to the replicators exist array
-func nh(rLevel redundancy.Level, addr []byte) int {
-	d := uint8(rLevel)
-	return replicaIndexBases[d-1] + int(addr[0]>>(8-d))
-}
+func nh(rLevel redundancy.Level, addr []byte) int { _ = "STUB: not implemented"; return 0 }

@@ -8,11 +8,8 @@ package replicas
 
 import (
 	"context"
-	"errors"
-	"sync"
 
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -26,36 +23,12 @@ type putter struct {
 
 // NewPutter is the putter constructor
 func NewPutter(p storage.Putter, rLevel redundancy.Level) storage.Putter {
-	return &putter{
-		putter: p,
-		rLevel: rLevel,
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Putter)
 }
 
 // Put makes the getter satisfy the storage.Getter interface
 func (p *putter) Put(ctx context.Context, ch swarm.Chunk) (err error) {
-	errs := []error{}
-	if p.rLevel == 0 {
-		return nil
-	}
-
-	rr := newReplicator(ch.Address(), p.rLevel)
-	errc := make(chan error, p.rLevel.GetReplicaCount())
-	wg := sync.WaitGroup{}
-	for r := range rr.c {
-		wg.Go(func() {
-			sch, err := soc.New(r.id, ch).Sign(signer)
-			if err == nil {
-				err = p.putter.Put(ctx, sch)
-			}
-			errc <- err
-		})
-	}
-
-	wg.Wait()
-	close(errc)
-	for err := range errc {
-		errs = append(errs, err)
-	}
-	return errors.Join(errs...)
+	_ = "STUB: not implemented"
+	return nil
 }

@@ -8,6 +8,7 @@ package migration
 //
 // In this step store is not being modified.
 func step_01() error {
+	_ = "STUB: not implemented"
 	// NOOP
 	return nil
 }

@@ -5,16 +5,9 @@
 package node
 
 import (
-	"errors"
-	"fmt"
-	"path/filepath"
-
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/metrics"
-	"github.com/ethersphere/bee/v2/pkg/statestore/storeadapter"
 	"github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/cache"
-	"github.com/ethersphere/bee/v2/pkg/storage/leveldbstore"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -22,24 +15,8 @@ import (
 // data directory. When given an empty directory path, the function will instead
 // initialize an in-memory state store that will not be persisted.
 func InitStateStore(logger log.Logger, dataDir string, cacheCapacity uint64) (storage.StateStorerManager, metrics.Collector, error) {
-	if dataDir == "" {
-		logger.Warning("using in-mem state store, no node state will be persisted")
-	} else {
-		dataDir = filepath.Join(dataDir, "statestore")
-	}
-	ldb, _, err := leveldbstore.New(dataDir, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	caching, err := cache.Wrap(ldb, int(cacheCapacity))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	stateStore, err := storeadapter.NewStateStorerAdapter(caching)
-
-	return stateStore, caching, err
+	_ = "STUB: not implemented"
+	return *new(storage.StateStorerManager), *new(metrics.Collector), nil
 }
 
 // InitStamperStore will create new stamper store with the given path to the
@@ -47,16 +24,8 @@ func InitStateStore(logger log.Logger, dataDir string, cacheCapacity uint64) (st
 // initialize an in-memory state store that will not be persisted.
 // The returned bool indicates whether the previous shutdown was unclean (dirty).
 func InitStamperStore(logger log.Logger, dataDir string, stateStore storage.StateStorer) (storage.Store, bool, error) {
-	if dataDir == "" {
-		logger.Warning("using in-mem stamper store, no node state will be persisted")
-	} else {
-		dataDir = filepath.Join(dataDir, "stamperstore")
-	}
-	store, dirty, err := leveldbstore.New(dataDir, nil)
-	if err != nil {
-		return nil, false, err
-	}
-	return store, dirty, nil
+	_ = "STUB: not implemented"
+	return *new(storage.Store), false, nil
 }
 
 const (
@@ -66,36 +35,16 @@ const (
 
 // checkOverlay checks the overlay is the same as stored in the statestore
 func checkOverlay(storer storage.StateStorer, overlay swarm.Address) error {
-	var storedOverlay swarm.Address
-	err := storer.Get(noncedOverlayKey, &storedOverlay)
-	if err != nil {
-		if !errors.Is(err, storage.ErrNotFound) {
-			return err
-		}
-		return storer.Put(noncedOverlayKey, overlay)
-	}
-
-	if !storedOverlay.Equal(overlay) {
-		return fmt.Errorf("overlay address changed. was %s before but now is %s", storedOverlay, overlay)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func overlayNonceExists(s storage.StateStorer) ([]byte, bool, error) {
-	nonce := make([]byte, 32)
-	if err := s.Get(overlayNonce, &nonce); err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			return nonce, false, nil
-		}
-		return nil, false, err
-	}
-	return nonce, true, nil
+	_ = "STUB: not implemented"
+	return nil, false, nil
 }
 
 func setOverlay(s storage.StateStorer, overlay swarm.Address, nonce []byte) error {
-	return errors.Join(
-		s.Put(overlayNonce, nonce),
-		s.Put(noncedOverlayKey, overlay),
-	)
+	_ = "STUB: not implemented"
+	return nil
 }

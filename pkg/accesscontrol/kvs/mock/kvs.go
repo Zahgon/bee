@@ -7,7 +7,6 @@ package mock
 
 import (
 	"context"
-	"encoding/hex"
 	"sync"
 
 	"github.com/ethersphere/bee/v2/pkg/accesscontrol/kvs"
@@ -25,27 +24,9 @@ type single struct {
 
 var singleInMemorySwarm *single
 
-func getInMemorySwarm() *single {
-	if singleInMemorySwarm == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if singleInMemorySwarm == nil {
-			singleInMemorySwarm = &single{
-				memoryMock: make(map[string]map[string][]byte),
-			}
-		}
-	}
-	return singleInMemorySwarm
-}
+func getInMemorySwarm() *single { _ = "STUB: not implemented"; return nil }
 
-func getMemory() map[string]map[string][]byte {
-	ch := make(chan *single)
-	go func() {
-		ch <- getInMemorySwarm()
-	}()
-	mem := <-ch
-	return mem.memoryMock
-}
+func getMemory() map[string]map[string][]byte { _ = "STUB: not implemented"; return nil }
 
 type mockKeyValueStore struct {
 	address swarm.Address
@@ -54,32 +35,23 @@ type mockKeyValueStore struct {
 var _ kvs.KeyValueStore = (*mockKeyValueStore)(nil)
 
 func (m *mockKeyValueStore) Get(_ context.Context, key []byte) ([]byte, error) {
-	lockGetPut.Lock()
-	defer lockGetPut.Unlock()
-	mem := getMemory()
-	val := mem[m.address.String()][hex.EncodeToString(key)]
-	return val, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *mockKeyValueStore) Put(_ context.Context, key []byte, value []byte) error {
-	lockGetPut.Lock()
-	defer lockGetPut.Unlock()
-	mem := getMemory()
-	if _, ok := mem[m.address.String()]; !ok {
-		mem[m.address.String()] = make(map[string][]byte)
-	}
-	mem[m.address.String()][hex.EncodeToString(key)] = value
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (m *mockKeyValueStore) Save(ctx context.Context) (swarm.Address, error) {
-	return m.address, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
-func New() kvs.KeyValueStore {
-	return &mockKeyValueStore{address: swarm.EmptyAddress}
-}
+func New() kvs.KeyValueStore { _ = "STUB: not implemented"; return *new(kvs.KeyValueStore) }
 
 func NewReference(address swarm.Address) kvs.KeyValueStore {
-	return &mockKeyValueStore{address: address}
+	_ = "STUB: not implemented"
+	return *new(kvs.KeyValueStore)
 }

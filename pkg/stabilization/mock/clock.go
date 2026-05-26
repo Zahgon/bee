@@ -14,20 +14,10 @@ type mockClock struct {
 	time time.Time
 }
 
-func NewClock(t time.Time) *mockClock {
-	return &mockClock{time: t}
-}
+func NewClock(t time.Time) *mockClock { _ = "STUB: not implemented"; return nil }
 
 // Now returns the current mock time.
-func (mc *mockClock) Now() time.Time {
-	mc.mu.Lock()
-	defer mc.mu.Unlock()
-	return mc.time
-}
+func (mc *mockClock) Now() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
 // Advance advances the mock time by the given duration.
-func (mc *mockClock) Advance(d time.Duration) {
-	mc.mu.Lock()
-	defer mc.mu.Unlock()
-	mc.time = mc.time.Add(d)
-}
+func (mc *mockClock) Advance(d time.Duration) { _ = "STUB: not implemented"; return }

@@ -5,7 +5,6 @@
 package puller
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -17,43 +16,6 @@ type metrics struct {
 	MaxUintErrCounter     prometheus.Counter     // how many times we got maxuint as topmost
 }
 
-func newMetrics() metrics {
-	subsystem := "puller"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		SyncWorkerIterCounter: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "worker_iterations",
-			Help:      "Total worker iterations.",
-		}),
-		SyncWorkerCounter: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "worker",
-			Help:      "Total active worker jobs.",
-		}),
-		SyncedCounter: prometheus.NewCounterVec(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "synced_chunks",
-			Help:      "Total synced chunks.",
-		}, []string{"type"}),
-		SyncWorkerErrCounter: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "worker_errors",
-			Help:      "Total worker errors.",
-		}),
-		MaxUintErrCounter: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "max_uint_errors",
-			Help:      "Total max uint errors.",
-		}),
-	}
-}
-
-func (p *Puller) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(p.metrics)
-}
+func (p *Puller) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

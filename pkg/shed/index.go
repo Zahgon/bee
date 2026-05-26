@@ -17,10 +17,6 @@
 package shed
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
-
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
 )
@@ -59,57 +55,7 @@ type Item struct {
 // Merge is a helper method to construct a new
 // Item by filling up fields with default values
 // of a particular Item with values from another one.
-func (i Item) Merge(i2 Item) Item {
-	if i.Address == nil {
-		i.Address = i2.Address
-	}
-	if i.Data == nil {
-		i.Data = i2.Data
-	}
-	if i.Location == nil {
-		i.Location = i2.Location
-	}
-	if i.AccessTimestamp == 0 {
-		i.AccessTimestamp = i2.AccessTimestamp
-	}
-	if i.StoreTimestamp == 0 {
-		i.StoreTimestamp = i2.StoreTimestamp
-	}
-	if i.BinID == 0 {
-		i.BinID = i2.BinID
-	}
-	if i.PinCounter == 0 {
-		i.PinCounter = i2.PinCounter
-	}
-	if i.Tag == 0 {
-		i.Tag = i2.Tag
-	}
-	if len(i.BatchID) == 0 {
-		i.BatchID = i2.BatchID
-	}
-	if len(i.Index) == 0 {
-		i.Index = i2.Index
-	}
-	if len(i.Timestamp) == 0 {
-		i.Timestamp = i2.Timestamp
-	}
-	if len(i.Sig) == 0 {
-		i.Sig = i2.Sig
-	}
-	if i.BucketDepth == 0 {
-		i.BucketDepth = i2.BucketDepth
-	}
-	if i.Depth == 0 {
-		i.Depth = i2.Depth
-	}
-	if i.Radius == 0 {
-		i.Radius = i2.Radius
-	}
-	if !i.Immutable {
-		i.Immutable = i2.Immutable
-	}
-	return i
-}
+func (i Item) Merge(i2 Item) Item { _ = "STUB: not implemented"; return *new(Item) }
 
 // Index represents a set of LevelDB key value pairs that have common
 // prefix. It holds functions for encoding and decoding keys and values
@@ -140,58 +86,32 @@ type IndexFuncs struct {
 // encoding functions. The name must be unique and will be validated
 // on database schema for a key prefix byte.
 func (db *DB) NewIndex(name string, funcs IndexFuncs) (f Index, err error) {
-	id, err := db.schemaIndexPrefix(name)
-	if err != nil {
-		return f, fmt.Errorf("get schema index prefix: %w", err)
-	}
-	prefix := []byte{id}
-	return Index{
-		db:     db,
-		prefix: prefix,
-		// This function adjusts Index LevelDB key
-		// by appending the provided index id byte.
-		// This is needed to avoid collisions between keys of different
-		// indexes as all index ids are unique.
-		encodeKeyFunc: func(e Item) (key []byte, err error) {
-			key, err = funcs.EncodeKey(e)
-			if err != nil {
-				return nil, err
-			}
-			return append(append(make([]byte, 0, len(key)+1), prefix...), key...), nil
-		},
-		// This function reverses the encodeKeyFunc constructed key
-		// to transparently work with index keys without their index ids.
-		// It assumes that index keys are prefixed with only one byte.
-		decodeKeyFunc: func(key []byte) (e Item, err error) {
-			return funcs.DecodeKey(key[1:])
-		},
-		encodeValueFunc: funcs.EncodeValue,
-		decodeValueFunc: funcs.DecodeValue,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(Index), nil
 }
+
+// This function adjusts Index LevelDB key
+// by appending the provided index id byte.
+// This is needed to avoid collisions between keys of different
+// indexes as all index ids are unique.
+
+// This function reverses the encodeKeyFunc constructed key
+// to transparently work with index keys without their index ids.
+// It assumes that index keys are prefixed with only one byte.
 
 // ItemKey accepts an Item and returns generated key for it.
 func (f Index) ItemKey(item Item) (key []byte, err error) {
-	return f.encodeKeyFunc(item)
+	_ = "STUB: not implemented"
+	return nil, nil
+
+	// Get accepts key fields represented as Item to retrieve a
+	// value from the index and return maximum available information
+	// from the index represented as another Item.
 }
 
-// Get accepts key fields represented as Item to retrieve a
-// value from the index and return maximum available information
-// from the index represented as another Item.
 func (f Index) Get(keyFields Item) (out Item, err error) {
-	key, err := f.encodeKeyFunc(keyFields)
-	if err != nil {
-		return out, fmt.Errorf("encode key: %w", err)
-	}
-	value, err := f.db.Get(key)
-	if err != nil {
-		return out, fmt.Errorf("get value: %w", err)
-	}
-	out, err = f.decodeValueFunc(keyFields, value)
-	if err != nil {
-		return out, fmt.Errorf("decode value: %w", err)
-	}
-	return out.Merge(keyFields), nil
+	_ = "STUB: not implemented"
+	return *new(Item), nil
 }
 
 // Fill populates fields on provided items that are part of the
@@ -200,112 +120,37 @@ func (f Index) Get(keyFields Item) (out Item, err error) {
 // key set. The passed slice items will be changed so that they
 // contain data from the index values. No new slice is allocated.
 // This function uses a single leveldb snapshot.
-func (f Index) Fill(items []Item) (err error) {
-	snapshot, err := f.db.ldb.GetSnapshot()
-	if err != nil {
-		return fmt.Errorf("get snapshot: %w", err)
-	}
-	defer snapshot.Release()
-
-	for i, item := range items {
-		key, err := f.encodeKeyFunc(item)
-		if err != nil {
-			return fmt.Errorf("encode key: %w", err)
-		}
-		value, err := snapshot.Get(key, nil)
-		if err != nil {
-			return fmt.Errorf("get value: %w", err)
-		}
-		v, err := f.decodeValueFunc(item, value)
-		if err != nil {
-			return fmt.Errorf("decode value: %w", err)
-		}
-		items[i] = v.Merge(item)
-	}
-	return nil
-}
+func (f Index) Fill(items []Item) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Has accepts key fields represented as Item to check
 // if there this Item's encoded key is stored in
 // the index.
-func (f Index) Has(keyFields Item) (bool, error) {
-	key, err := f.encodeKeyFunc(keyFields)
-	if err != nil {
-		return false, fmt.Errorf("encode key: %w", err)
-	}
-	return f.db.Has(key)
-}
+func (f Index) Has(keyFields Item) (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
 // HasMulti accepts multiple multiple key fields represented as Item to check if
 // there this Item's encoded key is stored in the index for each of them.
-func (f Index) HasMulti(items ...Item) ([]bool, error) {
-	have := make([]bool, len(items))
-	snapshot, err := f.db.ldb.GetSnapshot()
-	if err != nil {
-		return nil, fmt.Errorf("get snapshot: %w", err)
-	}
-	defer snapshot.Release()
-	for i, keyFields := range items {
-		key, err := f.encodeKeyFunc(keyFields)
-		if err != nil {
-			return nil, fmt.Errorf("encode key for address %x: %w", keyFields.Address, err)
-		}
-		have[i], err = snapshot.Has(key, nil)
-		if err != nil {
-			return nil, fmt.Errorf("has key for address %x: %w", keyFields.Address, err)
-		}
-	}
-	return have, nil
-}
+func (f Index) HasMulti(items ...Item) ([]bool, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Put accepts Item to encode information from it
 // and save it to the database.
-func (f Index) Put(i Item) (err error) {
-	key, err := f.encodeKeyFunc(i)
-	if err != nil {
-		return fmt.Errorf("encode key: %w", err)
-	}
-	value, err := f.encodeValueFunc(i)
-	if err != nil {
-		return fmt.Errorf("encode value: %w", err)
-	}
-	return f.db.Put(key, value)
-}
+func (f Index) Put(i Item) (err error) { _ = "STUB: not implemented"; return nil }
 
 // PutInBatch is the same as Put method, but it just
 // saves the key/value pair to the batch instead
 // directly to the database.
 func (f Index) PutInBatch(batch *leveldb.Batch, i Item) (err error) {
-	key, err := f.encodeKeyFunc(i)
-	if err != nil {
-		return fmt.Errorf("encode key: %w", err)
-	}
-	value, err := f.encodeValueFunc(i)
-	if err != nil {
-		return fmt.Errorf("encode value: %w", err)
-	}
-	batch.Put(key, value)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Delete accepts Item to remove a key/value pair
 // from the database based on its fields.
-func (f Index) Delete(keyFields Item) (err error) {
-	key, err := f.encodeKeyFunc(keyFields)
-	if err != nil {
-		return fmt.Errorf("encode key: %w", err)
-	}
-	return f.db.Delete(key)
-}
+func (f Index) Delete(keyFields Item) (err error) { _ = "STUB: not implemented"; return nil }
 
 // DeleteInBatch is the same as Delete just the operation
 // is performed on the batch instead on the database.
 func (f Index) DeleteInBatch(batch *leveldb.Batch, keyFields Item) (err error) {
-	key, err := f.encodeKeyFunc(keyFields)
-	if err != nil {
-		return fmt.Errorf("encode key: %w", err)
-	}
-	batch.Delete(key)
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -332,130 +177,49 @@ type IterateOptions struct {
 // Iterate function iterates over keys of the Index.
 // If IterateOptions is nil, the iterations is over all keys.
 func (f Index) Iterate(fn IndexIterFunc, options *IterateOptions) (err error) {
-	if options == nil {
-		options = new(IterateOptions)
-	}
-	// construct a prefix with Index prefix and optional common key prefix
-	prefix := append(f.prefix, options.Prefix...)
-	// start from the prefix
-	startKey := prefix
-	if options.StartFrom != nil {
-		// start from the provided StartFrom Item key value
-		startKey, err = f.encodeKeyFunc(*options.StartFrom)
-		if err != nil {
-			return fmt.Errorf("encode key: %w", err)
-		}
-	}
-
-	it := f.db.NewIterator()
-	defer it.Release()
-
-	var ok bool
-
-	// move the cursor to the start key
-	ok = it.Seek(startKey)
-
-	if !options.Reverse {
-		if !ok {
-			// stop iterator if seek has failed
-			return it.Error()
-		}
-	} else {
-		// reverse seeker
-		if options.StartFrom != nil {
-			if !ok {
-				return it.Error()
-			}
-		} else {
-			// find last key for this index (and prefix)
-
-			// move cursor to last key
-			ok = it.Last()
-			if !ok {
-				return it.Error()
-			}
-
-			if lastKeyHasPrefix := bytes.HasPrefix(it.Key(), prefix); !lastKeyHasPrefix {
-				// increment last prefix byte (that is not 0xFF) to try to find last key
-				incrementedPrefix := bytesIncrement(prefix)
-				if incrementedPrefix == nil {
-					return fmt.Errorf("index iterator invalid prefix: %v -> %v", prefix, string(prefix))
-				}
-
-				// should find first key after prefix (same or different index)
-				ok = it.Seek(incrementedPrefix)
-				if !ok {
-					return it.Error()
-				}
-
-				// previous key should have proper prefix
-				ok = it.Prev()
-				if !ok {
-					return it.Error()
-				}
-			}
-		}
-	}
-
-	itSeekerFn := it.Next
-	if options.Reverse {
-		itSeekerFn = it.Prev
-	}
-	if options.SkipStartFromItem && bytes.Equal(startKey, it.Key()) {
-		// skip the start from Item if it is the first key
-		// and it is explicitly configured to skip it
-		ok = itSeekerFn()
-	}
-	for ; ok; ok = itSeekerFn() {
-		item, err := f.itemFromIterator(it, prefix)
-		if err != nil {
-			if errors.Is(err, leveldb.ErrNotFound) {
-				break
-			}
-			return fmt.Errorf("get item from iterator: %w", err)
-		}
-		stop, err := fn(item)
-		if err != nil {
-			return fmt.Errorf("index iterator function: %w", err)
-		}
-		if stop {
-			break
-		}
-	}
-	return it.Error()
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// construct a prefix with Index prefix and optional common key prefix
+
+// start from the prefix
+
+// start from the provided StartFrom Item key value
+
+// move the cursor to the start key
+
+// stop iterator if seek has failed
+
+// reverse seeker
+
+// find last key for this index (and prefix)
+
+// move cursor to last key
+
+// increment last prefix byte (that is not 0xFF) to try to find last key
+
+// should find first key after prefix (same or different index)
+
+// previous key should have proper prefix
+
+// skip the start from Item if it is the first key
+// and it is explicitly configured to skip it
 
 // bytesIncrement increments the last byte that is not 0xFF, and returns
 // a new byte array truncated after the position that was incremented.
-func bytesIncrement(bytes []byte) []byte {
-	b := append(bytes[:0:0], bytes...)
+func bytesIncrement(bytes []byte) []byte { _ = "STUB: not implemented"; return nil }
 
-	for i := len(bytes) - 1; i >= 0; {
-		if b[i] == 0xFF {
-			i--
-			continue
-		}
+// found byte smaller than 0xFF: increment and truncate
 
-		// found byte smaller than 0xFF: increment and truncate
-		b[i]++
-		return b[:i+1]
-	}
-
-	// input contained only 0xFF bytes
-	return nil
-}
+// input contained only 0xFF bytes
 
 // First returns the first item in the Index which encoded key starts with a prefix.
 // If the prefix is nil, the first element of the whole index is returned.
 // If Index has no elements, a leveldb.ErrNotFound error is returned.
 func (f Index) First(prefix []byte) (i Item, err error) {
-	it := f.db.NewIterator()
-	defer it.Release()
-
-	totalPrefix := append(f.prefix, prefix...)
-	it.Seek(totalPrefix)
-
-	return f.itemFromIterator(it, totalPrefix)
+	_ = "STUB: not implemented"
+	return *new(Item), nil
 }
 
 // itemFromIterator returns the Item from the current iterator position.
@@ -463,100 +227,41 @@ func (f Index) First(prefix []byte) (i Item, err error) {
 // leveldb.ErrNotFound is returned. Value for totalPrefix must start with
 // Index prefix.
 func (f Index) itemFromIterator(it iterator.Iterator, totalPrefix []byte) (i Item, err error) {
-	key := it.Key()
-	if !bytes.HasPrefix(key, totalPrefix) {
-		return i, leveldb.ErrNotFound
-	}
-	// create a copy of key byte slice not to share leveldb underlying slice array
-	keyItem, err := f.decodeKeyFunc(append([]byte(nil), key...))
-	if err != nil {
-		return i, fmt.Errorf("decode key: %w", err)
-	}
-	// create a copy of value byte slice not to share leveldb underlying slice array
-	valueItem, err := f.decodeValueFunc(keyItem, append([]byte(nil), it.Value()...))
-	if err != nil {
-		return i, fmt.Errorf("decode value: %w", err)
-	}
-	return keyItem.Merge(valueItem), it.Error()
+	_ = "STUB: not implemented"
+	return *new(Item), nil
 }
+
+// create a copy of key byte slice not to share leveldb underlying slice array
+
+// create a copy of value byte slice not to share leveldb underlying slice array
 
 // Last returns the last item in the Index which encoded key starts with a prefix.
 // If the prefix is nil, the last element of the whole index is returned.
 // If Index has no elements, a leveldb.ErrNotFound error is returned.
 func (f Index) Last(prefix []byte) (i Item, err error) {
-	it := f.db.NewIterator()
-	defer it.Release()
-
-	// get the next prefix in line
-	// since leveldb iterator Seek seeks to the
-	// next key if the key that it seeks to is not found
-	// and by getting the previous key, the last one for the
-	// actual prefix is found
-	nextPrefix := incByteSlice(prefix)
-	l := len(prefix)
-
-	if l > 0 && nextPrefix != nil {
-		it.Seek(append(f.prefix, nextPrefix...))
-		it.Prev()
-	} else {
-		it.Last()
-	}
-
-	totalPrefix := append(f.prefix, prefix...)
-	return f.itemFromIterator(it, totalPrefix)
+	_ = "STUB: not implemented"
+	return *new(Item), nil
 }
+
+// get the next prefix in line
+// since leveldb iterator Seek seeks to the
+// next key if the key that it seeks to is not found
+// and by getting the previous key, the last one for the
+// actual prefix is found
 
 // incByteSlice returns the byte slice of the same size
 // of the provided one that is by one incremented in its
 // total value. If all bytes in provided slice are equal
 // to 255 a nil slice would be returned indicating that
 // increment can not happen for the same length.
-func incByteSlice(b []byte) (next []byte) {
-	l := len(b)
-	next = make([]byte, l)
-	copy(next, b)
-	for i := l - 1; i >= 0; i-- {
-		if b[i] == 255 {
-			next[i] = 0
-		} else {
-			next[i] = b[i] + 1
-			return next
-		}
-	}
-	return nil
-}
+func incByteSlice(b []byte) (next []byte) { _ = "STUB: not implemented"; return nil }
 
 // Count returns the number of items in index.
-func (f Index) Count() (count int, err error) {
-	it := f.db.NewIterator()
-	defer it.Release()
-
-	for ok := it.Seek(f.prefix); ok; ok = it.Next() {
-		key := it.Key()
-		if key[0] != f.prefix[0] {
-			break
-		}
-		count++
-	}
-	return count, it.Error()
-}
+func (f Index) Count() (count int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 // CountFrom returns the number of items in index keys
 // starting from the key encoded from the provided Item.
 func (f Index) CountFrom(start Item) (count int, err error) {
-	startKey, err := f.encodeKeyFunc(start)
-	if err != nil {
-		return 0, fmt.Errorf("encode key: %w", err)
-	}
-	it := f.db.NewIterator()
-	defer it.Release()
-
-	for ok := it.Seek(startKey); ok; ok = it.Next() {
-		key := it.Key()
-		if key[0] != f.prefix[0] {
-			break
-		}
-		count++
-	}
-	return count, it.Error()
+	_ = "STUB: not implemented"
+	return 0, nil
 }

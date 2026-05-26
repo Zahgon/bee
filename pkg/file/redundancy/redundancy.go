@@ -5,10 +5,7 @@
 package redundancy
 
 import (
-	"fmt"
-
 	"github.com/ethersphere/bee/v2/pkg/file/pipeline"
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 	"github.com/klauspost/reedsolomon"
 )
 
@@ -44,155 +41,60 @@ type Params struct {
 }
 
 func New(level Level, encryption bool, pipeLine pipeline.PipelineFunc) *Params {
-	maxShards := 0
-	maxParity := 0
-	if encryption {
-		maxShards = level.GetMaxEncShards()
-		maxParity = level.GetParities(swarm.EncryptedBranches)
-	} else {
-		maxShards = level.GetMaxShards()
-		maxParity = level.GetParities(swarm.BmtBranches)
-	}
-	// init dataBuffer for erasure coding
-	rsChunkLevels := 0
-	if level != NONE {
-		rsChunkLevels = 8
-	}
-	Buffer := make([][][]byte, rsChunkLevels)
-	for i := 0; i < rsChunkLevels; i++ {
-		Buffer[i] = make([][]byte, swarm.BmtBranches) // 128 long always because buffer varies at encrypted chunks
-	}
-
-	return &Params{
-		level:      level,
-		pipeLine:   pipeLine,
-		buffer:     Buffer,
-		cursor:     make([]int, 9),
-		maxShards:  maxShards,
-		maxParity:  maxParity,
-		encryption: encryption,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *Params) MaxShards() int {
-	return p.maxShards
-}
+// init dataBuffer for erasure coding
 
-func (p *Params) Level() Level {
-	return p.level
-}
+// 128 long always because buffer varies at encrypted chunks
 
-func (p *Params) Parities(shards int) int {
-	if p.encryption {
-		return p.level.GetEncParities(shards)
-	}
-	return p.level.GetParities(shards)
-}
+func (p *Params) MaxShards() int { _ = "STUB: not implemented"; return 0 }
+
+func (p *Params) Level() Level { _ = "STUB: not implemented"; return *new(Level) }
+
+func (p *Params) Parities(shards int) int { _ = "STUB: not implemented"; return 0 }
 
 // ChunkWrite caches the chunk data on the given chunk level and if it is full then it calls Encode
 func (p *Params) ChunkWrite(chunkLevel int, data []byte, callback ParityChunkCallback) error {
-	if p.level == NONE {
-		return nil
-	}
-	if len(data) != swarm.ChunkWithSpanSize {
-		zeros := make([]byte, swarm.ChunkWithSpanSize-len(data))
-		data = append(data, zeros...)
-	}
-
-	return p.chunkWrite(chunkLevel, data, callback)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ChunkWrite caches the chunk data on the given chunk level and if it is full then it calls Encode
 func (p *Params) chunkWrite(chunkLevel int, data []byte, callback ParityChunkCallback) error {
+	_ = "STUB: not implemented"
 	// append chunk to the buffer
-	p.buffer[chunkLevel][p.cursor[chunkLevel]] = data
-	p.cursor[chunkLevel]++
-
-	// add parity chunk if it is necessary
-	if p.cursor[chunkLevel] == p.maxShards {
-		// append erasure coded data
-		return p.encode(chunkLevel, callback)
-	}
 	return nil
 }
+
+// add parity chunk if it is necessary
+
+// append erasure coded data
 
 // Encode produces and stores parity chunks that will be also passed back to the caller
 func (p *Params) Encode(chunkLevel int, callback ParityChunkCallback) error {
-	if p.level == NONE || p.cursor[chunkLevel] == 0 {
-		return nil
-	}
-
-	return p.encode(chunkLevel, callback)
-}
-
-func (p *Params) encode(chunkLevel int, callback ParityChunkCallback) error {
-	shards := p.cursor[chunkLevel]
-	parities := p.Parities(shards)
-
-	n := shards + parities
-	// realloc for parity chunks if it does not override the prev one
-	// calculate parity chunks
-	enc, err := erasureEncoderFunc(shards, parities)
-	if err != nil {
-		return err
-	}
-
-	pz := len(p.buffer[chunkLevel][0])
-	for i := shards; i < n; i++ {
-		p.buffer[chunkLevel][i] = make([]byte, pz)
-	}
-	err = enc.Encode(p.buffer[chunkLevel][:n])
-	if err != nil {
-		return err
-	}
-
-	for i := shards; i < n; i++ {
-		chunkData := p.buffer[chunkLevel][i]
-		span := chunkData[:swarm.SpanSize]
-
-		writer := p.pipeLine()
-		args := pipeline.PipeWriteArgs{
-			Data: chunkData,
-			Span: span,
-		}
-		err = writer.ChainWrite(&args)
-		if err != nil {
-			return err
-		}
-
-		err = callback(chunkLevel+1, span, args.Ref)
-		if err != nil {
-			return err
-		}
-	}
-	p.cursor[chunkLevel] = 0
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+func (p *Params) encode(chunkLevel int, callback ParityChunkCallback) error {
+	_ = "STUB: not implemented"
+	return nil
+}
+
+// realloc for parity chunks if it does not override the prev one
+// calculate parity chunks
+
 // ElevateCarrierChunk moves the last poor orphan chunk to the level above where it can fit and there are other chunks as well.
 func (p *Params) ElevateCarrierChunk(chunkLevel int, callback ParityChunkCallback) error {
-	if p.level == NONE {
-		return nil
-	}
-	if p.cursor[chunkLevel] != 1 {
-		return fmt.Errorf("redundancy: cannot elevate carrier chunk because it is not the only chunk on the level. It has %d chunks", p.cursor[chunkLevel])
-	}
-
-	// not necessary to update current level since we will not work with it anymore
-	return p.chunkWrite(chunkLevel+1, p.buffer[chunkLevel][p.cursor[chunkLevel]-1], callback)
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// not necessary to update current level since we will not work with it anymore
 
 // GetRootData returns the topmost chunk in the tree.
 // throws and error if the encoding has not been finished in the BMT
 // OR redundancy is not used in the BMT
-func (p *Params) GetRootData() ([]byte, error) {
-	if p.level == NONE {
-		return nil, fmt.Errorf("redundancy: no redundancy level is used for the file in order to cache root data")
-	}
-	lastBuffer := p.buffer[len(p.buffer)-1]
-	if len(lastBuffer[0]) != swarm.ChunkWithSpanSize {
-		return nil, fmt.Errorf("redundancy: hashtrie sum has not finished in order to cache root data")
-	}
-	return lastBuffer[0], nil
-}
+func (p *Params) GetRootData() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

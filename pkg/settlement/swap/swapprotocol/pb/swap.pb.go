@@ -5,10 +5,9 @@ package pb
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
-	io "io"
 	math "math"
-	math_bits "math/bits"
+
+	proto "github.com/gogo/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,89 +25,53 @@ type EmitCheque struct {
 	Cheque []byte `protobuf:"bytes,1,opt,name=Cheque,proto3" json:"Cheque,omitempty"`
 }
 
-func (m *EmitCheque) Reset()         { *m = EmitCheque{} }
-func (m *EmitCheque) String() string { return proto.CompactTextString(m) }
-func (*EmitCheque) ProtoMessage()    {}
-func (*EmitCheque) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c35a3890a6e60fb7, []int{0}
-}
-func (m *EmitCheque) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *EmitCheque) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *EmitCheque) String() string            { _ = "STUB: not implemented"; return "" }
+func (*EmitCheque) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*EmitCheque) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *EmitCheque) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *EmitCheque) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_EmitCheque.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *EmitCheque) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EmitCheque.Merge(m, src)
-}
-func (m *EmitCheque) XXX_Size() int {
-	return m.Size()
-}
-func (m *EmitCheque) XXX_DiscardUnknown() {
-	xxx_messageInfo_EmitCheque.DiscardUnknown(m)
-}
+
+func (m *EmitCheque) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *EmitCheque) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *EmitCheque) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_EmitCheque proto.InternalMessageInfo
 
-func (m *EmitCheque) GetCheque() []byte {
-	if m != nil {
-		return m.Cheque
-	}
-	return nil
-}
+func (m *EmitCheque) GetCheque() []byte { _ = "STUB: not implemented"; return nil }
 
 type Handshake struct {
 	Beneficiary []byte `protobuf:"bytes,1,opt,name=Beneficiary,proto3" json:"Beneficiary,omitempty"`
 }
 
-func (m *Handshake) Reset()         { *m = Handshake{} }
-func (m *Handshake) String() string { return proto.CompactTextString(m) }
-func (*Handshake) ProtoMessage()    {}
-func (*Handshake) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c35a3890a6e60fb7, []int{1}
-}
-func (m *Handshake) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *Handshake) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *Handshake) String() string            { _ = "STUB: not implemented"; return "" }
+func (*Handshake) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*Handshake) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *Handshake) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *Handshake) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Handshake.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *Handshake) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Handshake.Merge(m, src)
-}
-func (m *Handshake) XXX_Size() int {
-	return m.Size()
-}
-func (m *Handshake) XXX_DiscardUnknown() {
-	xxx_messageInfo_Handshake.DiscardUnknown(m)
-}
+
+func (m *Handshake) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *Handshake) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *Handshake) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_Handshake proto.InternalMessageInfo
 
-func (m *Handshake) GetBeneficiary() []byte {
-	if m != nil {
-		return m.Beneficiary
-	}
-	return nil
-}
+func (m *Handshake) GetBeneficiary() []byte { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	proto.RegisterType((*EmitCheque)(nil), "swapprotocol.EmitCheque")
@@ -130,361 +93,39 @@ var fileDescriptor_c35a3890a6e60fb7 = []byte{
 	0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7a, 0xdd, 0x22, 0xd8, 0x95, 0x00, 0x00, 0x00,
 }
 
-func (m *EmitCheque) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *EmitCheque) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *EmitCheque) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *EmitCheque) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *EmitCheque) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Cheque) > 0 {
-		i -= len(m.Cheque)
-		copy(dAtA[i:], m.Cheque)
-		i = encodeVarintSwap(dAtA, i, uint64(len(m.Cheque)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *Handshake) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *Handshake) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *Handshake) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *Handshake) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *Handshake) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Beneficiary) > 0 {
-		i -= len(m.Beneficiary)
-		copy(dAtA[i:], m.Beneficiary)
-		i = encodeVarintSwap(dAtA, i, uint64(len(m.Beneficiary)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func encodeVarintSwap(dAtA []byte, offset int, v uint64) int {
-	offset -= sovSwap(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
-func (m *EmitCheque) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Cheque)
-	if l > 0 {
-		n += 1 + l + sovSwap(uint64(l))
-	}
-	return n
-}
+func encodeVarintSwap(dAtA []byte, offset int, v uint64) int { _ = "STUB: not implemented"; return 0 }
 
-func (m *Handshake) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Beneficiary)
-	if l > 0 {
-		n += 1 + l + sovSwap(uint64(l))
-	}
-	return n
-}
+func (m *EmitCheque) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-func sovSwap(x uint64) (n int) {
-	return (math_bits.Len64(x|1) + 6) / 7
-}
-func sozSwap(x uint64) (n int) {
-	return sovSwap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *EmitCheque) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSwap
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: EmitCheque: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EmitCheque: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cheque", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSwap
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthSwap
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Cheque = append(m.Cheque[:0], dAtA[iNdEx:postIndex]...)
-			if m.Cheque == nil {
-				m.Cheque = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSwap(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func (m *Handshake) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Handshake) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowSwap
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Handshake: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Handshake: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Beneficiary", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowSwap
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthSwap
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Beneficiary = append(m.Beneficiary[:0], dAtA[iNdEx:postIndex]...)
-			if m.Beneficiary == nil {
-				m.Beneficiary = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipSwap(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthSwap
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func sovSwap(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipSwap(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowSwap
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowSwap
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowSwap
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthSwap
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupSwap
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthSwap
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
+func sozSwap(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
+
+func (m *EmitCheque) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func (m *Handshake) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func skipSwap(dAtA []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 var (
 	ErrInvalidLengthSwap        = fmt.Errorf("proto: negative length found during unmarshaling")

@@ -73,7 +73,8 @@ func NewDefaultManifest(
 	ls file.LoadSaver,
 	encrypted bool,
 ) (Interface, error) {
-	return NewManifest(DefaultManifestType, ls, encrypted)
+	_ = "STUB: not implemented"
+	return *new(Interface), nil
 }
 
 // NewDefaultManifestReference creates a new manifest with default type.
@@ -81,7 +82,8 @@ func NewDefaultManifestReference(
 	reference swarm.Address,
 	ls file.LoadSaver,
 ) (Interface, error) {
-	return NewManifestReference(DefaultManifestType, reference, ls)
+	_ = "STUB: not implemented"
+	return *new(Interface), nil
 }
 
 // NewManifest creates a new manifest.
@@ -90,14 +92,8 @@ func NewManifest(
 	ls file.LoadSaver,
 	encrypted bool,
 ) (Interface, error) {
-	switch manifestType {
-	case ManifestSimpleContentType:
-		return NewSimpleManifest(ls)
-	case ManifestMantarayContentType:
-		return NewMantarayManifest(ls, encrypted)
-	default:
-		return nil, ErrInvalidManifestType
-	}
+	_ = "STUB: not implemented"
+	return *new(Interface), nil
 }
 
 // NewManifestReference loads existing manifest.
@@ -106,14 +102,8 @@ func NewManifestReference(
 	reference swarm.Address,
 	ls file.LoadSaver,
 ) (Interface, error) {
-	switch manifestType {
-	case ManifestSimpleContentType:
-		return NewSimpleManifestReference(reference, ls)
-	case ManifestMantarayContentType:
-		return NewMantarayManifestReference(reference, ls)
-	default:
-		return nil, ErrInvalidManifestType
-	}
+	_ = "STUB: not implemented"
+	return *new(Interface), nil
 }
 
 type manifestEntry struct {
@@ -123,16 +113,13 @@ type manifestEntry struct {
 
 // NewEntry creates a new manifest entry.
 func NewEntry(reference swarm.Address, metadata map[string]string) Entry {
-	return &manifestEntry{
-		reference: reference,
-		metadata:  metadata,
-	}
+	_ = "STUB: not implemented"
+	return *new(Entry)
 }
 
 func (e *manifestEntry) Reference() swarm.Address {
-	return e.reference
+	_ = "STUB: not implemented"
+	return *new(swarm.Address)
 }
 
-func (e *manifestEntry) Metadata() map[string]string {
-	return e.metadata
-}
+func (e *manifestEntry) Metadata() map[string]string { _ = "STUB: not implemented"; return nil }

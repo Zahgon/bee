@@ -5,16 +5,12 @@
 package ens
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	goens "github.com/wealdtech/go-ens/v3"
 
-	"github.com/ethersphere/bee/v2/pkg/resolver"
 	"github.com/ethersphere/bee/v2/pkg/resolver/client"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -58,145 +54,66 @@ type Option func(*Client)
 
 // NewClient will return a new Client.
 func NewClient(endpoint string, opts ...Option) (client.Interface, error) {
-	c := &Client{
-		endpoint:  endpoint,
-		connectFn: wrapDial,
-		resolveFn: wrapResolve,
-	}
-
-	// Apply all options to the Client.
-	for _, o := range opts {
-		o(c)
-	}
-
-	// Set the default ENS contract address.
-	if c.contractAddr == "" {
-		c.contractAddr = defaultENSContractAddress
-	}
-
-	// Establish a connection to the ENS.
-	if c.connectFn == nil {
-		return nil, fmt.Errorf("connectFn: %w", ErrNotImplemented)
-	}
-	ethCl, registry, err := c.connectFn(c.endpoint, c.contractAddr)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", err, ErrFailedToConnect)
-	}
-	c.ethCl = ethCl
-	c.registry = registry
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return *new(client.Interface), nil
 }
+
+// Apply all options to the Client.
+
+// Set the default ENS contract address.
+
+// Establish a connection to the ENS.
 
 // WithContractAddress will set the ENS contract address.
-func WithContractAddress(addr string) Option {
-	return func(c *Client) {
-		c.contractAddr = addr
-	}
-}
+func WithContractAddress(addr string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // IsConnected returns true if there is an active RPC connection with an
 // Ethereum node at the configured endpoint.
-func (c *Client) IsConnected() bool {
-	return c.ethCl != nil
-}
+func (c *Client) IsConnected() bool { _ = "STUB: not implemented"; return false }
 
 // Endpoint returns the endpoint the client was connected to.
 func (c *Client) Endpoint() string {
-	return c.endpoint
+	_ = "STUB: not implemented"
+
+	// Resolve implements the resolver.Client interface.
+	return ""
 }
 
-// Resolve implements the resolver.Client interface.
 func (c *Client) Resolve(name string) (Address, error) {
-	if c.resolveFn == nil {
-		return swarm.ZeroAddress, fmt.Errorf("resolveFn: %w", ErrNotImplemented)
-	}
-
-	hash, err := c.resolveFn(c.registry, common.HexToAddress(c.contractAddr), name)
-	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("%w: %w", err, ErrResolveFailed)
-	}
-
-	// Ensure that the content hash string is in a valid format, eg.
-	// "bzz://<address>".
-	if !strings.HasPrefix(hash, swarmContentHashPrefix) {
-		return swarm.ZeroAddress, fmt.Errorf("check content hash prefix %s: %w", hash, resolver.ErrInvalidContentHash)
-	}
-
-	// Trim the prefix and try to parse the result as a bzz address.
-	addr, err := swarm.ParseHexAddress(strings.TrimPrefix(hash, swarmContentHashPrefix))
-	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("parse response hash %s: %w", hash, resolver.ErrInvalidContentHash)
-	}
-
-	return addr, nil
+	_ = "STUB: not implemented"
+	return *new(Address), nil
 }
+
+// Ensure that the content hash string is in a valid format, eg.
+// "bzz://<address>".
+
+// Trim the prefix and try to parse the result as a bzz address.
 
 // Close closes the RPC connection with the client, terminating all unfinished
 // requests. If the connection is already closed, this call is a noop.
-func (c *Client) Close() error {
-	if c.ethCl != nil {
-		c.ethCl.Close()
-	}
-	c.ethCl = nil
-
-	return nil
-}
+func (c *Client) Close() error { _ = "STUB: not implemented"; return nil }
 
 func wrapDial(endpoint, contractAddr string) (*ethclient.Client, *goens.Registry, error) {
+	_ = "STUB: not implemented"
 	// Dial the eth client.
-	ethCl, err := ethclient.Dial(endpoint)
-	if err != nil {
-		return nil, nil, fmt.Errorf("dial: %w", err)
-	}
-
-	// Obtain the ENS registry.
-	registry, err := goens.NewRegistryAt(ethCl, common.HexToAddress(contractAddr))
-	if err != nil {
-		return nil, nil, fmt.Errorf("new registry: %w", err)
-	}
-
-	// Ensure that the ENS registry client is deployed to the given contract address.
-	_, err = registry.Owner("")
-	if err != nil {
-		return nil, nil, fmt.Errorf("owner: %w", err)
-	}
-
-	return ethCl, registry, nil
+	return nil, nil, nil
 }
+
+// Obtain the ENS registry.
+
+// Ensure that the ENS registry client is deployed to the given contract address.
 
 func wrapResolve(registry *goens.Registry, _ common.Address, name string) (string, error) {
-	ownerAddress, err := registry.Owner(name)
-	// it returns error only if the service is not available
-	if err != nil {
-		return "", fmt.Errorf("%w: %w", resolver.ErrServiceNotAvailable, err)
-	}
-
-	// If the name is not registered, return an error.
-	if bytes.Equal(ownerAddress.Bytes(), goens.UnknownAddress.Bytes()) {
-		return "", fmt.Errorf("%w: %w", errNameNotRegistered, resolver.ErrNotFound)
-	}
-
-	// Obtain the resolver for this domain name.
-	ensR, err := registry.Resolver(name)
-	if err != nil {
-		return "", fmt.Errorf("%w: %w", resolver.ErrServiceNotAvailable, err)
-	}
-
-	// Try and read out the content hash record.
-	ch, err := ensR.Contenthash()
-	if err != nil {
-		// Check if it's a service error (rate limiting, network issues)
-		if strings.Contains(err.Error(), "429") || strings.Contains(err.Error(), "rate limit") {
-			return "", fmt.Errorf("%w: %w", resolver.ErrServiceNotAvailable, err)
-		}
-		return "", fmt.Errorf("contenthash: %w: %w", err, resolver.ErrInvalidContentHash)
-	}
-
-	addr, err := goens.ContenthashToString(ch)
-	if err != nil {
-		return "", fmt.Errorf("contenthash to string: %w: %w", err, resolver.ErrInvalidContentHash)
-	}
-
-	return addr, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
+
+// it returns error only if the service is not available
+
+// If the name is not registered, return an error.
+
+// Obtain the resolver for this domain name.
+
+// Try and read out the content hash record.
+
+// Check if it's a service error (rate limiting, network issues)

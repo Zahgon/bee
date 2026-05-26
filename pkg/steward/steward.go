@@ -8,16 +8,12 @@ package steward
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
-	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
 	"github.com/ethersphere/bee/v2/pkg/postage"
 	"github.com/ethersphere/bee/v2/pkg/retrieval"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/storer"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/ethersphere/bee/v2/pkg/topology"
 	"github.com/ethersphere/bee/v2/pkg/traversal"
 )
 
@@ -39,12 +35,8 @@ type steward struct {
 }
 
 func New(ns storer.NetStore, r retrieval.Interface, joinerPutter storage.Putter) Interface {
-	return &steward{
-		netStore:     ns,
-		traverser:    traversal.New(ns.Download(true), joinerPutter, redundancy.DefaultLevel),
-		netTraverser: traversal.New(&netGetter{r}, joinerPutter, redundancy.DefaultLevel),
-		netGetter:    r,
-	}
+	_ = "STUB: not implemented"
+	return *new(Interface)
 }
 
 // Reupload content with the given root hash to the network.
@@ -53,49 +45,14 @@ func New(ns storer.NetStore, r retrieval.Interface, joinerPutter storage.Putter)
 // It assumes all chunks are available locally. It is therefore
 // advisable to pin the content locally before trying to reupload it.
 func (s *steward) Reupload(ctx context.Context, root swarm.Address, stamper postage.Stamper) error {
-	uploaderSession := s.netStore.DirectUpload()
-	getter := s.netStore.Download(false)
-
-	fn := func(addr swarm.Address) error {
-		c, err := getter.Get(ctx, addr)
-		if err != nil {
-			return err
-		}
-
-		stamp, err := stamper.Stamp(c.Address(), c.Address())
-		if err != nil {
-			return fmt.Errorf("stamping chunk %s: %w", c.Address(), err)
-		}
-
-		return uploaderSession.Put(ctx, c.WithStamp(stamp))
-	}
-
-	if err := s.traverser.Traverse(ctx, root, fn); err != nil {
-		return errors.Join(
-			fmt.Errorf("traversal of %s failed: %w", root.String(), err),
-			uploaderSession.Cleanup(),
-		)
-	}
-
-	return uploaderSession.Done(root)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // IsRetrievable implements Interface.IsRetrievable method.
 func (s *steward) IsRetrievable(ctx context.Context, root swarm.Address) (bool, error) {
-	fn := func(a swarm.Address) error {
-		_, err := s.netGetter.RetrieveChunk(ctx, a, swarm.ZeroAddress)
-		return err
-	}
-	switch err := s.netTraverser.Traverse(ctx, root, fn); {
-	case errors.Is(err, storage.ErrNotFound):
-		return false, nil
-	case errors.Is(err, topology.ErrNotFound):
-		return false, nil
-	case err != nil:
-		return false, fmt.Errorf("traversal of %q failed: %w", root, err)
-	default:
-		return true, nil
-	}
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 // netGetter implements the storage Getter.Get method in a way
@@ -106,5 +63,6 @@ type netGetter struct {
 
 // Get implements the storage Getter.Get interface.
 func (ng *netGetter) Get(ctx context.Context, addr swarm.Address) (swarm.Chunk, error) {
-	return ng.retrieval.RetrieveChunk(ctx, addr, swarm.ZeroAddress)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }

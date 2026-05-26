@@ -15,35 +15,15 @@ type inflight struct {
 	inflight map[[64]byte]struct{}
 }
 
-func newInflight() *inflight {
-	return &inflight{
-		inflight: make(map[[64]byte]struct{}),
-	}
-}
+func newInflight() *inflight { _ = "STUB: not implemented"; return nil }
 
 func (i *inflight) delete(idAddress swarm.Address, batchID []byte) {
-	var key [64]byte
-	copy(key[:32], idAddress.Bytes())
-	copy(key[32:], batchID)
-
-	i.mtx.Lock()
-	delete(i.inflight, key)
-	i.mtx.Unlock()
+	_ = "STUB: not implemented"
+	return
 }
 
 func (i *inflight) set(idAddress swarm.Address, batchID []byte) bool {
-	var key [64]byte
-	copy(key[:32], idAddress.Bytes())
-	copy(key[32:], batchID)
-
-	i.mtx.Lock()
-	defer i.mtx.Unlock()
-
-	if _, ok := i.inflight[key]; ok {
-		return true
-	}
-
-	i.inflight[key] = struct{}{}
+	_ = "STUB: not implemented"
 	return false
 }
 
@@ -55,17 +35,6 @@ type attempts struct {
 
 // try to log a chunk sync attempt. returns false when
 // maximum amount of attempts have been reached.
-func (a *attempts) try(idAddress swarm.Address) bool {
-	a.mtx.Lock()
-	defer a.mtx.Unlock()
+func (a *attempts) try(idAddress swarm.Address) bool { _ = "STUB: not implemented"; return false }
 
-	key := idAddress.ByteString()
-	a.attempts[key]++
-	return a.attempts[key] < a.retryCount
-}
-
-func (a *attempts) delete(idAddress swarm.Address) {
-	a.mtx.Lock()
-	delete(a.attempts, idAddress.ByteString())
-	a.mtx.Unlock()
-}
+func (a *attempts) delete(idAddress swarm.Address) { _ = "STUB: not implemented"; return }

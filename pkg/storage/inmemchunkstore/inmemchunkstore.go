@@ -22,99 +22,38 @@ type chunkCount struct {
 	count int
 }
 
-func New() *ChunkStore {
-	return &ChunkStore{
-		chunks: make(map[string]chunkCount),
-	}
-}
+func New() *ChunkStore { _ = "STUB: not implemented"; return nil }
 
 func (c *ChunkStore) Get(_ context.Context, addr swarm.Address) (swarm.Chunk, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	chunk, ok := c.chunks[c.key(addr)]
-	if !ok {
-		return nil, storage.ErrNotFound
-	}
-	return chunk.chunk, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 func (c *ChunkStore) Put(_ context.Context, ch swarm.Chunk) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	chunkCount, ok := c.chunks[c.key(ch.Address())]
-	if !ok {
-		chunkCount.chunk = swarm.NewChunk(ch.Address(), ch.Data()).WithStamp(ch.Stamp())
-	}
-	chunkCount.count++
-	c.chunks[c.key(ch.Address())] = chunkCount
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (c *ChunkStore) Has(_ context.Context, addr swarm.Address) (bool, error) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	_, exists := c.chunks[c.key(addr)]
-
-	return exists, nil
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 func (c *ChunkStore) Delete(_ context.Context, addr swarm.Address) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	chunkCount := c.chunks[c.key(addr)]
-	chunkCount.count--
-	if chunkCount.count <= 0 {
-		delete(c.chunks, addr.ByteString())
-	} else {
-		c.chunks[c.key(addr)] = chunkCount
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (c *ChunkStore) Replace(_ context.Context, ch swarm.Chunk, emplace bool) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	chunkCount := c.chunks[c.key(ch.Address())]
-	chunkCount.chunk = ch
-	if emplace {
-		chunkCount.count++
-	}
-	c.chunks[c.key(ch.Address())] = chunkCount
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (c *ChunkStore) Iterate(_ context.Context, fn storage.IterateChunkFn) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	for _, chunkCount := range c.chunks {
-		stop, err := fn(chunkCount.chunk)
-		if err != nil {
-			return err
-		}
-		if stop {
-			return nil
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (c *ChunkStore) Close() error {
-	return nil
-}
+func (c *ChunkStore) Close() error { _ = "STUB: not implemented"; return nil }
 
-func (c *ChunkStore) key(addr swarm.Address) string {
-	if len(addr.Bytes()) < swarm.HashSize {
-		return addr.ByteString()
-	}
-	return string(addr.Bytes()[:swarm.HashSize])
-}
+func (c *ChunkStore) key(addr swarm.Address) string { _ = "STUB: not implemented"; return "" }

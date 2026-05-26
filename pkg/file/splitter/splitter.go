@@ -7,12 +7,9 @@ package splitter
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"io"
 
 	"github.com/ethersphere/bee/v2/pkg/file"
-	"github.com/ethersphere/bee/v2/pkg/file/splitter/internal"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -24,9 +21,8 @@ type simpleSplitter struct {
 
 // NewSimpleSplitter creates a new SimpleSplitter
 func NewSimpleSplitter(storePutter storage.Putter) file.Splitter {
-	return &simpleSplitter{
-		putter: storePutter,
-	}
+	_ = "STUB: not implemented"
+	return *new(file.Splitter)
 }
 
 // Split implements the file.Splitter interface
@@ -36,34 +32,6 @@ func NewSimpleSplitter(storePutter storage.Putter) file.Splitter {
 //
 // It returns the Swarmhash of the data.
 func (s *simpleSplitter) Split(ctx context.Context, r io.ReadCloser, dataLength int64, toEncrypt bool) (addr swarm.Address, err error) {
-	j := internal.NewSimpleSplitterJob(ctx, s.putter, dataLength, toEncrypt)
-	var total int64
-	data := make([]byte, swarm.ChunkSize)
-	var eof bool
-	for !eof {
-		c, err := r.Read(data)
-		total += int64(c)
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				if total < dataLength {
-					return swarm.ZeroAddress, fmt.Errorf("splitter only received %d bytes of data, expected %d bytes", total+int64(c), dataLength)
-				}
-				eof = true
-				continue
-			} else {
-				return swarm.ZeroAddress, err
-			}
-		}
-		cc, err := j.Write(data[:c])
-		if err != nil {
-			return swarm.ZeroAddress, err
-		}
-		if cc < c {
-			return swarm.ZeroAddress, fmt.Errorf("write count to file hasher component %d does not match read count %d", cc, c)
-		}
-	}
-
-	sum := j.Sum(nil)
-	newAddress := swarm.NewAddress(sum)
-	return newAddress, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }

@@ -5,7 +5,6 @@
 package transaction
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -15,27 +14,4 @@ type metrics struct {
 }
 
 // newMetrics is a convenient constructor for creating new metrics.
-func newMetrics() metrics {
-	const subsystem = "transaction"
-
-	return metrics{
-		MethodCalls: prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Namespace: m.Namespace,
-				Subsystem: subsystem,
-				Name:      "method_calls",
-				Help:      "The number of method calls.",
-			},
-			[]string{"method", "status"},
-		),
-		MethodDuration: prometheus.NewHistogramVec(
-			prometheus.HistogramOpts{
-				Namespace: m.Namespace,
-				Subsystem: subsystem,
-				Name:      "method_duration",
-				Help:      "The duration each method call took.",
-			},
-			[]string{"method", "status"},
-		),
-	}
-}
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }

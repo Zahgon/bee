@@ -5,7 +5,6 @@
 package libp2p
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -29,108 +28,9 @@ type metrics struct {
 	HeadersExchangeDuration    prometheus.Histogram
 }
 
-func newMetrics() metrics {
-	subsystem := "libp2p"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		CreatedConnectionCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "created_connection_count",
-			Help:      "Number of initiated outgoing libp2p connections.",
-		}),
-		HandledConnectionCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "handled_connection_count",
-			Help:      "Number of handled incoming libp2p connections.",
-		}),
-		CreatedStreamCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "created_stream_count",
-			Help:      "Number of initiated outgoing libp2p streams.",
-		}),
-		ClosedStreamCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "closed_stream_count",
-			Help:      "Number of closed outgoing libp2p streams.",
-		}),
-		StreamResetCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "stream_reset_count",
-			Help:      "Number of outgoing libp2p streams resets.",
-		}),
-		HandledStreamCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "handled_stream_count",
-			Help:      "Number of handled incoming libp2p streams.",
-		}),
-		BlocklistedPeerCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "blocklisted_peer_count",
-			Help:      "Number of peers we've blocklisted.",
-		}),
-		BlocklistedPeerErrCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "blocklisted_peer_err_count",
-			Help:      "Number of peers we've been unable to blocklist.",
-		}),
-		DisconnectCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "disconnect_count",
-			Help:      "Number of peers we've disconnected from (initiated locally).",
-		}),
-		ConnectBreakerCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "connect_breaker_count",
-			Help:      "Number of times we got a closed breaker while connecting to another peer.",
-		}),
-		UnexpectedProtocolReqCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "unexpected_protocol_request_count",
-			Help:      "Number of requests the peer is not expecting.",
-		}),
-		KickedOutPeersCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "kickedout_peers_count",
-			Help:      "Number of total kicked-out peers.",
-		}),
-		StreamHandlerErrResetCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "stream_handler_error_reset_count",
-			Help:      "Number of total stream handler error resets.",
-		}),
-		HeadersExchangeDuration: prometheus.NewHistogram(prometheus.HistogramOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "headers_exchange_duration",
-			Help:      "The duration spent exchanging the headers.",
-		}),
-	}
-}
-
-func (s *Service) Metrics() []prometheus.Collector {
-	collectors := append(m.PrometheusCollectorsFromFields(s.metrics), s.handshakeService.Metrics()...)
-	if mc, ok := s.reacher.(interface{ Metrics() []prometheus.Collector }); ok {
-		collectors = append(collectors, mc.Metrics()...)
-	}
-	return collectors
-}
+func (s *Service) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }
 
 // StatusMetrics exposes metrics that are exposed on the status protocol.
-func (s *Service) StatusMetrics() []prometheus.Collector {
-	return []prometheus.Collector{
-		s.metrics.HeadersExchangeDuration,
-	}
-}
+func (s *Service) StatusMetrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

@@ -5,11 +5,4 @@
 package bzz
 
 // ContainsAddress reports whether a is present in addrs.
-func ContainsAddress(addrs []Address, a *Address) bool {
-	for _, v := range addrs {
-		if v.Equal(a) {
-			return true
-		}
-	}
-	return false
-}
+func ContainsAddress(addrs []Address, a *Address) bool { _ = "STUB: not implemented"; return false }

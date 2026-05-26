@@ -8,10 +8,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
-	"fmt"
 
-	"github.com/btcsuite/btcd/btcec/v2"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethersphere/bee/v2/pkg/file"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -51,131 +48,48 @@ var _ GranteeList = (*GranteeListStruct)(nil)
 
 // Get simply returns the list of public keys.
 func (g *GranteeListStruct) Get() []*ecdsa.PublicKey {
-	return g.grantees
+	_ = "STUB: not implemented"
+
+	// Add adds a list of public keys to the grantee list. It filters out duplicates.
+	return nil
 }
 
-// Add adds a list of public keys to the grantee list. It filters out duplicates.
 func (g *GranteeListStruct) Add(addList []*ecdsa.PublicKey) error {
-	if len(addList) == 0 {
-		return ErrNothingToAdd
-	}
-	filteredList := make([]*ecdsa.PublicKey, 0, len(addList))
-	for _, addkey := range addList {
-		add := true
-		for _, granteekey := range g.grantees {
-			if granteekey.Equal(addkey) {
-				add = false
-				break
-			}
-		}
-		for _, filteredkey := range filteredList {
-			if filteredkey.Equal(addkey) {
-				add = false
-				break
-			}
-		}
-		if add {
-			filteredList = append(filteredList, addkey)
-		}
-	}
-	g.grantees = append(g.grantees, filteredList...)
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Save saves the grantee list to the underlying storage and returns the reference.
 func (g *GranteeListStruct) Save(ctx context.Context) (swarm.Address, error) {
-	data, err := serialize(g.grantees)
-	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("grantee serialize error: %w", err)
-	}
-	refBytes, err := g.loadSave.Save(ctx, data)
-	if err != nil {
-		return swarm.ZeroAddress, fmt.Errorf("grantee save error: %w", err)
-	}
-
-	return swarm.NewAddress(refBytes), nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
 // Remove removes a list of public keys from the grantee list, if there is any.
 func (g *GranteeListStruct) Remove(keysToRemove []*ecdsa.PublicKey) error {
-	if len(keysToRemove) == 0 {
-		return ErrNothingToRemove
-	}
-
-	if len(g.grantees) == 0 {
-		return ErrNoGranteeFound
-	}
-	grantees := g.grantees
-
-	for _, remove := range keysToRemove {
-		for i := 0; i < len(grantees); i++ {
-			if grantees[i].Equal(remove) {
-				grantees[i] = grantees[len(grantees)-1]
-				grantees = grantees[:len(grantees)-1]
-			}
-		}
-	}
-	g.grantees = grantees
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // NewGranteeList creates a new (and empty) grantee list.
-func NewGranteeList(ls file.LoadSaver) *GranteeListStruct {
-	return &GranteeListStruct{
-		grantees: []*ecdsa.PublicKey{},
-		loadSave: ls,
-	}
-}
+func NewGranteeList(ls file.LoadSaver) *GranteeListStruct { _ = "STUB: not implemented"; return nil }
 
 // NewGranteeListReference loads an existing grantee list.
 func NewGranteeListReference(ctx context.Context, ls file.LoadSaver, reference swarm.Address) (*GranteeListStruct, error) {
-	data, err := ls.Load(ctx, reference.Bytes())
-	if err != nil {
-		return nil, fmt.Errorf("failed to load grantee list reference, %w", err)
-	}
-	grantees := deserialize(data)
-
-	return &GranteeListStruct{
-		grantees: grantees,
-		loadSave: ls,
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func serialize(publicKeys []*ecdsa.PublicKey) ([]byte, error) {
-	b := make([]byte, 0, len(publicKeys)*publicKeyLen)
-	for _, key := range publicKeys {
-		// TODO: check if this is the correct way to serialize the public key
-		// Is this the only curve we support?
-		// Should we have switch case for different curves?
-		//nolint:staticcheck // SA1019: ecdsa fields are deprecated, but secp256k1 is not supported by crypto/ecdh
-		pubBytes := crypto.S256().Marshal(key.X, key.Y)
-		b = append(b, pubBytes...)
-	}
-	return b, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func deserialize(data []byte) []*ecdsa.PublicKey {
-	if len(data) == 0 {
-		return []*ecdsa.PublicKey{}
-	}
+// TODO: check if this is the correct way to serialize the public key
+// Is this the only curve we support?
+// Should we have switch case for different curves?
+//nolint:staticcheck // SA1019: ecdsa fields are deprecated, but secp256k1 is not supported by crypto/ecdh
 
-	p := make([]*ecdsa.PublicKey, 0, len(data)/publicKeyLen)
-	for i := 0; i < len(data); i += publicKeyLen {
-		pubKey := deserializeBytes(data[i : i+publicKeyLen])
-		if pubKey == nil {
-			return []*ecdsa.PublicKey{}
-		}
-		p = append(p, pubKey)
-	}
-	return p
-}
+func deserialize(data []byte) []*ecdsa.PublicKey { _ = "STUB: not implemented"; return nil }
 
-func deserializeBytes(data []byte) *ecdsa.PublicKey {
-	key, err := btcec.ParsePubKey(data)
-	if err != nil {
-		return nil
-	}
-	return key.ToECDSA()
-}
+func deserializeBytes(data []byte) *ecdsa.PublicKey { _ = "STUB: not implemented"; return nil }

@@ -4,32 +4,18 @@
 
 package api
 
-import "sync/atomic"
-
 // ProbeStatus is the status of a probe.
 // ProbeStatus is treated as a sync/atomic int32.
 type ProbeStatus int32
 
 // get returns the value of the ProbeStatus.
-func (ps *ProbeStatus) get() ProbeStatus {
-	return ProbeStatus(atomic.LoadInt32((*int32)(ps)))
-}
+func (ps *ProbeStatus) get() ProbeStatus { _ = "STUB: not implemented"; return *new(ProbeStatus) }
 
 // set updates the value of the ProbeStatus.
-func (ps *ProbeStatus) set(v ProbeStatus) {
-	atomic.StoreInt32((*int32)(ps), int32(v))
-}
+func (ps *ProbeStatus) set(v ProbeStatus) { _ = "STUB: not implemented"; return }
 
 // String implements the fmt.Stringer interface.
-func (ps ProbeStatus) String() string {
-	switch ps.get() {
-	case ProbeStatusOK:
-		return "ok"
-	case ProbeStatusNOK:
-		return "nok"
-	}
-	return "unknown"
-}
+func (ps ProbeStatus) String() string { _ = "STUB: not implemented"; return "" }
 
 const (
 	// ProbeStatusOK indicates positive ProbeStatus status.
@@ -49,31 +35,23 @@ type Probe struct {
 
 // NewProbe returns new Probe.
 func NewProbe() *Probe {
-	return &Probe{}
+	_ = "STUB: not implemented"
+
+	// Healthy returns the value of the healthy status.
+	return nil
 }
 
-// Healthy returns the value of the healthy status.
-func (p *Probe) Healthy() ProbeStatus {
-	if p == nil {
-		return ProbeStatusNOK
-	}
-	return p.healthy.get()
-}
+func (p *Probe) Healthy() ProbeStatus { _ = "STUB: not implemented"; return *new(ProbeStatus) }
 
 // SetHealthy updates the value of the healthy status.
 func (p *Probe) SetHealthy(ps ProbeStatus) {
-	p.healthy.set(ps)
+	_ = "STUB: not implemented"
+
+	// Ready returns the value of the ready status.
+	return
 }
 
-// Ready returns the value of the ready status.
-func (p *Probe) Ready() ProbeStatus {
-	if p == nil {
-		return ProbeStatusNOK
-	}
-	return p.ready.get()
-}
+func (p *Probe) Ready() ProbeStatus { _ = "STUB: not implemented"; return *new(ProbeStatus) }
 
 // SetReady updates the value of the ready status.
-func (p *Probe) SetReady(ps ProbeStatus) {
-	p.ready.set(ps)
-}
+func (p *Probe) SetReady(ps ProbeStatus) { _ = "STUB: not implemented"; return }

@@ -9,9 +9,6 @@
 package jsonhttp
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -45,284 +42,164 @@ type StatusResponse struct {
 
 // Respond writes a JSON-encoded body to http.ResponseWriter.
 func Respond(w http.ResponseWriter, statusCode int, response any) {
-	if statusCode == 0 {
-		statusCode = http.StatusOK
-	}
-	if response == nil {
-		response = &StatusResponse{
-			Message: http.StatusText(statusCode),
-			Code:    statusCode,
-		}
-	} else {
-		switch message := response.(type) {
-		case string:
-			response = &StatusResponse{
-				Message: message,
-				Code:    statusCode,
-			}
-		case error:
-			response = &StatusResponse{
-				Message: message.Error(),
-				Code:    statusCode,
-			}
-		case interface{ String() string }:
-			response = &StatusResponse{
-				Message: message.String(),
-				Code:    statusCode,
-			}
-		}
-	}
-	var b bytes.Buffer
-	enc := json.NewEncoder(&b)
-	enc.SetEscapeHTML(EscapeHTML)
-	if err := enc.Encode(response); err != nil {
-		panic(err)
-	}
-	if DefaultContentTypeHeader != "" {
-		w.Header().Set("Content-Type", DefaultContentTypeHeader)
-	}
-	w.WriteHeader(statusCode)
-	fmt.Fprintln(w, b.String())
+	_ = "STUB: not implemented"
+	return
 }
 
 // Continue writes a response with status code 100.
-func Continue(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusContinue, response)
-}
+func Continue(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // SwitchingProtocols writes a response with status code 101.
-func SwitchingProtocols(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusSwitchingProtocols, response)
-}
+func SwitchingProtocols(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // OK writes a response with status code 200.
-func OK(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusOK, response)
-}
+func OK(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Created writes a response with status code 201.
-func Created(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusCreated, response)
-}
+func Created(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Accepted writes a response with status code 202.
-func Accepted(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusAccepted, response)
-}
+func Accepted(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NonAuthoritativeInfo writes a response with status code 203.
-func NonAuthoritativeInfo(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusNonAuthoritativeInfo, response)
-}
+func NonAuthoritativeInfo(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NoContent writes a response with status code 204. It does not
 // accept a response value since the HTTP server will not write it
 // to the client when returning a NoContent response.
-func NoContent(w http.ResponseWriter) {
-	Respond(w, http.StatusNoContent, nil)
-}
+func NoContent(w http.ResponseWriter) { _ = "STUB: not implemented"; return }
 
 // ResetContent writes a response with status code 205.
-func ResetContent(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusResetContent, response)
-}
+func ResetContent(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // PartialContent writes a response with status code 206.
-func PartialContent(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusPartialContent, response)
-}
+func PartialContent(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // MultipleChoices writes a response with status code 300.
-func MultipleChoices(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusMultipleChoices, response)
-}
+func MultipleChoices(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // MovedPermanently writes a response with status code 301.
-func MovedPermanently(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusMovedPermanently, response)
-}
+func MovedPermanently(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Found writes a response with status code 302.
-func Found(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusFound, response)
-}
+func Found(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // SeeOther writes a response with status code 303.
-func SeeOther(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusSeeOther, response)
-}
+func SeeOther(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NotModified writes a response with status code 304.
-func NotModified(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusNotModified, response)
-}
+func NotModified(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // UseProxy writes a response with status code 305.
-func UseProxy(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUseProxy, response)
-}
+func UseProxy(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // TemporaryRedirect writes a response with status code 307.
-func TemporaryRedirect(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusTemporaryRedirect, response)
-}
+func TemporaryRedirect(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // PermanentRedirect writes a response with status code 308.
-func PermanentRedirect(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusPermanentRedirect, response)
-}
+func PermanentRedirect(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // BadRequest writes a response with status code 400.
-func BadRequest(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusBadRequest, response)
-}
+func BadRequest(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Unauthorized writes a response with status code 401.
-func Unauthorized(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUnauthorized, response)
-}
+func Unauthorized(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // PaymentRequired writes a response with status code 402.
-func PaymentRequired(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusPaymentRequired, response)
-}
+func PaymentRequired(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Forbidden writes a response with status code 403.
-func Forbidden(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusForbidden, response)
-}
+func Forbidden(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NotFound writes a response with status code 404.
-func NotFound(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusNotFound, response)
-}
+func NotFound(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // MethodNotAllowed writes a response with status code 405.
-func MethodNotAllowed(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusMethodNotAllowed, response)
-}
+func MethodNotAllowed(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NotAcceptable writes a response with status code 406.
-func NotAcceptable(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusNotAcceptable, response)
-}
+func NotAcceptable(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // ProxyAuthRequired writes a response with status code 407.
-func ProxyAuthRequired(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusProxyAuthRequired, response)
-}
+func ProxyAuthRequired(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // RequestTimeout writes a response with status code 408.
-func RequestTimeout(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusRequestTimeout, response)
-}
+func RequestTimeout(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Conflict writes a response with status code 409.
-func Conflict(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusConflict, response)
-}
+func Conflict(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Gone writes a response with status code 410.
-func Gone(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusGone, response)
-}
+func Gone(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // LengthRequired writes a response with status code 411.
-func LengthRequired(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusLengthRequired, response)
-}
+func LengthRequired(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // PreconditionFailed writes a response with status code 412.
-func PreconditionFailed(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusPreconditionFailed, response)
-}
+func PreconditionFailed(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // RequestEntityTooLarge writes a response with status code 413.
-func RequestEntityTooLarge(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusRequestEntityTooLarge, response)
-}
+func RequestEntityTooLarge(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // RequestURITooLong writes a response with status code 414.
-func RequestURITooLong(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusRequestURITooLong, response)
-}
+func RequestURITooLong(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // UnsupportedMediaType writes a response with status code 415.
-func UnsupportedMediaType(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUnsupportedMediaType, response)
-}
+func UnsupportedMediaType(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // RequestedRangeNotSatisfiable writes a response with status code 416.
 func RequestedRangeNotSatisfiable(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusRequestedRangeNotSatisfiable, response)
+	_ = "STUB: not implemented"
+	return
 }
 
 // ExpectationFailed writes a response with status code 417.
-func ExpectationFailed(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusExpectationFailed, response)
-}
+func ExpectationFailed(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // Teapot writes a response with status code 418.
-func Teapot(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusTeapot, response)
-}
+func Teapot(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // UnprocessableEntity writes a response with status code 422.
-func UnprocessableEntity(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUnprocessableEntity, response)
-}
+func UnprocessableEntity(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // UpgradeRequired writes a response with status code 426.
-func UpgradeRequired(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUpgradeRequired, response)
-}
+func UpgradeRequired(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // PreconditionRequired writes a response with status code 428.
-func PreconditionRequired(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusPreconditionRequired, response)
-}
+func PreconditionRequired(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // TooManyRequests writes a response with status code 429.
-func TooManyRequests(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusTooManyRequests, response)
-}
+func TooManyRequests(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // RequestHeaderFieldsTooLarge writes a response with status code 431.
 func RequestHeaderFieldsTooLarge(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusRequestHeaderFieldsTooLarge, response)
+	_ = "STUB: not implemented"
+	return
 }
 
 // UnavailableForLegalReasons writes a response with status code 451.
 func UnavailableForLegalReasons(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusUnavailableForLegalReasons, response)
+	_ = "STUB: not implemented"
+	return
 }
 
 // InternalServerError writes a response with status code 500.
-func InternalServerError(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusInternalServerError, response)
-}
+func InternalServerError(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // NotImplemented writes a response with status code 501.
-func NotImplemented(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusNotImplemented, response)
-}
+func NotImplemented(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // BadGateway writes a response with status code 502.
-func BadGateway(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusBadGateway, response)
-}
+func BadGateway(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // ServiceUnavailable writes a response with status code 503.
-func ServiceUnavailable(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusServiceUnavailable, response)
-}
+func ServiceUnavailable(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // GatewayTimeout writes a response with status code 504.
-func GatewayTimeout(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusGatewayTimeout, response)
-}
+func GatewayTimeout(w http.ResponseWriter, response any) { _ = "STUB: not implemented"; return }
 
 // HTTPVersionNotSupported writes a response with status code 505.
 func HTTPVersionNotSupported(w http.ResponseWriter, response any) {
-	Respond(w, http.StatusHTTPVersionNotSupported, response)
+	_ = "STUB: not implemented"
+	return
 }

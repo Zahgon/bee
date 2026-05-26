@@ -24,46 +24,28 @@ type (
 
 // SetHost sets the http request host in the context
 func SetHost(ctx context.Context, domain string) context.Context {
-	return context.WithValue(ctx, requestHostKey{}, domain)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // GetHost gets the request host from the context
-func GetHost(ctx context.Context) string {
-	v, ok := ctx.Value(requestHostKey{}).(string)
-	if ok {
-		return v
-	}
-	return ""
-}
+func GetHost(ctx context.Context) string { _ = "STUB: not implemented"; return "" }
 
 func SetGasLimit(ctx context.Context, limit uint64) context.Context {
-	return context.WithValue(ctx, gasLimitKey{}, limit)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
-func GetGasLimit(ctx context.Context) uint64 {
-	v, ok := ctx.Value(gasLimitKey{}).(uint64)
-	if ok {
-		return v
-	}
+func GetGasLimit(ctx context.Context) uint64 { _ = "STUB: not implemented"; return 0 }
+
+func GetGasLimitWithDefault(ctx context.Context, defaultLimit uint64) uint64 {
+	_ = "STUB: not implemented"
 	return 0
 }
 
-func GetGasLimitWithDefault(ctx context.Context, defaultLimit uint64) uint64 {
-	limit := GetGasLimit(ctx)
-	if limit == 0 {
-		return defaultLimit
-	}
-	return limit
-}
-
 func SetGasPrice(ctx context.Context, price *big.Int) context.Context {
-	return context.WithValue(ctx, gasPriceKey{}, price)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
-func GetGasPrice(ctx context.Context) *big.Int {
-	v, ok := ctx.Value(gasPriceKey{}).(*big.Int)
-	if ok {
-		return v
-	}
-	return nil
-}
+func GetGasPrice(ctx context.Context) *big.Int { _ = "STUB: not implemented"; return nil }

@@ -5,10 +5,7 @@
 package file
 
 import (
-	"bytes"
 	"context"
-	"errors"
-	"fmt"
 	"io"
 
 	"github.com/ethersphere/bee/v2/pkg/swarm"
@@ -22,89 +19,28 @@ type simpleReadCloser struct {
 
 // NewSimpleReadCloser creates a new simpleReadCloser.
 func NewSimpleReadCloser(buffer []byte) io.ReadCloser {
-	return &simpleReadCloser{
-		buffer: bytes.NewBuffer(buffer),
-	}
+	_ = "STUB: not implemented"
+	return *new(io.ReadCloser)
 }
 
 // Read implements io.Reader.
-func (s *simpleReadCloser) Read(b []byte) (int, error) {
-	if s.closed {
-		return 0, errors.New("read on closed reader")
-	}
-	return s.buffer.Read(b)
-}
+func (s *simpleReadCloser) Read(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // Close implements io.Closer.
-func (s *simpleReadCloser) Close() error {
-	if s.closed {
-		return errors.New("close on already closed reader")
-	}
-	s.closed = true
-	return nil
-}
+func (s *simpleReadCloser) Close() error { _ = "STUB: not implemented"; return nil }
 
 // JoinReadAll reads all output from the provided Joiner.
 func JoinReadAll(ctx context.Context, j Joiner, outFile io.Writer) (int64, error) {
-	l := j.Size()
+	_ = "STUB: not implemented"
 
 	// join, rinse, repeat until done
-	data := make([]byte, swarm.ChunkSize)
-	var total int64
-	for i := int64(0); i < l; i += swarm.ChunkSize {
-		cr, err := j.Read(data)
-		if err != nil {
-			return total, err
-		}
-		total += int64(cr)
-		cw, err := outFile.Write(data[:cr])
-		if err != nil {
-			return total, err
-		}
-		if cw != cr {
-			return total, fmt.Errorf("short wrote %d of %d for chunk %d", cw, cr, i)
-		}
-	}
-	if total != l {
-		return total, fmt.Errorf("received only %d of %d total bytes", total, l)
-	}
-	return total, nil
+	return 0, nil
 }
 
 // SplitWriteAll writes all input from provided reader to the provided splitter
 func SplitWriteAll(ctx context.Context, s Splitter, r io.Reader, l int64, toEncrypt bool) (swarm.Address, error) {
-	chunkPipe := NewChunkPipe()
-	errC := make(chan error)
-	go func() {
-		buf := make([]byte, swarm.ChunkSize)
-		c, err := io.CopyBuffer(chunkPipe, r, buf)
-		if err != nil {
-			errC <- err
-		}
-		if c != l {
-			errC <- errors.New("read count mismatch")
-		}
-		err = chunkPipe.Close()
-		if err != nil {
-			errC <- err
-		}
-		close(errC)
-	}()
-
-	addr, err := s.Split(ctx, chunkPipe, l, toEncrypt)
-	if err != nil {
-		return swarm.ZeroAddress, err
-	}
-
-	select {
-	case err := <-errC:
-		if err != nil {
-			return swarm.ZeroAddress, err
-		}
-	case <-ctx.Done():
-		return swarm.ZeroAddress, ctx.Err()
-	}
-	return addr, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
 type Loader interface {

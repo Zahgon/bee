@@ -5,7 +5,6 @@
 package batchstore
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -15,31 +14,6 @@ type metrics struct {
 	UnreserveDuration *prometheus.HistogramVec
 }
 
-func newMetrics() metrics {
-	subsystem := "batchstore"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		Commitment: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "commitment",
-			Help:      "Sum of all batches' commitment.",
-		}),
-		Radius: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "radius",
-			Help:      "Radius of responsibility observed by the batchstore.",
-		}),
-		UnreserveDuration: prometheus.NewHistogramVec(prometheus.HistogramOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "unreserve_duration",
-			Help:      "Duration in seconds for the Unreserve call.",
-		}, []string{"beforeLock"}),
-	}
-}
-
-func (s *store) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(s.metrics)
-}
+func (s *store) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

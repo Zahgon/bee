@@ -13,41 +13,11 @@ type Subscriber struct {
 	subs map[string][]chan struct{}
 }
 
-func NewSubscriber() *Subscriber {
-	return &Subscriber{
-		subs: make(map[string][]chan struct{}),
-	}
-}
+func NewSubscriber() *Subscriber { _ = "STUB: not implemented"; return nil }
 
 func (b *Subscriber) Subscribe(str string) (<-chan struct{}, func()) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
-
-	c := make(chan struct{}, 1)
-	b.subs[str] = append(b.subs[str], c)
-
-	return c, func() {
-		b.mtx.Lock()
-		defer b.mtx.Unlock()
-
-		for i, s := range b.subs[str] {
-			if s == c {
-				b.subs[str][i] = nil
-				b.subs[str] = append(b.subs[str][:i], b.subs[str][i+1:]...)
-				break
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (b *Subscriber) Trigger(str string) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
-
-	for _, s := range b.subs[str] {
-		select {
-		case s <- struct{}{}:
-		default:
-		}
-	}
-}
+func (b *Subscriber) Trigger(str string) { _ = "STUB: not implemented"; return }

@@ -14,12 +14,11 @@ type Clock interface {
 // systemClock implements Clock using the standard time package
 type systemClock struct{}
 
-func (sc *systemClock) Now() time.Time {
-	return time.Now()
-}
+func (sc *systemClock) Now() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
 func (c systemClock) AfterFunc(d time.Duration, f func()) *time.Timer {
-	return time.AfterFunc(d, f)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Use SystemClock as the default

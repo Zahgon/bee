@@ -5,12 +5,9 @@
 package chequebook
 
 import (
-	"bytes"
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethersphere/bee/v2/pkg/crypto"
 	"github.com/ethersphere/bee/v2/pkg/crypto/eip712"
 )
@@ -30,11 +27,8 @@ type SignedCheque struct {
 
 // chequebookDomain computes chainId-dependent EIP712 domain
 func chequebookDomain(chainID int64) eip712.TypedDataDomain {
-	return eip712.TypedDataDomain{
-		Name:    "Chequebook",
-		Version: "1.0",
-		ChainId: math.NewHexOrDecimal256(chainID),
-	}
+	_ = "STUB: not implemented"
+	return *new(eip712.TypedDataDomain)
 }
 
 // ChequeTypes are the needed type descriptions for cheque signing
@@ -69,48 +63,27 @@ type chequeSigner struct {
 
 // NewChequeSigner creates a new cheque signer for the given chainID.
 func NewChequeSigner(signer crypto.Signer, chainID int64) ChequeSigner {
-	return &chequeSigner{
-		signer:  signer,
-		chainID: chainID,
-	}
+	_ = "STUB: not implemented"
+	return *new(ChequeSigner)
 }
 
 // eip712DataForCheque converts a cheque into the correct TypedData structure.
 func eip712DataForCheque(cheque *Cheque, chainID int64) *eip712.TypedData {
-	return &eip712.TypedData{
-		Domain: chequebookDomain(chainID),
-		Types:  ChequeTypes,
-		Message: eip712.TypedDataMessage{
-			"chequebook":       cheque.Chequebook.Hex(),
-			"beneficiary":      cheque.Beneficiary.Hex(),
-			"cumulativePayout": cheque.CumulativePayout.String(),
-		},
-		PrimaryType: "Cheque",
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Sign signs a cheque.
 func (s *chequeSigner) Sign(cheque *Cheque) ([]byte, error) {
-	return s.signer.SignTypedData(eip712DataForCheque(cheque, s.chainID))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (cheque *Cheque) String() string {
-	return fmt.Sprintf("Contract: %x Beneficiary: %x CumulativePayout: %v", cheque.Chequebook, cheque.Beneficiary, cheque.CumulativePayout)
-}
+func (cheque *Cheque) String() string { _ = "STUB: not implemented"; return "" }
 
-func (cheque *Cheque) Equal(other *Cheque) bool {
-	if cheque.Beneficiary != other.Beneficiary {
-		return false
-	}
-	if cheque.CumulativePayout.Cmp(other.CumulativePayout) != 0 {
-		return false
-	}
-	return cheque.Chequebook == other.Chequebook
-}
+func (cheque *Cheque) Equal(other *Cheque) bool { _ = "STUB: not implemented"; return false }
 
 func (cheque *SignedCheque) Equal(other *SignedCheque) bool {
-	if !bytes.Equal(cheque.Signature, other.Signature) {
-		return false
-	}
-	return cheque.Cheque.Equal(&other.Cheque)
+	_ = "STUB: not implemented"
+	return false
 }

@@ -7,27 +7,13 @@ package reacher
 // peerHeap is a min-heap of peers ordered by retryAfter time.
 type peerHeap []*peer
 
-func (h peerHeap) Len() int           { return len(h) }
-func (h peerHeap) Less(i, j int) bool { return h[i].retryAfter.Before(h[j].retryAfter) }
-func (h peerHeap) Swap(i, j int) {
-	h[i], h[j] = h[j], h[i]
-	h[i].index = i
-	h[j].index = j
-}
+func (h peerHeap) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (h peerHeap) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
+func (h peerHeap) Swap(i, j int)      { _ = "STUB: not implemented"; return }
 
-func (h *peerHeap) Push(x any) {
-	n := len(*h)
-	p := x.(*peer)
-	p.index = n
-	*h = append(*h, p)
-}
+func (h *peerHeap) Push(x any) { _ = "STUB: not implemented"; return }
 
-func (h *peerHeap) Pop() any {
-	old := *h
-	n := len(old)
-	p := old[n-1]
-	old[n-1] = nil // avoid memory leak
-	p.index = -1   // for safety
-	*h = old[0 : n-1]
-	return p
-}
+func (h *peerHeap) Pop() any { _ = "STUB: not implemented"; return *new(any) }
+
+// avoid memory leak
+// for safety

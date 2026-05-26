@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/ethersphere/bee/v2/pkg/bigint"
-	"github.com/ethersphere/bee/v2/pkg/jsonhttp"
 )
 
 const (
@@ -33,31 +32,6 @@ type peerDataResponse struct {
 }
 
 func (s *Service) accountingInfoHandler(w http.ResponseWriter, _ *http.Request) {
-	logger := s.logger.WithName("get_accounting").Build()
-
-	infos, err := s.accounting.PeerAccounting()
-	if err != nil {
-		jsonhttp.InternalServerError(w, httpErrGetAccountingInfo)
-		logger.Debug("accounting info failed to load balances")
-		logger.Error(err, "can not get accounting info")
-		return
-	}
-
-	infoResponses := make(map[string]peerDataResponse, len(infos))
-	for k := range infos {
-		infoResponses[k] = peerDataResponse{
-			Balance:                  bigint.Wrap(infos[k].Balance),
-			ConsumedBalance:          bigint.Wrap(infos[k].ConsumedBalance),
-			ThresholdReceived:        bigint.Wrap(infos[k].ThresholdReceived),
-			ThresholdGiven:           bigint.Wrap(infos[k].ThresholdGiven),
-			CurrentThresholdReceived: bigint.Wrap(infos[k].CurrentThresholdReceived),
-			CurrentThresholdGiven:    bigint.Wrap(infos[k].CurrentThresholdGiven),
-			SurplusBalance:           bigint.Wrap(infos[k].SurplusBalance),
-			ReservedBalance:          bigint.Wrap(infos[k].ReservedBalance),
-			ShadowReservedBalance:    bigint.Wrap(infos[k].ShadowReservedBalance),
-			GhostBalance:             bigint.Wrap(infos[k].GhostBalance),
-		}
-	}
-
-	jsonhttp.OK(w, peerData{InfoResponse: infoResponses})
+	_ = "STUB: not implemented"
+	return
 }

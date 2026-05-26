@@ -7,8 +7,6 @@ package mantaray
 import (
 	"context"
 	"errors"
-
-	"golang.org/x/sync/errgroup"
 )
 
 var (
@@ -38,54 +36,9 @@ type LoadSaver interface {
 	Saver
 }
 
-func (n *Node) load(ctx context.Context, l Loader) error {
-	if n == nil || n.ref == nil {
-		return nil
-	}
-	if l == nil {
-		return ErrNoLoader
-	}
-	b, err := l.Load(ctx, n.ref)
-	if err != nil {
-		return err
-	}
-	return n.UnmarshalBinary(b)
-}
+func (n *Node) load(ctx context.Context, l Loader) error { _ = "STUB: not implemented"; return nil }
 
 // Save persists a trie recursively  traversing the nodes
-func (n *Node) Save(ctx context.Context, s Saver) error {
-	if s == nil {
-		return ErrNoSaver
-	}
-	return n.save(ctx, s)
-}
+func (n *Node) Save(ctx context.Context, s Saver) error { _ = "STUB: not implemented"; return nil }
 
-func (n *Node) save(ctx context.Context, s Saver) error {
-	if n != nil && n.ref != nil {
-		return nil
-	}
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-	eg, ectx := errgroup.WithContext(ctx)
-	for _, f := range n.forks {
-		eg.Go(func() error {
-			return f.save(ectx, s)
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	bytes, err := n.MarshalBinary()
-	if err != nil {
-		return err
-	}
-	n.ref, err = s.Save(ctx, bytes)
-	if err != nil {
-		return err
-	}
-	n.forks = nil
-	return nil
-}
+func (n *Node) save(ctx context.Context, s Saver) error { _ = "STUB: not implemented"; return nil }

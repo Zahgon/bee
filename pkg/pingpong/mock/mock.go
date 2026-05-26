@@ -16,9 +16,11 @@ type Service struct {
 }
 
 func New(pingFunc func(ctx context.Context, address swarm.Address, msgs ...string) (rtt time.Duration, err error)) *Service {
-	return &Service{pingFunc: pingFunc}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *Service) Ping(ctx context.Context, address swarm.Address, msgs ...string) (rtt time.Duration, err error) {
-	return s.pingFunc(ctx, address, msgs...)
+	_ = "STUB: not implemented"
+	return *new(time.Duration), nil
 }

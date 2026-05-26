@@ -5,43 +5,18 @@
 package api
 
 import (
-	"bytes"
 	"context"
-	"encoding/hex"
-	"errors"
-	"fmt"
-	"io"
-	"mime"
 	"net/http"
-	"path"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
-	olog "github.com/opentracing/opentracing-go/log"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethersphere/bee/v2/pkg/accesscontrol"
 	"github.com/ethersphere/bee/v2/pkg/feeds"
-	"github.com/ethersphere/bee/v2/pkg/file"
-	"github.com/ethersphere/bee/v2/pkg/file/joiner"
-	"github.com/ethersphere/bee/v2/pkg/file/loadsave"
 	"github.com/ethersphere/bee/v2/pkg/file/redundancy"
-	"github.com/ethersphere/bee/v2/pkg/file/redundancy/getter"
-	"github.com/ethersphere/bee/v2/pkg/jsonhttp"
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/manifest"
-	"github.com/ethersphere/bee/v2/pkg/postage"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/storer"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/ethersphere/bee/v2/pkg/topology"
-	"github.com/ethersphere/bee/v2/pkg/tracing"
-	"github.com/ethersphere/langos"
-	"github.com/gorilla/mux"
 )
 
 // The size of buffer used for prefetching content with Langos when not using erasure coding
@@ -58,106 +33,11 @@ const (
 	contentTypeSniffLen = 512
 )
 
-func lookaheadBufferSize(size int64) int {
-	if size <= largeBufferFilesizeThreshold {
-		return smallFileBufferSize
-	}
-	return largeFileBufferSize
-}
+func lookaheadBufferSize(size int64) int { _ = "STUB: not implemented"; return 0 }
 
 func (s *Service) bzzUploadHandler(w http.ResponseWriter, r *http.Request) {
-	span, logger, ctx := s.tracer.StartSpanFromContext(r.Context(), "post_bzz", s.logger.WithName("post_bzz").Build())
-	defer span.Finish()
-
-	headers := struct {
-		ContentType    string           `map:"Content-Type"`
-		BatchID        []byte           `map:"Swarm-Postage-Batch-Id" validate:"required"`
-		SwarmTag       uint64           `map:"Swarm-Tag"`
-		Pin            bool             `map:"Swarm-Pin"`
-		Deferred       *bool            `map:"Swarm-Deferred-Upload"`
-		Encrypt        bool             `map:"Swarm-Encrypt"`
-		IsDir          bool             `map:"Swarm-Collection"`
-		RLevel         redundancy.Level `map:"Swarm-Redundancy-Level" validate:"rLevel"`
-		Act            bool             `map:"Swarm-Act"`
-		HistoryAddress swarm.Address    `map:"Swarm-Act-History-Address"`
-	}{}
-	if response := s.mapStructure(r.Header, &headers); response != nil {
-		response("invalid header params", logger, w)
-		return
-	}
-
-	var (
-		tag      uint64
-		err      error
-		deferred = defaultUploadMethod(headers.Deferred)
-	)
-
-	defer s.observeUploadSpeed(w, r, time.Now(), "bzz", deferred)
-
-	if deferred || headers.Pin {
-		tag, err = s.getOrCreateSessionID(headers.SwarmTag)
-		if err != nil {
-			logger.Debug("get or create tag failed", "error", err)
-			logger.Error(nil, "get or create tag failed")
-			switch {
-			case errors.Is(err, storage.ErrNotFound):
-				jsonhttp.NotFound(w, "tag not found")
-			default:
-				jsonhttp.InternalServerError(w, "cannot get or create tag")
-			}
-			ext.LogError(span, err, olog.String("action", "tag.create"))
-			return
-		}
-		span.SetTag("tagID", tag)
-	}
-
-	putter, err := s.newStamperPutter(ctx, putterOptions{
-		BatchID:  headers.BatchID,
-		TagID:    tag,
-		Pin:      headers.Pin,
-		Deferred: deferred,
-	})
-	if err != nil {
-		logger.Debug("putter failed", "error", err)
-		logger.Error(nil, "putter failed")
-		switch {
-		case errors.Is(err, errBatchUnusable) || errors.Is(err, postage.ErrNotUsable):
-			jsonhttp.UnprocessableEntity(w, "batch not usable yet or does not exist")
-		case errors.Is(err, postage.ErrNotFound):
-			jsonhttp.NotFound(w, "batch with id not found")
-		case errors.Is(err, errInvalidPostageBatch):
-			jsonhttp.BadRequest(w, "invalid batch id")
-		default:
-			jsonhttp.BadRequest(w, nil)
-		}
-		ext.LogError(span, err, olog.String("action", "new.StamperPutter"))
-		return
-	}
-
-	ow := &cleanupOnErrWriter{
-		ResponseWriter: w,
-		onErr:          putter.Cleanup,
-		logger:         logger,
-	}
-
-	contentTypeHdr := strings.TrimSpace(headers.ContentType)
-	r.Header.Set(ContentTypeHeader, contentTypeHdr)
-	mt, _, errParseCT := mime.ParseMediaType(contentTypeHdr)
-	isMultipart := errParseCT == nil && mt == multiPartFormData
-
-	isDirUpload := headers.IsDir || isMultipart
-	if !isDirUpload {
-		s.fileUploadHandler(ctx, logger, span, ow, r, putter, headers.Encrypt, tag, headers.RLevel, headers.Act, headers.HistoryAddress)
-		return
-	}
-
-	if contentTypeHdr == "" {
-		logger.Error(nil, "content-type required for directory upload")
-		jsonhttp.BadRequest(w, errInvalidContentType)
-		return
-	}
-
-	s.dirUploadHandler(ctx, logger, span, ow, r, putter, headers.Encrypt, tag, headers.RLevel, headers.Act, headers.HistoryAddress)
+	_ = "STUB: not implemented"
+	return
 }
 
 // bzzUploadResponse is returned when an HTTP request to upload a file is successful
@@ -180,221 +60,27 @@ func (s *Service) fileUploadHandler(
 	act bool,
 	historyAddress swarm.Address,
 ) {
-	queries := struct {
-		FileName string `map:"name" validate:"startsnotwith=/"`
-	}{}
-	if response := s.mapStructure(r.URL.Query(), &queries); response != nil {
-		response("invalid query params", logger, w)
-		return
-	}
-
-	p := requestPipelineFn(putter, encrypt, rLevel)
-
-	var body io.Reader = r.Body
-	if r.Header.Get(ContentTypeHeader) == "" {
-		sniffBuf := make([]byte, contentTypeSniffLen)
-		n, err := io.ReadFull(r.Body, sniffBuf)
-		sniffBuf = sniffBuf[:n]
-		if err != nil && !errors.Is(err, io.EOF) && !errors.Is(err, io.ErrUnexpectedEOF) {
-			logger.Debug("body read failed", "file_name", queries.FileName, "error", err)
-			logger.Error(nil, "body read failed", "file_name", queries.FileName)
-			jsonhttp.BadRequest(w, "failed to read request body")
-			return
-		}
-
-		r.Header.Set(ContentTypeHeader, http.DetectContentType(sniffBuf))
-		body = io.MultiReader(bytes.NewReader(sniffBuf), r.Body)
-	}
-
-	// first store the file and get its reference
-	fr, err := p(ctx, body)
-	if err != nil {
-		logger.Debug("file store failed", "file_name", queries.FileName, "error", err)
-		logger.Error(nil, "file store failed", "file_name", queries.FileName)
-		switch {
-		case errors.Is(err, postage.ErrBucketFull):
-			jsonhttp.PaymentRequired(w, "batch is overissued")
-		default:
-			jsonhttp.InternalServerError(w, errFileStore)
-		}
-		ext.LogError(span, err, olog.String("action", "file.store"))
-		return
-	}
-
-	// If filename is still empty, use the file hash as the filename
-	if queries.FileName == "" {
-		queries.FileName = fr.String()
-		if err := s.validate.Struct(queries); err != nil {
-			verr := &validationError{
-				Entry: "file hash",
-				Value: queries.FileName,
-				Cause: err,
-			}
-			logger.Debug("invalid body filename", "error", verr)
-			logger.Error(nil, "invalid body filename")
-			jsonhttp.BadRequest(w, jsonhttp.StatusResponse{
-				Message: "invalid body params",
-				Code:    http.StatusBadRequest,
-				Reasons: []jsonhttp.Reason{{
-					Field: "file hash",
-					Error: verr.Error(),
-				}},
-			})
-			return
-		}
-	}
-
-	factory := requestPipelineFactory(ctx, putter, encrypt, rLevel)
-	l := loadsave.New(s.storer.ChunkStore(), s.storer.Cache(), factory, rLevel)
-
-	m, err := manifest.NewDefaultManifest(l, encrypt)
-	if err != nil {
-		logger.Debug("create manifest failed", "file_name", queries.FileName, "error", err)
-		logger.Error(nil, "create manifest failed", "file_name", queries.FileName)
-		switch {
-		case errors.Is(err, manifest.ErrInvalidManifestType):
-			jsonhttp.BadRequest(w, "create manifest failed")
-		default:
-			jsonhttp.InternalServerError(w, nil)
-		}
-		return
-	}
-
-	rootMetadata := map[string]string{
-		manifest.WebsiteIndexDocumentSuffixKey: queries.FileName,
-	}
-	err = m.Add(ctx, manifest.RootPath, manifest.NewEntry(swarm.ZeroAddress, rootMetadata))
-	if err != nil {
-		logger.Debug("adding metadata to manifest failed", "file_name", queries.FileName, "error", err)
-		logger.Error(nil, "adding metadata to manifest failed", "file_name", queries.FileName)
-		jsonhttp.InternalServerError(w, "add metadata failed")
-		return
-	}
-
-	fileMtdt := map[string]string{
-		manifest.EntryMetadataContentTypeKey: r.Header.Get(ContentTypeHeader),
-		manifest.EntryMetadataFilenameKey:    queries.FileName,
-	}
-
-	err = m.Add(ctx, queries.FileName, manifest.NewEntry(fr, fileMtdt))
-	if err != nil {
-		logger.Debug("adding file to manifest failed", "file_name", queries.FileName, "error", err)
-		logger.Error(nil, "adding file to manifest failed", "file_name", queries.FileName)
-		jsonhttp.InternalServerError(w, "add file failed")
-		return
-	}
-
-	logger.Debug("info", "encrypt", encrypt, "file_name", queries.FileName, "hash", fr, "metadata", fileMtdt)
-
-	manifestReference, err := m.Store(ctx)
-	if err != nil {
-		logger.Debug("manifest store failed", "file_name", queries.FileName, "error", err)
-		logger.Error(nil, "manifest store failed", "file_name", queries.FileName)
-		switch {
-		case errors.Is(err, postage.ErrBucketFull):
-			jsonhttp.PaymentRequired(w, "batch is overissued")
-		default:
-			jsonhttp.InternalServerError(w, "manifest store failed")
-		}
-		return
-	}
-	logger.Debug("store", "manifest_reference", manifestReference)
-
-	reference := manifestReference
-	historyReference := swarm.ZeroAddress
-	if act {
-		reference, historyReference, err = s.actEncryptionHandler(r.Context(), putter, reference, historyAddress)
-		if err != nil {
-			logger.Debug("access control upload failed", "error", err)
-			logger.Error(nil, "access control upload failed")
-			switch {
-			case errors.Is(err, accesscontrol.ErrNotFound):
-				jsonhttp.NotFound(w, "act or history entry not found")
-			case errors.Is(err, accesscontrol.ErrInvalidPublicKey) || errors.Is(err, accesscontrol.ErrSecretKeyInfinity):
-				jsonhttp.BadRequest(w, "invalid public key")
-			case errors.Is(err, accesscontrol.ErrUnexpectedType):
-				jsonhttp.BadRequest(w, "failed to create history")
-			default:
-				jsonhttp.InternalServerError(w, errActUpload)
-			}
-			return
-		}
-	}
-
-	err = putter.Done(manifestReference)
-	if err != nil {
-		logger.Debug("done split failed", "reference", manifestReference, "error", err)
-		logger.Error(nil, "done split failed")
-		jsonhttp.InternalServerError(w, "done split failed")
-		ext.LogError(span, err, olog.String("action", "putter.Done"))
-		return
-	}
-	span.LogFields(olog.Bool("success", true))
-	span.SetTag("root_address", reference)
-
-	if tagID != 0 {
-		w.Header().Set(SwarmTagHeader, fmt.Sprint(tagID))
-		span.SetTag("tagID", tagID)
-	}
-	w.Header().Set(ETagHeader, fmt.Sprintf("%q", reference.String()))
-	w.Header().Set(AccessControlExposeHeaders, SwarmTagHeader)
-	if act {
-		w.Header().Set(SwarmActHistoryAddressHeader, historyReference.String())
-		w.Header().Add(AccessControlExposeHeaders, SwarmActHistoryAddressHeader)
-	}
-
-	jsonhttp.Created(w, bzzUploadResponse{
-		Reference: reference,
-	})
+	_ = "STUB: not implemented"
+	return
 }
+
+// first store the file and get its reference
+
+// If filename is still empty, use the file hash as the filename
 
 func (s *Service) bzzDownloadHandler(w http.ResponseWriter, r *http.Request) {
-	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger.WithName("get_bzz_by_path").Build())
-
-	paths := struct {
-		Address swarm.Address `map:"address,resolve" validate:"required"`
-		Path    string        `map:"path"`
-	}{}
-	if response := s.mapStructure(mux.Vars(r), &paths); response != nil {
-		response("invalid path params", logger, w)
-		return
-	}
-
-	address := paths.Address
-	if v := getAddressFromContext(r.Context()); !v.IsZero() {
-		address = v
-	}
-
-	if strings.HasSuffix(paths.Path, "/") {
-		paths.Path = strings.TrimRight(paths.Path, "/") + "/" // NOTE: leave one slash if there was some.
-	}
-
-	s.serveReference(logger, address, paths.Path, w, r, false)
+	_ = "STUB: not implemented"
+	return
 }
+
+// NOTE: leave one slash if there was some.
 
 func (s *Service) bzzHeadHandler(w http.ResponseWriter, r *http.Request) {
-	logger := tracing.NewLoggerWithTraceID(r.Context(), s.logger.WithName("head_bzz_by_path").Build())
-
-	paths := struct {
-		Address swarm.Address `map:"address,resolve" validate:"required"`
-		Path    string        `map:"path"`
-	}{}
-	if response := s.mapStructure(mux.Vars(r), &paths); response != nil {
-		response("invalid path params", logger, w)
-		return
-	}
-
-	address := paths.Address
-	if v := getAddressFromContext(r.Context()); !v.IsZero() {
-		address = v
-	}
-
-	if strings.HasSuffix(paths.Path, "/") {
-		paths.Path = strings.TrimRight(paths.Path, "/") + "/" // NOTE: leave one slash if there was some.
-	}
-
-	s.serveReference(logger, address, paths.Path, w, r, true)
+	_ = "STUB: not implemented"
+	return
 }
+
+// NOTE: leave one slash if there was some.
 
 type getWrappedResult struct {
 	ch  swarm.Chunk
@@ -406,300 +92,68 @@ type getWrappedResult struct {
 // figure out if its a v1 or v2 chunk.
 // it returns the first correct feed found, the type found ("v1" or "v2") or an error.
 func (s *Service) resolveFeed(ctx context.Context, getter storage.Getter, ch swarm.Chunk) (swarm.Chunk, string, error) {
-	innerCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	getWrapped := func(v1 bool) chan getWrappedResult {
-		ret := make(chan getWrappedResult)
-		go func() {
-			wc, err := feeds.GetWrappedChunk(innerCtx, getter, ch, v1)
-			if err != nil {
-				select {
-				case ret <- getWrappedResult{nil, v1, err}:
-					return
-				case <-innerCtx.Done():
-					return
-				}
-			}
-
-			// here we just check whether the address is retrievable.
-			// if it returns an error we send that over the channel, otherwise
-			// we send the wc chunk back to the caller so that the feed can be
-			// dereferenced.
-			_, err = getter.Get(innerCtx, wc.Address())
-			if err != nil {
-				select {
-				case ret <- getWrappedResult{wc, v1, err}:
-					return
-				case <-innerCtx.Done():
-					return
-				}
-			}
-			select {
-			case ret <- getWrappedResult{wc, v1, nil}:
-				return
-			case <-innerCtx.Done():
-				return
-			}
-		}()
-		return ret
-	}
-	isV1, err := feeds.IsV1Payload(ch)
-	if err != nil {
-		return nil, "", err
-	}
-	// if we have v1 length, it means there's ambiguity so we
-	// should fetch both feed versions. if the length isn't v1
-	// then we should only try to fetch v2.
-	var (
-		v1C, v2C chan getWrappedResult
-		both     = false
-	)
-	if isV1 {
-		both = true
-		v1C = getWrapped(true)
-		v2C = getWrapped(false)
-	} else {
-		v2C = getWrapped(false)
-	}
-
-	// closure to handle processing one channel then the other.
-	// the "resolving" parameter is meant to tell the closure which feed type is in the result struct
-	// which in turns allows it to return which feed type was resolved.
-	processChanOutput := func(resolving string, result getWrappedResult, other chan getWrappedResult) (swarm.Chunk, string, error) {
-		defer cancel()
-		if !both {
-			if resolving == "v2" {
-				return result.ch, resolving, nil
-			}
-			return result.ch, resolving, result.err
-		}
-		// both are being checked. if there's no err return the chunk
-		// otherwise wait for the other channel
-		if result.err == nil {
-			return result.ch, resolving, nil
-		}
-		if resolving == "v1" {
-			resolving = "v2"
-		} else {
-			resolving = "v1"
-		}
-		// wait for the other one
-		select {
-		case result := <-other:
-			if !result.v1 {
-				// resolving v2
-				return result.ch, resolving, nil
-			}
-			return result.ch, resolving, result.err
-		case <-innerCtx.Done():
-			return nil, "", ctx.Err()
-		}
-	}
-	select {
-	case v1r := <-v1C:
-		return processChanOutput("v1", v1r, v2C)
-	case v2r := <-v2C:
-		return processChanOutput("v2", v2r, v1C)
-	case <-innerCtx.Done():
-		return nil, "", ctx.Err()
-	}
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), "", nil
 }
+
+// here we just check whether the address is retrievable.
+// if it returns an error we send that over the channel, otherwise
+// we send the wc chunk back to the caller so that the feed can be
+// dereferenced.
+
+// if we have v1 length, it means there's ambiguity so we
+// should fetch both feed versions. if the length isn't v1
+// then we should only try to fetch v2.
+
+// closure to handle processing one channel then the other.
+// the "resolving" parameter is meant to tell the closure which feed type is in the result struct
+// which in turns allows it to return which feed type was resolved.
+
+// both are being checked. if there's no err return the chunk
+// otherwise wait for the other channel
+
+// wait for the other one
+
+// resolving v2
 
 func (s *Service) serveReference(logger log.Logger, address swarm.Address, pathVar string, w http.ResponseWriter, r *http.Request, headerOnly bool) {
-	loggerV1 := logger.V(1).Build()
-
-	headers := struct {
-		Cache                 *bool             `map:"Swarm-Cache"`
-		Strategy              *getter.Strategy  `map:"Swarm-Redundancy-Strategy"`
-		FallbackMode          *bool             `map:"Swarm-Redundancy-Fallback-Mode"`
-		RLevel                *redundancy.Level `map:"Swarm-Redundancy-Level" validate:"omitempty,rLevel"`
-		ChunkRetrievalTimeout *string           `map:"Swarm-Chunk-Retrieval-Timeout"`
-	}{}
-
-	if response := s.mapStructure(r.Header, &headers); response != nil {
-		response("invalid header params", logger, w)
-		return
-	}
-	cache := true
-	if headers.Cache != nil {
-		cache = *headers.Cache
-	}
-
-	rLevel := redundancy.DefaultLevel
-	if headers.RLevel != nil {
-		rLevel = *headers.RLevel
-	}
-
-	ctx := r.Context()
-	ls := loadsave.NewReadonly(s.storer.Download(cache), s.storer.Cache(), rLevel)
-	feedDereferenced := false
-
-	ctx, err := getter.SetConfigInContext(ctx, headers.Strategy, headers.FallbackMode, headers.ChunkRetrievalTimeout, logger)
-	if err != nil {
-		logger.Error(err, err.Error())
-		jsonhttp.BadRequest(w, "could not parse headers")
-		return
-	}
-FETCH:
-	// read manifest entry
-	m, err := manifest.NewDefaultManifestReference(
-		address,
-		ls,
-	)
-	if err != nil {
-		logger.Debug("bzz download: not manifest", "address", address, "error", err)
-		logger.Error(nil, "not manifest")
-		jsonhttp.NotFound(w, nil)
-		return
-	}
-
-	// there's a possible ambiguity here, right now the data which was
-	// read can be an entry.Entry or a mantaray feed manifest. Try to
-	// unmarshal as mantaray first and possibly resolve the feed, otherwise
-	// go on normally.
-	if !feedDereferenced {
-		if l, err := s.manifestFeed(ctx, m); err == nil {
-			// we have a feed manifest here
-			ch, cur, _, err := l.At(ctx, time.Now().Unix(), 0)
-			if err != nil {
-				logger.Debug("bzz download: feed lookup failed", "error", err)
-				logger.Error(nil, "bzz download: feed lookup failed")
-				jsonhttp.NotFound(w, "feed not found")
-				return
-			}
-			if ch == nil {
-				logger.Debug("bzz download: feed lookup: no updates")
-				logger.Error(nil, "bzz download: feed lookup")
-				jsonhttp.NotFound(w, "no update found")
-				return
-			}
-
-			wc, feedVer, err := s.resolveFeed(ctx, s.storer.Download(cache), ch)
-			if err != nil {
-				if errors.Is(err, feeds.ErrNotLegacyPayload) {
-					logger.Debug("bzz: download: feed is not a legacy payload")
-					logger.Error(err, "bzz download: feed is not a legacy payload")
-					jsonhttp.BadRequest(w, "bzz download: feed is not a legacy payload")
-					return
-				}
-				if errors.As(err, &feeds.WrappedChunkNotFoundError{}) {
-					logger.Debug("bzz download: feed pointing to the wrapped chunk not found", "error", err)
-					logger.Error(err, "bzz download: feed pointing to the wrapped chunk not found")
-					jsonhttp.NotFound(w, "bzz download: feed pointing to the wrapped chunk not found")
-					return
-				}
-				logger.Debug("bzz download: mapStructure feed update failed", "error", err)
-				logger.Error(nil, "bzz download: mapStructure feed update failed")
-				jsonhttp.InternalServerError(w, "mapStructure feed update")
-				return
-			}
-
-			address = wc.Address()
-			// modify ls and init with non-existing wrapped chunk
-			ls = loadsave.NewReadonlyWithRootCh(s.storer.Download(cache), s.storer.Cache(), wc, rLevel)
-			feedDereferenced = true
-			curBytes, err := cur.MarshalBinary()
-			if err != nil {
-				s.logger.Debug("bzz download: marshal feed index failed", "error", err)
-				s.logger.Error(nil, "bzz download: marshal index failed")
-				jsonhttp.InternalServerError(w, "marshal index")
-				return
-			}
-
-			w.Header().Set(SwarmFeedIndexHeader, hex.EncodeToString(curBytes))
-			w.Header().Set(SwarmFeedResolvedVersionHeader, feedVer)
-			// this header might be overriding others. handle with care. in the future
-			// we should implement an append functionality for this specific header,
-			// since different parts of handlers might be overriding others' values
-			// resulting in inconsistent headers in the response.
-			w.Header().Set(AccessControlExposeHeaders, SwarmFeedIndexHeader)
-			goto FETCH
-		}
-	}
-	if pathVar == "" {
-		loggerV1.Debug("bzz download: handle empty path", "address", address)
-
-		if indexDocumentSuffixKey, ok := manifestMetadataLoad(ctx, m, manifest.RootPath, manifest.WebsiteIndexDocumentSuffixKey); ok {
-			pathWithIndex := path.Join(pathVar, indexDocumentSuffixKey)
-			indexDocumentManifestEntry, err := m.Lookup(ctx, pathWithIndex)
-			if err == nil {
-				// index document exists
-				logger.Debug("bzz download: serving path", "path", pathWithIndex)
-
-				s.serveManifestEntry(logger, w, r, indexDocumentManifestEntry, !feedDereferenced, headerOnly)
-				return
-			}
-		}
-
-		logger.Debug("bzz download: address not found or incorrect", "address", address, "path", pathVar)
-		logger.Error(nil, "address not found or incorrect")
-		jsonhttp.NotFound(w, "address not found or incorrect")
-		return
-	}
-	me, err := m.Lookup(ctx, pathVar)
-	if err != nil {
-		loggerV1.Debug("bzz download: invalid path", "address", address, "path", pathVar, "error", err)
-		logger.Error(nil, "bzz download: invalid path")
-
-		if errors.Is(err, manifest.ErrNotFound) {
-
-			if !strings.HasPrefix(pathVar, "/") {
-				// check for directory
-				dirPath := pathVar + "/"
-				exists, err := m.HasPrefix(ctx, dirPath)
-				if err == nil && exists {
-					// redirect to directory
-					u := r.URL
-					u.Path += "/"
-					redirectURL := u.String()
-
-					logger.Debug("bzz download: redirecting failed", "url", redirectURL, "error", err)
-
-					http.Redirect(w, r, redirectURL, http.StatusPermanentRedirect)
-					return
-				}
-			}
-
-			// check index suffix path
-			if indexDocumentSuffixKey, ok := manifestMetadataLoad(ctx, m, manifest.RootPath, manifest.WebsiteIndexDocumentSuffixKey); ok {
-				if !strings.HasSuffix(pathVar, indexDocumentSuffixKey) {
-					// check if path is directory with index
-					pathWithIndex := path.Join(pathVar, indexDocumentSuffixKey)
-					indexDocumentManifestEntry, err := m.Lookup(ctx, pathWithIndex)
-					if err == nil {
-						// index document exists
-						logger.Debug("bzz download: serving path", "path", pathWithIndex)
-
-						s.serveManifestEntry(logger, w, r, indexDocumentManifestEntry, !feedDereferenced, headerOnly)
-						return
-					}
-				}
-			}
-
-			// check if error document is to be shown
-			if errorDocumentPath, ok := manifestMetadataLoad(ctx, m, manifest.RootPath, manifest.WebsiteErrorDocumentPathKey); ok {
-				if pathVar != errorDocumentPath {
-					errorDocumentManifestEntry, err := m.Lookup(ctx, errorDocumentPath)
-					if err == nil {
-						// error document exists
-						logger.Debug("bzz download: serving path", "path", errorDocumentPath)
-
-						s.serveManifestEntry(logger, w, r, errorDocumentManifestEntry, !feedDereferenced, headerOnly)
-						return
-					}
-				}
-			}
-
-			jsonhttp.NotFound(w, "path address not found")
-		} else {
-			jsonhttp.NotFound(w, nil)
-		}
-		return
-	}
-
-	// serve requested path
-	s.serveManifestEntry(logger, w, r, me, !feedDereferenced, headerOnly)
+	_ = "STUB: not implemented"
+	return
 }
+
+// read manifest entry
+
+// there's a possible ambiguity here, right now the data which was
+// read can be an entry.Entry or a mantaray feed manifest. Try to
+// unmarshal as mantaray first and possibly resolve the feed, otherwise
+// go on normally.
+
+// we have a feed manifest here
+
+// modify ls and init with non-existing wrapped chunk
+
+// this header might be overriding others. handle with care. in the future
+// we should implement an append functionality for this specific header,
+// since different parts of handlers might be overriding others' values
+// resulting in inconsistent headers in the response.
+
+// index document exists
+
+// check for directory
+
+// redirect to directory
+
+// check index suffix path
+
+// check if path is directory with index
+
+// index document exists
+
+// check if error document is to be shown
+
+// error document exists
+
+// serve requested path
 
 func (s *Service) serveManifestEntry(
 	logger log.Logger,
@@ -708,100 +162,19 @@ func (s *Service) serveManifestEntry(
 	manifestEntry manifest.Entry,
 	etag, headersOnly bool,
 ) {
-	additionalHeaders := http.Header{}
-	mtdt := manifestEntry.Metadata()
-	if fname, ok := mtdt[manifest.EntryMetadataFilenameKey]; ok {
-		fname = filepath.Base(fname) // only keep the file name
-		additionalHeaders[ContentDispositionHeader] = []string{fmt.Sprintf("inline; filename=\"%s\"", escapeQuotes(fname))}
-	}
-	if mimeType, ok := mtdt[manifest.EntryMetadataContentTypeKey]; ok {
-		additionalHeaders[ContentTypeHeader] = []string{mimeType}
-	}
-
-	s.downloadHandler(logger, w, r, manifestEntry.Reference(), additionalHeaders, etag, headersOnly, nil)
+	_ = "STUB: not implemented"
+	return
 }
+
+// only keep the file name
 
 // downloadHandler contains common logic for downloading Swarm file from API
 func (s *Service) downloadHandler(logger log.Logger, w http.ResponseWriter, r *http.Request, reference swarm.Address, additionalHeaders http.Header, etag, headersOnly bool, rootCh swarm.Chunk) {
-	headers := struct {
-		Strategy              *getter.Strategy  `map:"Swarm-Redundancy-Strategy"`
-		RLevel                *redundancy.Level `map:"Swarm-Redundancy-Level" validate:"omitempty,rLevel"`
-		FallbackMode          *bool             `map:"Swarm-Redundancy-Fallback-Mode"`
-		ChunkRetrievalTimeout *string           `map:"Swarm-Chunk-Retrieval-Timeout"`
-		LookaheadBufferSize   *int              `map:"Swarm-Lookahead-Buffer-Size"`
-		Cache                 *bool             `map:"Swarm-Cache"`
-	}{}
-
-	if response := s.mapStructure(r.Header, &headers); response != nil {
-		response("invalid header params", logger, w)
-		return
-	}
-	cache := true
-	if headers.Cache != nil {
-		cache = *headers.Cache
-	}
-
-	ctx := r.Context()
-	ctx, err := getter.SetConfigInContext(ctx, headers.Strategy, headers.FallbackMode, headers.ChunkRetrievalTimeout, logger)
-	if err != nil {
-		logger.Error(err, err.Error())
-		jsonhttp.BadRequest(w, "could not parse headers")
-		return
-	}
-	rLevel := redundancy.DefaultLevel
-	if headers.RLevel != nil {
-		rLevel = *headers.RLevel
-	}
-
-	var (
-		reader file.Joiner
-		l      int64
-	)
-	if rootCh != nil {
-		reader, l, err = joiner.NewJoiner(ctx, s.storer.Download(cache), s.storer.Cache(), reference, rootCh)
-	} else {
-		reader, l, err = joiner.New(ctx, s.storer.Download(cache), s.storer.Cache(), reference, rLevel)
-	}
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) || errors.Is(err, topology.ErrNotFound) {
-			logger.Debug("api download: not found ", "address", reference, "error", err)
-			logger.Error(nil, err.Error())
-			jsonhttp.NotFound(w, nil)
-			return
-		}
-		logger.Debug("api download: unexpected error", "address", reference, "error", err)
-		logger.Error(nil, "api download: unexpected error")
-		jsonhttp.InternalServerError(w, "joiner failed")
-		return
-	}
-
-	// include additional headers
-	for name, values := range additionalHeaders {
-		for _, value := range values {
-			w.Header().Add(name, value)
-		}
-	}
-	if etag {
-		w.Header().Set(ETagHeader, fmt.Sprintf("%q", reference))
-	}
-	w.Header().Set(ContentLengthHeader, strconv.FormatInt(l, 10))
-	w.Header().Add(AccessControlExposeHeaders, ContentDispositionHeader)
-
-	if headersOnly {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	bufSize := lookaheadBufferSize(l)
-	if headers.LookaheadBufferSize != nil {
-		bufSize = *(headers.LookaheadBufferSize)
-	}
-	if bufSize > 0 {
-		http.ServeContent(w, r, "", time.Now(), langos.NewBufferedLangos(reader, bufSize))
-		return
-	}
-	http.ServeContent(w, r, "", time.Now(), reader)
+	_ = "STUB: not implemented"
+	return
 }
+
+// include additional headers
 
 // manifestMetadataLoad returns the value for a key stored in the metadata of
 // manifest path, or empty string if no value is present.
@@ -811,16 +184,7 @@ func manifestMetadataLoad(
 	manifest manifest.Interface,
 	path, metadataKey string,
 ) (string, bool) {
-	me, err := manifest.Lookup(ctx, path)
-	if err != nil {
-		return "", false
-	}
-
-	manifestRootMetadata := me.Metadata()
-	if val, ok := manifestRootMetadata[metadataKey]; ok {
-		return val, ok
-	}
-
+	_ = "STUB: not implemented"
 	return "", false
 }
 
@@ -828,36 +192,6 @@ func (s *Service) manifestFeed(
 	ctx context.Context,
 	m manifest.Interface,
 ) (feeds.Lookup, error) {
-	e, err := m.Lookup(ctx, "/")
-	if err != nil {
-		return nil, fmt.Errorf("node lookup: %w", err)
-	}
-	var (
-		owner, topic []byte
-		t            = new(feeds.Type)
-	)
-	meta := e.Metadata()
-	if e := meta[feedMetadataEntryOwner]; e != "" {
-		owner, err = hex.DecodeString(e)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if e := meta[feedMetadataEntryTopic]; e != "" {
-		topic, err = hex.DecodeString(e)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if e := meta[feedMetadataEntryType]; e != "" {
-		err := t.FromString(e)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if len(owner) == 0 || len(topic) == 0 {
-		return nil, fmt.Errorf("node lookup: %s", "feed metadata absent")
-	}
-	f := feeds.New(topic, common.BytesToAddress(owner))
-	return s.feedFactory.NewLookup(*t, f)
+	_ = "STUB: not implemented"
+	return *new(feeds.Lookup), nil
 }

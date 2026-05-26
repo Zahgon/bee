@@ -5,10 +5,9 @@ package pb
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
-	io "io"
 	math "math"
-	math_bits "math/bits"
+
+	proto "github.com/gogo/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,45 +25,27 @@ type Syn struct {
 	ObservedUnderlay []byte `protobuf:"bytes,1,opt,name=ObservedUnderlay,proto3" json:"ObservedUnderlay,omitempty"`
 }
 
-func (m *Syn) Reset()         { *m = Syn{} }
-func (m *Syn) String() string { return proto.CompactTextString(m) }
-func (*Syn) ProtoMessage()    {}
-func (*Syn) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a77305914d5d202f, []int{0}
-}
-func (m *Syn) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *Syn) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *Syn) String() string            { _ = "STUB: not implemented"; return "" }
+func (*Syn) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*Syn) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *Syn) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *Syn) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Syn.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *Syn) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Syn.Merge(m, src)
-}
-func (m *Syn) XXX_Size() int {
-	return m.Size()
-}
-func (m *Syn) XXX_DiscardUnknown() {
-	xxx_messageInfo_Syn.DiscardUnknown(m)
-}
+
+func (m *Syn) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *Syn) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *Syn) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_Syn proto.InternalMessageInfo
 
-func (m *Syn) GetObservedUnderlay() []byte {
-	if m != nil {
-		return m.ObservedUnderlay
-	}
-	return nil
-}
+func (m *Syn) GetObservedUnderlay() []byte { _ = "STUB: not implemented"; return nil }
 
 type Ack struct {
 	Address        *BzzAddress `protobuf:"bytes,1,opt,name=Address,proto3" json:"Address,omitempty"`
@@ -74,125 +55,64 @@ type Ack struct {
 	WelcomeMessage string      `protobuf:"bytes,99,opt,name=WelcomeMessage,proto3" json:"WelcomeMessage,omitempty"`
 }
 
-func (m *Ack) Reset()         { *m = Ack{} }
-func (m *Ack) String() string { return proto.CompactTextString(m) }
-func (*Ack) ProtoMessage()    {}
-func (*Ack) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a77305914d5d202f, []int{1}
-}
-func (m *Ack) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *Ack) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *Ack) String() string            { _ = "STUB: not implemented"; return "" }
+func (*Ack) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*Ack) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *Ack) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *Ack) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Ack.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *Ack) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Ack.Merge(m, src)
-}
-func (m *Ack) XXX_Size() int {
-	return m.Size()
-}
-func (m *Ack) XXX_DiscardUnknown() {
-	xxx_messageInfo_Ack.DiscardUnknown(m)
-}
+
+func (m *Ack) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *Ack) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *Ack) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_Ack proto.InternalMessageInfo
 
-func (m *Ack) GetAddress() *BzzAddress {
-	if m != nil {
-		return m.Address
-	}
-	return nil
-}
+func (m *Ack) GetAddress() *BzzAddress { _ = "STUB: not implemented"; return nil }
 
-func (m *Ack) GetNetworkID() uint64 {
-	if m != nil {
-		return m.NetworkID
-	}
-	return 0
-}
+func (m *Ack) GetNetworkID() uint64 { _ = "STUB: not implemented"; return 0 }
 
-func (m *Ack) GetFullNode() bool {
-	if m != nil {
-		return m.FullNode
-	}
-	return false
-}
+func (m *Ack) GetFullNode() bool { _ = "STUB: not implemented"; return false }
 
-func (m *Ack) GetNonce() []byte {
-	if m != nil {
-		return m.Nonce
-	}
-	return nil
-}
+func (m *Ack) GetNonce() []byte { _ = "STUB: not implemented"; return nil }
 
-func (m *Ack) GetWelcomeMessage() string {
-	if m != nil {
-		return m.WelcomeMessage
-	}
-	return ""
-}
+func (m *Ack) GetWelcomeMessage() string { _ = "STUB: not implemented"; return "" }
 
 type SynAck struct {
 	Syn *Syn `protobuf:"bytes,1,opt,name=Syn,proto3" json:"Syn,omitempty"`
 	Ack *Ack `protobuf:"bytes,2,opt,name=Ack,proto3" json:"Ack,omitempty"`
 }
 
-func (m *SynAck) Reset()         { *m = SynAck{} }
-func (m *SynAck) String() string { return proto.CompactTextString(m) }
-func (*SynAck) ProtoMessage()    {}
-func (*SynAck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a77305914d5d202f, []int{2}
-}
-func (m *SynAck) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *SynAck) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *SynAck) String() string            { _ = "STUB: not implemented"; return "" }
+func (*SynAck) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*SynAck) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *SynAck) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *SynAck) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SynAck.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *SynAck) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SynAck.Merge(m, src)
-}
-func (m *SynAck) XXX_Size() int {
-	return m.Size()
-}
-func (m *SynAck) XXX_DiscardUnknown() {
-	xxx_messageInfo_SynAck.DiscardUnknown(m)
-}
+
+func (m *SynAck) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *SynAck) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *SynAck) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_SynAck proto.InternalMessageInfo
 
-func (m *SynAck) GetSyn() *Syn {
-	if m != nil {
-		return m.Syn
-	}
-	return nil
-}
+func (m *SynAck) GetSyn() *Syn { _ = "STUB: not implemented"; return nil }
 
-func (m *SynAck) GetAck() *Ack {
-	if m != nil {
-		return m.Ack
-	}
-	return nil
-}
+func (m *SynAck) GetAck() *Ack { _ = "STUB: not implemented"; return nil }
 
 type BzzAddress struct {
 	Underlay  []byte `protobuf:"bytes,1,opt,name=Underlay,proto3" json:"Underlay,omitempty"`
@@ -200,59 +120,31 @@ type BzzAddress struct {
 	Overlay   []byte `protobuf:"bytes,3,opt,name=Overlay,proto3" json:"Overlay,omitempty"`
 }
 
-func (m *BzzAddress) Reset()         { *m = BzzAddress{} }
-func (m *BzzAddress) String() string { return proto.CompactTextString(m) }
-func (*BzzAddress) ProtoMessage()    {}
-func (*BzzAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a77305914d5d202f, []int{3}
-}
-func (m *BzzAddress) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *BzzAddress) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *BzzAddress) String() string            { _ = "STUB: not implemented"; return "" }
+func (*BzzAddress) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*BzzAddress) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *BzzAddress) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *BzzAddress) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_BzzAddress.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *BzzAddress) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BzzAddress.Merge(m, src)
-}
-func (m *BzzAddress) XXX_Size() int {
-	return m.Size()
-}
-func (m *BzzAddress) XXX_DiscardUnknown() {
-	xxx_messageInfo_BzzAddress.DiscardUnknown(m)
-}
+
+func (m *BzzAddress) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *BzzAddress) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *BzzAddress) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_BzzAddress proto.InternalMessageInfo
 
-func (m *BzzAddress) GetUnderlay() []byte {
-	if m != nil {
-		return m.Underlay
-	}
-	return nil
-}
+func (m *BzzAddress) GetUnderlay() []byte { _ = "STUB: not implemented"; return nil }
 
-func (m *BzzAddress) GetSignature() []byte {
-	if m != nil {
-		return m.Signature
-	}
-	return nil
-}
+func (m *BzzAddress) GetSignature() []byte { _ = "STUB: not implemented"; return nil }
 
-func (m *BzzAddress) GetOverlay() []byte {
-	if m != nil {
-		return m.Overlay
-	}
-	return nil
-}
+func (m *BzzAddress) GetOverlay() []byte { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	proto.RegisterType((*Syn)(nil), "handshake.Syn")
@@ -287,927 +179,68 @@ var fileDescriptor_a77305914d5d202f = []byte{
 	0x7e, 0x02, 0x00, 0x00, 0xff, 0xff, 0x87, 0xa7, 0x49, 0x00, 0xd6, 0x01, 0x00, 0x00,
 }
 
-func (m *Syn) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *Syn) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *Syn) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *Syn) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *Syn) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ObservedUnderlay) > 0 {
-		i -= len(m.ObservedUnderlay)
-		copy(dAtA[i:], m.ObservedUnderlay)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.ObservedUnderlay)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *Ack) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *Ack) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *Ack) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *Ack) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *Ack) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.WelcomeMessage) > 0 {
-		i -= len(m.WelcomeMessage)
-		copy(dAtA[i:], m.WelcomeMessage)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.WelcomeMessage)))
-		i--
-		dAtA[i] = 0x6
-		i--
-		dAtA[i] = 0x9a
-	}
-	if len(m.Nonce) > 0 {
-		i -= len(m.Nonce)
-		copy(dAtA[i:], m.Nonce)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.Nonce)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.FullNode {
-		i--
-		if m.FullNode {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.NetworkID != 0 {
-		i = encodeVarintHandshake(dAtA, i, uint64(m.NetworkID))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Address != nil {
-		{
-			size, err := m.Address.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintHandshake(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *SynAck) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *SynAck) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *SynAck) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *SynAck) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *SynAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Ack != nil {
-		{
-			size, err := m.Ack.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintHandshake(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Syn != nil {
-		{
-			size, err := m.Syn.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintHandshake(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *BzzAddress) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *BzzAddress) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *BzzAddress) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *BzzAddress) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *BzzAddress) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Overlay) > 0 {
-		i -= len(m.Overlay)
-		copy(dAtA[i:], m.Overlay)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.Overlay)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Signature) > 0 {
-		i -= len(m.Signature)
-		copy(dAtA[i:], m.Signature)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.Signature)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Underlay) > 0 {
-		i -= len(m.Underlay)
-		copy(dAtA[i:], m.Underlay)
-		i = encodeVarintHandshake(dAtA, i, uint64(len(m.Underlay)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func encodeVarintHandshake(dAtA []byte, offset int, v uint64) int {
-	offset -= sovHandshake(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
-func (m *Syn) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ObservedUnderlay)
-	if l > 0 {
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	return n
+	_ = "STUB: not implemented"
+	return 0
 }
 
-func (m *Ack) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Address != nil {
-		l = m.Address.Size()
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	if m.NetworkID != 0 {
-		n += 1 + sovHandshake(uint64(m.NetworkID))
-	}
-	if m.FullNode {
-		n += 2
-	}
-	l = len(m.Nonce)
-	if l > 0 {
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	l = len(m.WelcomeMessage)
-	if l > 0 {
-		n += 2 + l + sovHandshake(uint64(l))
-	}
-	return n
-}
+func (m *Syn) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-func (m *SynAck) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Syn != nil {
-		l = m.Syn.Size()
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	if m.Ack != nil {
-		l = m.Ack.Size()
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	return n
-}
+func (m *Ack) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-func (m *BzzAddress) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Underlay)
-	if l > 0 {
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	l = len(m.Signature)
-	if l > 0 {
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	l = len(m.Overlay)
-	if l > 0 {
-		n += 1 + l + sovHandshake(uint64(l))
-	}
-	return n
-}
+func (m *SynAck) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-func sovHandshake(x uint64) (n int) {
-	return (math_bits.Len64(x|1) + 6) / 7
-}
-func sozHandshake(x uint64) (n int) {
-	return sovHandshake(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Syn) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowHandshake
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Syn: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Syn: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ObservedUnderlay", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ObservedUnderlay = append(m.ObservedUnderlay[:0], dAtA[iNdEx:postIndex]...)
-			if m.ObservedUnderlay == nil {
-				m.ObservedUnderlay = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipHandshake(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func (m *BzzAddress) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Ack) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowHandshake
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Ack: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Ack: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Address == nil {
-				m.Address = &BzzAddress{}
-			}
-			if err := m.Address.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NetworkID", wireType)
-			}
-			m.NetworkID = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.NetworkID |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FullNode", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.FullNode = bool(v != 0)
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Nonce", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Nonce = append(m.Nonce[:0], dAtA[iNdEx:postIndex]...)
-			if m.Nonce == nil {
-				m.Nonce = []byte{}
-			}
-			iNdEx = postIndex
-		case 99:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WelcomeMessage", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.WelcomeMessage = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipHandshake(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func sovHandshake(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SynAck) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowHandshake
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SynAck: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SynAck: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Syn", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Syn == nil {
-				m.Syn = &Syn{}
-			}
-			if err := m.Syn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ack", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Ack == nil {
-				m.Ack = &Ack{}
-			}
-			if err := m.Ack.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipHandshake(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func sozHandshake(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *BzzAddress) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowHandshake
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: BzzAddress: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: BzzAddress: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Underlay", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Underlay = append(m.Underlay[:0], dAtA[iNdEx:postIndex]...)
-			if m.Underlay == nil {
-				m.Underlay = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Signature", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Signature = append(m.Signature[:0], dAtA[iNdEx:postIndex]...)
-			if m.Signature == nil {
-				m.Signature = []byte{}
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Overlay", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Overlay = append(m.Overlay[:0], dAtA[iNdEx:postIndex]...)
-			if m.Overlay == nil {
-				m.Overlay = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipHandshake(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func (m *Syn) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipHandshake(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowHandshake
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowHandshake
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthHandshake
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupHandshake
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthHandshake
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
+func (m *Ack) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func (m *SynAck) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func (m *BzzAddress) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func skipHandshake(dAtA []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 var (
 	ErrInvalidLengthHandshake        = fmt.Errorf("proto: negative length found during unmarshaling")

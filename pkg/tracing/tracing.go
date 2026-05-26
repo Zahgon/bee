@@ -5,19 +5,14 @@
 package tracing
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"errors"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/p2p"
 	"github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go"
-	"github.com/uber/jaeger-client-go/config"
 )
 
 var (
@@ -59,221 +54,93 @@ type Options struct {
 // NewTracer creates a new Tracer and returns a closer which needs to be closed
 // when the Tracer is no longer used to flush remaining traces.
 func NewTracer(o *Options) (*Tracer, io.Closer, error) {
-	if o == nil {
-		o = new(Options)
-	}
-
-	cfg := config.Configuration{
-		Disabled:    !o.Enabled,
-		ServiceName: o.ServiceName,
-		Sampler: &config.SamplerConfig{
-			Type:  jaeger.SamplerTypeConst,
-			Param: 1,
-		},
-		Reporter: &config.ReporterConfig{
-			LogSpans:            true,
-			BufferFlushInterval: 1 * time.Second,
-			LocalAgentHostPort:  o.Endpoint,
-		},
-		Headers: &jaeger.HeadersConfig{
-			TraceContextHeaderName:   TraceContextHeaderName,
-			TraceBaggageHeaderPrefix: TraceBaggageHeaderPrefix,
-		},
-	}
-
-	t, closer, err := cfg.NewTracer()
-	if err != nil {
-		return nil, nil, err
-	}
-	return &Tracer{tracer: t}, closer, nil
+	_ = "STUB: not implemented"
+	return nil, *new(io.Closer), nil
 }
 
 // StartSpanFromContext starts a new tracing span that is either a root one or a
 // child of existing one from the provided Context. If logger is provided, a new
 // log Entry will be returned with "traceID" log field.
 func (t *Tracer) StartSpanFromContext(ctx context.Context, operationName string, l log.Logger, opts ...opentracing.StartSpanOption) (opentracing.Span, log.Logger, context.Context) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	var span opentracing.Span
-	if parentContext := FromContext(ctx); parentContext != nil {
-		opts = append(opts, opentracing.ChildOf(parentContext))
-		span = t.tracer.StartSpan(operationName, opts...)
-	} else {
-		span = t.tracer.StartSpan(operationName, opts...)
-	}
-	sc := span.Context()
-	return span, loggerWithTraceID(sc, l), WithContext(ctx, sc)
+	_ = "STUB: not implemented"
+	return *new(opentracing.Span), *new(log.Logger), *new(context.Context)
 }
 
 // FollowSpanFromContext starts a new tracing span that is either a root one or
 // follows an existing one from the provided Context. If logger is provided, a new
 // log Entry will be returned with "traceID" log field.
 func (t *Tracer) FollowSpanFromContext(ctx context.Context, operationName string, l log.Logger, opts ...opentracing.StartSpanOption) (opentracing.Span, log.Logger, context.Context) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	var span opentracing.Span
-	if parentContext := FromContext(ctx); parentContext != nil {
-		opts = append(opts, opentracing.FollowsFrom(parentContext))
-		span = t.tracer.StartSpan(operationName, opts...)
-	} else {
-		span = t.tracer.StartSpan(operationName, opts...)
-	}
-	sc := span.Context()
-	return span, loggerWithTraceID(sc, l), WithContext(ctx, sc)
+	_ = "STUB: not implemented"
+	return *new(opentracing.Span), *new(log.Logger), *new(context.Context)
 }
 
 // AddContextHeader adds a tracing span context to provided p2p Headers from
 // the go context. If the tracing span context is not present in go context,
 // ErrContextNotFound is returned.
 func (t *Tracer) AddContextHeader(ctx context.Context, headers p2p.Headers) error {
-	if t == nil {
-		t = noopTracer
-	}
-
-	c := FromContext(ctx)
-	if c == nil {
-		return ErrContextNotFound
-	}
-
-	var b bytes.Buffer
-	w := bufio.NewWriter(&b)
-	if err := t.tracer.Inject(c, opentracing.Binary, w); err != nil {
-		return err
-	}
-	if err := w.Flush(); err != nil {
-		return err
-	}
-
-	headers[p2p.HeaderNameTracingSpanContext] = b.Bytes()
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // FromHeaders returns tracing span context from p2p Headers. If the tracing
 // span context is not present in go context, ErrContextNotFound is returned.
 func (t *Tracer) FromHeaders(headers p2p.Headers) (opentracing.SpanContext, error) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	v := headers[p2p.HeaderNameTracingSpanContext]
-	if v == nil {
-		return nil, ErrContextNotFound
-	}
-	c, err := t.tracer.Extract(opentracing.Binary, bytes.NewReader(v))
-	if err != nil {
-		if errors.Is(err, opentracing.ErrSpanContextNotFound) {
-			return nil, ErrContextNotFound
-		}
-		return nil, err
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return *new(opentracing.SpanContext), nil
 }
 
 // WithContextFromHeaders returns a new context with injected tracing span
 // context if they are found in p2p Headers. If the tracing span context is not
 // present in go context, ErrContextNotFound is returned.
 func (t *Tracer) WithContextFromHeaders(ctx context.Context, headers p2p.Headers) (context.Context, error) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	c, err := t.FromHeaders(headers)
-	if err != nil {
-		return ctx, err
-	}
-	return WithContext(ctx, c), nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
 // AddContextHTTPHeader adds a tracing span context to provided HTTP headers
 // from the go context. If the tracing span context is not present in
 // go context, ErrContextNotFound is returned.
 func (t *Tracer) AddContextHTTPHeader(ctx context.Context, headers http.Header) error {
-	if t == nil {
-		t = noopTracer
-	}
-
-	c := FromContext(ctx)
-	if c == nil {
-		return ErrContextNotFound
-	}
-
-	carrier := opentracing.HTTPHeadersCarrier(headers)
-	return t.tracer.Inject(c, opentracing.HTTPHeaders, carrier)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // FromHTTPHeaders returns tracing span context from HTTP headers. If the tracing
 // span context is not present in go context, ErrContextNotFound is returned.
 func (t *Tracer) FromHTTPHeaders(headers http.Header) (opentracing.SpanContext, error) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	carrier := opentracing.HTTPHeadersCarrier(headers)
-	c, err := t.tracer.Extract(opentracing.HTTPHeaders, carrier)
-	if err != nil {
-		if errors.Is(err, opentracing.ErrSpanContextNotFound) {
-			return nil, ErrContextNotFound
-		}
-		return nil, err
-	}
-
-	return c, nil
+	_ = "STUB: not implemented"
+	return *new(opentracing.SpanContext), nil
 }
 
 // WithContextFromHTTPHeaders returns a new context with injected tracing span
 // context if they are found in HTTP headers. If the tracing span context is not
 // present in go context, ErrContextNotFound is returned.
 func (t *Tracer) WithContextFromHTTPHeaders(ctx context.Context, headers http.Header) (context.Context, error) {
-	if t == nil {
-		t = noopTracer
-	}
-
-	c, err := t.FromHTTPHeaders(headers)
-	if err != nil {
-		return ctx, err
-	}
-
-	return WithContext(ctx, c), nil
+	_ = "STUB: not implemented"
+	return *new(context.Context), nil
 }
 
 // WithContext adds tracing span context to go context.
 func WithContext(ctx context.Context, c opentracing.SpanContext) context.Context {
-	return context.WithValue(ctx, contextKey{}, c)
+	_ = "STUB: not implemented"
+	return *new(context.Context)
 }
 
 // FromContext return tracing span context from go context. If the tracing span
 // context is not present in go context, nil is returned.
 func FromContext(ctx context.Context) opentracing.SpanContext {
-	c, ok := ctx.Value(contextKey{}).(opentracing.SpanContext)
-	if !ok {
-		return nil
-	}
-	return c
+	_ = "STUB: not implemented"
+	return *new(opentracing.SpanContext)
 }
 
 // NewLoggerWithTraceID creates a new log Entry with "traceID" field added if it
 // exists in tracing span context stored from go context.
 func NewLoggerWithTraceID(ctx context.Context, l log.Logger) log.Logger {
-	return loggerWithTraceID(FromContext(ctx), l)
+	_ = "STUB: not implemented"
+	return *new(log.Logger)
 }
 
 func loggerWithTraceID(sc opentracing.SpanContext, l log.Logger) log.Logger {
-	if l == nil {
-		return nil
-	}
-	jsc, ok := sc.(jaeger.SpanContext)
-	if !ok {
-		return l
-	}
-	traceID := jsc.TraceID()
-	if !traceID.IsValid() {
-		return l
-	}
-	return l.WithValues(LogField, traceID).Build()
+	_ = "STUB: not implemented"
+	return *new(log.Logger)
 }

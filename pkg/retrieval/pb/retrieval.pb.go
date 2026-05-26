@@ -5,10 +5,9 @@ package pb
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
-	io "io"
 	math "math"
-	math_bits "math/bits"
+
+	proto "github.com/gogo/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,45 +25,27 @@ type Request struct {
 	Addr []byte `protobuf:"bytes,1,opt,name=Addr,proto3" json:"Addr,omitempty"`
 }
 
-func (m *Request) Reset()         { *m = Request{} }
-func (m *Request) String() string { return proto.CompactTextString(m) }
-func (*Request) ProtoMessage()    {}
-func (*Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fcade0a564e5dcd4, []int{0}
-}
-func (m *Request) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *Request) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *Request) String() string            { _ = "STUB: not implemented"; return "" }
+func (*Request) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*Request) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *Request) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *Request) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Request.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *Request) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Request.Merge(m, src)
-}
-func (m *Request) XXX_Size() int {
-	return m.Size()
-}
-func (m *Request) XXX_DiscardUnknown() {
-	xxx_messageInfo_Request.DiscardUnknown(m)
-}
+
+func (m *Request) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *Request) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *Request) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_Request proto.InternalMessageInfo
 
-func (m *Request) GetAddr() []byte {
-	if m != nil {
-		return m.Addr
-	}
-	return nil
-}
+func (m *Request) GetAddr() []byte { _ = "STUB: not implemented"; return nil }
 
 type Delivery struct {
 	Data  []byte `protobuf:"bytes,1,opt,name=Data,proto3" json:"Data,omitempty"`
@@ -72,59 +53,31 @@ type Delivery struct {
 	Err   string `protobuf:"bytes,3,opt,name=Err,proto3" json:"Err,omitempty"`
 }
 
-func (m *Delivery) Reset()         { *m = Delivery{} }
-func (m *Delivery) String() string { return proto.CompactTextString(m) }
-func (*Delivery) ProtoMessage()    {}
-func (*Delivery) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fcade0a564e5dcd4, []int{1}
-}
-func (m *Delivery) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
+func (m *Delivery) Reset()                    { _ = "STUB: not implemented"; return }
+func (m *Delivery) String() string            { _ = "STUB: not implemented"; return "" }
+func (*Delivery) ProtoMessage()               { _ = "STUB: not implemented"; return }
+func (*Delivery) Descriptor() ([]byte, []int) { _ = "STUB: not implemented"; return nil, nil }
+
+func (m *Delivery) XXX_Unmarshal(b []byte) error { _ = "STUB: not implemented"; return nil }
+
 func (m *Delivery) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Delivery.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
-func (m *Delivery) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Delivery.Merge(m, src)
-}
-func (m *Delivery) XXX_Size() int {
-	return m.Size()
-}
-func (m *Delivery) XXX_DiscardUnknown() {
-	xxx_messageInfo_Delivery.DiscardUnknown(m)
-}
+
+func (m *Delivery) XXX_Merge(src proto.Message) { _ = "STUB: not implemented"; return }
+
+func (m *Delivery) XXX_Size() int { _ = "STUB: not implemented"; return 0 }
+
+func (m *Delivery) XXX_DiscardUnknown() { _ = "STUB: not implemented"; return }
 
 var xxx_messageInfo_Delivery proto.InternalMessageInfo
 
-func (m *Delivery) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
+func (m *Delivery) GetData() []byte { _ = "STUB: not implemented"; return nil }
 
-func (m *Delivery) GetStamp() []byte {
-	if m != nil {
-		return m.Stamp
-	}
-	return nil
-}
+func (m *Delivery) GetStamp() []byte { _ = "STUB: not implemented"; return nil }
 
-func (m *Delivery) GetErr() string {
-	if m != nil {
-		return m.Err
-	}
-	return ""
-}
+func (m *Delivery) GetErr() string { _ = "STUB: not implemented"; return "" }
 
 func init() {
 	proto.RegisterType((*Request)(nil), "retrieval.Request")
@@ -148,449 +101,42 @@ var fileDescriptor_fcade0a564e5dcd4 = []byte{
 	0x00,
 }
 
-func (m *Request) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *Request) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *Request) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *Request) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *Request) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Addr) > 0 {
-		i -= len(m.Addr)
-		copy(dAtA[i:], m.Addr)
-		i = encodeVarintRetrieval(dAtA, i, uint64(len(m.Addr)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
-func (m *Delivery) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
+func (m *Delivery) Marshal() (dAtA []byte, err error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (m *Delivery) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
+func (m *Delivery) MarshalTo(dAtA []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 func (m *Delivery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Err) > 0 {
-		i -= len(m.Err)
-		copy(dAtA[i:], m.Err)
-		i = encodeVarintRetrieval(dAtA, i, uint64(len(m.Err)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Stamp) > 0 {
-		i -= len(m.Stamp)
-		copy(dAtA[i:], m.Stamp)
-		i = encodeVarintRetrieval(dAtA, i, uint64(len(m.Stamp)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Data) > 0 {
-		i -= len(m.Data)
-		copy(dAtA[i:], m.Data)
-		i = encodeVarintRetrieval(dAtA, i, uint64(len(m.Data)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func encodeVarintRetrieval(dAtA []byte, offset int, v uint64) int {
-	offset -= sovRetrieval(v)
-	base := offset
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return base
-}
-func (m *Request) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Addr)
-	if l > 0 {
-		n += 1 + l + sovRetrieval(uint64(l))
-	}
-	return n
+	_ = "STUB: not implemented"
+	return 0
 }
 
-func (m *Delivery) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Data)
-	if l > 0 {
-		n += 1 + l + sovRetrieval(uint64(l))
-	}
-	l = len(m.Stamp)
-	if l > 0 {
-		n += 1 + l + sovRetrieval(uint64(l))
-	}
-	l = len(m.Err)
-	if l > 0 {
-		n += 1 + l + sovRetrieval(uint64(l))
-	}
-	return n
-}
+func (m *Request) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-func sovRetrieval(x uint64) (n int) {
-	return (math_bits.Len64(x|1) + 6) / 7
-}
-func sozRetrieval(x uint64) (n int) {
-	return sovRetrieval(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Request) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRetrieval
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Request: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Request: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Addr = append(m.Addr[:0], dAtA[iNdEx:postIndex]...)
-			if m.Addr == nil {
-				m.Addr = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRetrieval(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func (m *Delivery) Size() (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Delivery) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRetrieval
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Delivery: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Delivery: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
-			if m.Data == nil {
-				m.Data = []byte{}
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Stamp", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Stamp = append(m.Stamp[:0], dAtA[iNdEx:postIndex]...)
-			if m.Stamp == nil {
-				m.Stamp = []byte{}
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Err", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Err = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRetrieval(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRetrieval
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
+func sovRetrieval(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
 
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipRetrieval(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	depth := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowRetrieval
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-		case 1:
-			iNdEx += 8
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowRetrieval
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if length < 0 {
-				return 0, ErrInvalidLengthRetrieval
-			}
-			iNdEx += length
-		case 3:
-			depth++
-		case 4:
-			if depth == 0 {
-				return 0, ErrUnexpectedEndOfGroupRetrieval
-			}
-			depth--
-		case 5:
-			iNdEx += 4
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-		if iNdEx < 0 {
-			return 0, ErrInvalidLengthRetrieval
-		}
-		if depth == 0 {
-			return iNdEx, nil
-		}
-	}
-	return 0, io.ErrUnexpectedEOF
-}
+func sozRetrieval(x uint64) (n int) { _ = "STUB: not implemented"; return 0 }
+
+func (m *Request) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func (m *Delivery) Unmarshal(dAtA []byte) error { _ = "STUB: not implemented"; return nil }
+
+func skipRetrieval(dAtA []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
 var (
 	ErrInvalidLengthRetrieval        = fmt.Errorf("proto: negative length found during unmarshaling")

@@ -15,13 +15,11 @@ import (
 	"errors"
 	"io"
 	"sync"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/postage"
 	"github.com/ethersphere/bee/v2/pkg/pushsync"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/ethersphere/bee/v2/pkg/topology"
 )
 
 // loggerName is the tree path name of the logger for this package.
@@ -60,28 +58,15 @@ type pss struct {
 
 // New returns a new pss service.
 func New(key *ecdsa.PrivateKey, logger log.Logger) Interface {
-	return &pss{
-		key:      key,
-		logger:   logger.WithName(loggerName).Register(),
-		handlers: make(map[Topic][]*Handler),
-		metrics:  newMetrics(),
-		quit:     make(chan struct{}),
-	}
+	_ = "STUB: not implemented"
+	return *new(Interface)
 }
 
-func (ps *pss) Close() error {
-	close(ps.quit)
-	ps.handlersMu.Lock()
-	defer ps.handlersMu.Unlock()
+func (ps *pss) Close() error { _ = "STUB: not implemented"; return nil }
 
-	ps.handlers = make(map[Topic][]*Handler) // unset handlers on shutdown
+// unset handlers on shutdown
 
-	return nil
-}
-
-func (ps *pss) SetPushSyncer(pushSyncer pushsync.PushSyncer) {
-	ps.pusher = pushSyncer
-}
+func (ps *pss) SetPushSyncer(pushSyncer pushsync.PushSyncer) { _ = "STUB: not implemented"; return }
 
 // Handler defines code to be executed upon reception of a trojan message.
 type Handler func(context.Context, []byte)
@@ -90,108 +75,27 @@ type Handler func(context.Context, []byte)
 // wraps it in a trojan chunk such that one of the targets is a prefix of the chunk address.
 // Uses push-sync to deliver message.
 func (p *pss) Send(ctx context.Context, topic Topic, payload []byte, stamper postage.Stamper, recipient *ecdsa.PublicKey, targets Targets) error {
-	p.metrics.TotalMessagesSentCounter.Inc()
-
-	tStart := time.Now()
-
-	tc, err := Wrap(ctx, topic, payload, recipient, targets)
-	if err != nil {
-		return err
-	}
-
-	stamp, err := stamper.Stamp(tc.Address(), tc.Address())
-	if err != nil {
-		return err
-	}
-	tc = tc.WithStamp(stamp)
-
-	p.metrics.MessageMiningDuration.Set(time.Since(tStart).Seconds())
-
-	// push the chunk using push sync so that it reaches it destination in network
-	if _, err = p.pusher.PushChunkToClosest(ctx, tc); err != nil {
-		if errors.Is(err, topology.ErrWantSelf) {
-			return nil
-		}
-		return err
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// push the chunk using push sync so that it reaches it destination in network
+
 // Register allows the definition of a Handler func for a specific topic on the pss struct.
 func (p *pss) Register(topic Topic, handler Handler) (cleanup func()) {
-	p.handlersMu.Lock()
-	defer p.handlersMu.Unlock()
-
-	p.handlers[topic] = append(p.handlers[topic], &handler)
-
-	return func() {
-		p.handlersMu.Lock()
-		defer p.handlersMu.Unlock()
-
-		h := p.handlers[topic]
-		for i := range h {
-			if h[i] == &handler {
-				p.handlers[topic] = append(h[:i], h[i+1:]...)
-				return
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (p *pss) topics() []Topic {
-	p.handlersMu.Lock()
-	defer p.handlersMu.Unlock()
-
-	ts := make([]Topic, 0, len(p.handlers))
-	for t := range p.handlers {
-		ts = append(ts, t)
-	}
-
-	return ts
-}
+func (p *pss) topics() []Topic { _ = "STUB: not implemented"; return nil }
 
 // TryUnwrap allows unwrapping a chunk as a trojan message and calling its handlers based on the topic.
-func (p *pss) TryUnwrap(c swarm.Chunk) {
-	if len(c.Data()) < swarm.ChunkWithSpanSize {
-		return // chunk not full
-	}
-	ctx := context.Background()
-	topic, msg, err := Unwrap(ctx, p.key, c, p.topics())
-	if err != nil {
-		return // cannot unwrap
-	}
-	h := p.getHandlers(topic)
-	if h == nil {
-		return // no handler
-	}
+func (p *pss) TryUnwrap(c swarm.Chunk) { _ = "STUB: not implemented"; return }
 
-	ctx, cancel := context.WithCancel(ctx)
-	done := make(chan struct{})
-	var wg sync.WaitGroup
-	go func() {
-		defer cancel()
-		select {
-		case <-p.quit:
-		case <-done:
-		}
-	}()
-	for _, hh := range h {
-		wg.Add(1)
-		go func(hh Handler) {
-			defer wg.Done()
-			hh(ctx, msg)
-		}(*hh)
-	}
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
-}
+// chunk not full
 
-func (p *pss) getHandlers(topic Topic) []*Handler {
-	p.handlersMu.Lock()
-	defer p.handlersMu.Unlock()
+// cannot unwrap
 
-	return p.handlers[topic]
-}
+// no handler
+
+func (p *pss) getHandlers(topic Topic) []*Handler { _ = "STUB: not implemented"; return nil }

@@ -27,60 +27,18 @@ type SingleFlightCache[T any] struct {
 }
 
 func NewSingleFlightCache[T any](metricsPrefix string) *SingleFlightCache[T] {
-	return &SingleFlightCache[T]{
-		key:     metricsPrefix,
-		metrics: newMetricSet(metricsPrefix),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (c *SingleFlightCache[T]) Collectors() []prometheus.Collector {
-	return []prometheus.Collector{
-		c.metrics.Hits,
-		c.metrics.Misses,
-		c.metrics.Loads,
-		c.metrics.SharedLoads,
-		c.metrics.LoadErrors,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (c *SingleFlightCache[T]) Set(value T) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	c.value = value
-}
+func (c *SingleFlightCache[T]) Set(value T) { _ = "STUB: not implemented"; return }
 
 func (c *SingleFlightCache[T]) PeekOrLoad(ctx context.Context, canReuse ReuseEvaluator[T], loader Loader[T]) (T, error) {
-	c.mu.RLock()
-	value := c.value
-	c.mu.RUnlock()
-
-	if canReuse(value) {
-		c.metrics.Hits.Inc()
-		return value, nil
-	}
-
-	c.metrics.Misses.Inc()
-
-	result, shared, err := c.group.Do(ctx, c.key, func(ctx context.Context) (any, error) {
-		c.metrics.Loads.Inc()
-		value, err := loader()
-		if err != nil {
-			c.metrics.LoadErrors.Inc()
-			return value, err
-		}
-		c.Set(value)
-		return value, nil
-	})
-
-	if shared {
-		c.metrics.SharedLoads.Inc()
-	}
-
-	if err != nil {
-		var zero T
-		return zero, err
-	}
-
-	return result.(T), nil
+	_ = "STUB: not implemented"
+	return *new(T), nil
 }

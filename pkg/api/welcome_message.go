@@ -5,10 +5,7 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
-
-	"github.com/ethersphere/bee/v2/pkg/jsonhttp"
 )
 
 const welcomeMessageMaxRequestSize = 512
@@ -22,28 +19,11 @@ type welcomeMessageResponse struct {
 }
 
 func (s *Service) getWelcomeMessageHandler(w http.ResponseWriter, _ *http.Request) {
-	val := s.p2p.GetWelcomeMessage()
-	jsonhttp.OK(w, welcomeMessageResponse{
-		WelcomeMesssage: val,
-	})
+	_ = "STUB: not implemented"
+	return
 }
 
 func (s *Service) setWelcomeMessageHandler(w http.ResponseWriter, r *http.Request) {
-	logger := s.logger.WithName("post_welcome_message").Build()
-
-	var data welcomeMessageRequest
-	err := json.NewDecoder(r.Body).Decode(&data)
-	if err != nil {
-		logger.Debug("failed to read body", "error", err)
-		jsonhttp.BadRequest(w, err)
-		return
-	}
-
-	if err := s.p2p.SetWelcomeMessage(data.WelcomeMesssage); err != nil {
-		logger.Debug("set welcome message failed", "error", err)
-		logger.Error(nil, "set welcome message failed")
-		jsonhttp.InternalServerError(w, err)
-		return
-	}
-	jsonhttp.OK(w, nil)
+	_ = "STUB: not implemented"
+	return
 }

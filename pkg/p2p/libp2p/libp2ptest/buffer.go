@@ -15,14 +15,6 @@ type SafeBuffer struct {
 	m sync.Mutex
 }
 
-func (s *SafeBuffer) Write(p []byte) (n int, err error) {
-	s.m.Lock()
-	defer s.m.Unlock()
-	return s.b.Write(p)
-}
+func (s *SafeBuffer) Write(p []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
-func (s *SafeBuffer) String() string {
-	s.m.Lock()
-	defer s.m.Unlock()
-	return s.b.String()
-}
+func (s *SafeBuffer) String() string { _ = "STUB: not implemented"; return "" }

@@ -6,9 +6,7 @@ package log
 
 import (
 	"io"
-	"strconv"
 	"sync"
-	"sync/atomic"
 )
 
 // Level specifies a level of verbosity for logger.
@@ -17,63 +15,25 @@ import (
 type Level int32
 
 // get returns the value of the Level.
-func (l *Level) get() Level {
-	return Level(atomic.LoadInt32((*int32)(l)))
-}
+func (l *Level) get() Level { _ = "STUB: not implemented"; return *new(Level) }
 
 // set updates the value of the Level.
-func (l *Level) set(v Level) {
-	atomic.StoreInt32((*int32)(l), int32(v))
-}
+func (l *Level) set(v Level) { _ = "STUB: not implemented"; return }
 
 // String implements the fmt.Stringer interface.
-func (l Level) String() string {
-	switch l.get() {
-	case VerbosityNone:
-		return "none"
-	case VerbosityError:
-		return "error"
-	case VerbosityWarning:
-		return "warning"
-	case VerbosityInfo:
-		return "info"
-	case VerbosityDebug:
-		return "debug"
-	case VerbosityAll:
-		return "all"
-	}
-	return strconv.FormatInt(int64(l), 10) // Covers all in the range [VerbosityDebug ... VerbosityAll>.
-}
+func (l Level) String() string { _ = "STUB: not implemented"; return "" }
+
+// Covers all in the range [VerbosityDebug ... VerbosityAll>.
 
 // ParseVerbosityLevel returns a verbosity Level parsed from the given s.
 func ParseVerbosityLevel(s string) (Level, error) {
-	switch s {
-	case "none":
-		return VerbosityNone, nil
-	case "error":
-		return VerbosityError, nil
-	case "warning":
-		return VerbosityWarning, nil
-	case "info":
-		return VerbosityInfo, nil
-	case "debug":
-		return VerbosityDebug, nil
-	case "all":
-		return VerbosityAll, nil
-	}
-	i, err := strconv.ParseInt(s, 10, 32)
-	return Level(i), err
+	_ = "STUB: not implemented"
+	return *new(Level), nil
 }
 
 // MustParseVerbosityLevel returns a verbosity Level parsed from the given s.
 // It panics if the given s is not a valid verbosity level.
-func MustParseVerbosityLevel(s string) Level {
-	l, err := ParseVerbosityLevel(s)
-	if err != nil {
-		panic(err)
-	}
-	return l
-}
+func MustParseVerbosityLevel(s string) Level { _ = "STUB: not implemented"; return *new(Level) }
 
 const (
 	// VerbosityNone will silence the logger.
@@ -169,12 +129,9 @@ type Logger interface {
 
 // Lock wraps io.Writer in a mutex to make it safe for concurrent use.
 // In particular, *os.Files must be locked before use.
-func Lock(w io.Writer) io.Writer {
-	if _, ok := w.(*lockWriter); ok {
-		return w // No need to layer on another lock.
-	}
-	return &lockWriter{w: w}
-}
+func Lock(w io.Writer) io.Writer { _ = "STUB: not implemented"; return *new(io.Writer) }
+
+// No need to layer on another lock.
 
 // lockWriter attaches mutex to io.Writer for convince of usage.
 type lockWriter struct {
@@ -183,12 +140,7 @@ type lockWriter struct {
 }
 
 // Write implements the io.Writer interface.
-func (ls *lockWriter) Write(bs []byte) (int, error) {
-	ls.Lock()
-	n, err := ls.w.Write(bs)
-	ls.Unlock()
-	return n, err
-}
+func (ls *lockWriter) Write(bs []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // Options specifies parameters that affect logger behavior.
 type Options struct {
@@ -205,39 +157,27 @@ type Option func(*Options)
 // WithSink tells the logger to log to the given sync.
 // The provided sync should be safe for concurrent use,
 // if it is not then it should be wrapped with Lock helper.
-func WithSink(sink io.Writer) Option {
-	return func(opts *Options) { opts.sink = sink }
-}
+func WithSink(sink io.Writer) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithVerbosity tells the logger which verbosity level should be logged by default.
-func WithVerbosity(verbosity Level) Option {
-	return func(opts *Options) { opts.verbosity = verbosity }
-}
+func WithVerbosity(verbosity Level) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCaller tells the logger to add a "caller" key to some or all log lines.
 // This has some overhead, so some users might not want it.
-func WithCaller(category MessageCategory) Option {
-	return func(opts *Options) { opts.fmtOptions.caller = category }
-}
+func WithCaller(category MessageCategory) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCallerFunc tells the logger to also log the calling function name.
 // This has no effect if caller logging is not enabled (see WithCaller).
-func WithCallerFunc() Option {
-	return func(opts *Options) { opts.fmtOptions.logCallerFunc = true }
-}
+func WithCallerFunc() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithTimestamp tells the logger to add a "timestamp" key to log lines.
 // This has some overhead, so some users might not want it.
-func WithTimestamp() Option {
-	return func(opts *Options) { opts.fmtOptions.logTimestamp = true }
-}
+func WithTimestamp() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithTimestampLayout tells the logger how to render timestamps when
 // WithTimestamp is enabled. If not specified, a default format will
 // be used. For more details, see docs for Go's time.Layout.
-func WithTimestampLayout(layout string) Option {
-	return func(opts *Options) { opts.fmtOptions.timestampLayout = layout }
-}
+func WithTimestampLayout(layout string) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithMaxDepth tells the logger how many levels of nested fields
 // (e.g. a struct that contains a struct, etc.) it may log. Every time
@@ -245,57 +185,23 @@ func WithTimestampLayout(layout string) Option {
 // When the maximum is reached, the value will be converted to a string
 // indicating that the max depth has been exceeded. If this field is not
 // specified, a default value will be used.
-func WithMaxDepth(depth int) Option {
-	return func(opts *Options) { opts.fmtOptions.maxLogDepth = depth }
-}
+func WithMaxDepth(depth int) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithJSONOutput tells the logger if the output should be formatted as JSON.
-func WithJSONOutput() Option {
-	return func(opts *Options) { opts.fmtOptions.jsonOutput = true }
-}
+func WithJSONOutput() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithCallerDepth tells the logger the number of stack-frames
 // to skip when attributing the log line to a file and line.
-func WithCallerDepth(depth int) Option {
-	return func(opts *Options) { opts.fmtOptions.callerDepth = depth }
-}
+func WithCallerDepth(depth int) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithLevelHooks tells the logger to register and execute hooks at related
 // severity log levels. If VerbosityAll is given, then the given hooks will
 // be registered with each severity log level, including the debug V levels.
 // On the other hand, if VerbosityNone is given, hooks will
 // not be registered with any severity log level.
-func WithLevelHooks(l Level, hooks ...Hook) Option {
-	return func(opts *Options) {
-		if opts.levelHooks == nil {
-			opts.levelHooks = make(map[Level][]Hook)
-		}
-		switch l {
-		case VerbosityNone:
-			return
-		case VerbosityAll:
-			for _, ml := range []Level{
-				VerbosityError,
-				VerbosityWarning,
-				VerbosityInfo,
-				VerbosityDebug,
-				VerbosityAll, // V levels.
-			} {
-				opts.levelHooks[ml] = append(opts.levelHooks[ml], hooks...)
-			}
-		default:
-			opts.levelHooks[l] = append(opts.levelHooks[l], hooks...)
-		}
-	}
-}
+func WithLevelHooks(l Level, hooks ...Hook) Option { _ = "STUB: not implemented"; return *new(Option) }
+
+// V levels.
 
 // WithLogMetrics tells the logger to collect metrics about log messages.
-func WithLogMetrics() Option {
-	return func(opts *Options) {
-		if opts.logMetrics != nil {
-			return
-		}
-		opts.logMetrics = newLogMetrics()
-		WithLevelHooks(VerbosityAll, opts.logMetrics)(opts)
-	}
-}
+func WithLogMetrics() Option { _ = "STUB: not implemented"; return *new(Option) }

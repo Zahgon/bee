@@ -5,17 +5,12 @@
 package cache
 
 import (
-	"io"
-
 	"github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/storageutil"
 	lru "github.com/hashicorp/golang-lru/v2"
 )
 
 // key returns a string representation of the given key.
-func key(key storage.Key) string {
-	return storageutil.JoinFields(key.Namespace(), key.ID())
-}
+func key(key storage.Key) string { _ = "STUB: not implemented"; return "" }
 
 var _ storage.IndexStore = (*Cache)(nil)
 
@@ -32,76 +27,32 @@ type Cache struct {
 // It returns an error if the capacity is less than or equal to zero or if the
 // given store implements storage.Tx
 func Wrap(store storage.IndexStore, capacity int) (*Cache, error) {
-	lru, err := lru.New[string, []byte](capacity)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Cache{store, lru, newMetrics()}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // add caches given item.
-func (c *Cache) add(i storage.Item) {
-	b, err := i.Marshal()
-	if err != nil {
-		return
-	}
-	c.lru.Add(key(i), b)
-}
+func (c *Cache) add(i storage.Item) { _ = "STUB: not implemented"; return }
 
 // Get implements storage.Store interface.
 // On a call it tries to first retrieve the item from cache.
 // If the item does not exist in cache, it tries to retrieve
 // it from the underlying store.
-func (c *Cache) Get(i storage.Item) error {
-	if val, ok := c.lru.Get(key(i)); ok {
-		c.metrics.CacheHit.Inc()
-		return i.Unmarshal(val)
-	}
-
-	if err := c.IndexStore.Get(i); err != nil {
-		return err
-	}
-
-	c.metrics.CacheMiss.Inc()
-	c.add(i)
-
-	return nil
-}
+func (c *Cache) Get(i storage.Item) error { _ = "STUB: not implemented"; return nil }
 
 // Has implements storage.Store interface.
 // On a call it tries to first retrieve the item from cache.
 // If the item does not exist in cache, it tries to retrieve
 // it from the underlying store.
-func (c *Cache) Has(k storage.Key) (bool, error) {
-	if _, ok := c.lru.Get(key(k)); ok {
-		c.metrics.CacheHit.Inc()
-		return true, nil
-	}
-
-	c.metrics.CacheMiss.Inc()
-	return c.IndexStore.Has(k)
-}
+func (c *Cache) Has(k storage.Key) (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
 // Put implements storage.Store interface.
 // On a call it also inserts the item into the cache so that the next
 // call to Put and Has will be able to retrieve the item from cache.
-func (c *Cache) Put(i storage.Item) error {
-	c.add(i)
-	return c.IndexStore.Put(i)
-}
+func (c *Cache) Put(i storage.Item) error { _ = "STUB: not implemented"; return nil }
 
 // Delete implements storage.Store interface.
 // On a call it also removes the item from the cache.
-func (c *Cache) Delete(i storage.Item) error {
-	_ = c.lru.Remove(key(i))
-	return c.IndexStore.Delete(i)
-}
+func (c *Cache) Delete(i storage.Item) error { _ = "STUB: not implemented"; return nil }
 
-func (c *Cache) Close() error {
-	c.lru.Purge()
-	if closer, ok := c.IndexStore.(io.Closer); ok {
-		return closer.Close()
-	}
-	return nil
-}
+func (c *Cache) Close() error { _ = "STUB: not implemented"; return nil }

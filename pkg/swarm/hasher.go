@@ -6,14 +6,10 @@ package swarm
 
 import (
 	"hash"
-
-	"golang.org/x/crypto/sha3"
 )
 
 // NewHasher returns new Keccak-256 hasher.
-func NewHasher() hash.Hash {
-	return sha3.NewLegacyKeccak256()
-}
+func NewHasher() hash.Hash { _ = "STUB: not implemented"; return *new(hash.Hash) }
 
 type PrefixHasher struct {
 	hash.Hash
@@ -22,17 +18,6 @@ type PrefixHasher struct {
 
 // NewPrefixHasher returns new hasher which is Keccak-256 hasher
 // with prefix value added as initial data.
-func NewPrefixHasher(prefix []byte) hash.Hash {
-	h := &PrefixHasher{
-		Hash:   NewHasher(),
-		prefix: prefix,
-	}
-	h.Reset()
+func NewPrefixHasher(prefix []byte) hash.Hash { _ = "STUB: not implemented"; return *new(hash.Hash) }
 
-	return h
-}
-
-func (h *PrefixHasher) Reset() {
-	h.Hash.Reset()
-	_, _ = h.Write(h.prefix)
-}
+func (h *PrefixHasher) Reset() { _ = "STUB: not implemented"; return }

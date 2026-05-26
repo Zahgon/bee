@@ -7,15 +7,12 @@
 package cmd
 
 import (
-	"errors"
-
 	"github.com/ethersphere/bee/v2/pkg/log"
 )
 
-func isWindowsService() (bool, error) {
-	return false, nil
-}
+func isWindowsService() (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
 func createWindowsEventLogger(_ string, _ log.Logger) (log.Logger, error) {
-	return nil, errors.New("cannot create Windows event logger")
+	_ = "STUB: not implemented"
+	return *new(log.Logger), nil
 }

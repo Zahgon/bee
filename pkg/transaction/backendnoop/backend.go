@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethersphere/bee/v2/pkg/postage/postagecontract"
 	"github.com/ethersphere/bee/v2/pkg/transaction"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -26,69 +25,80 @@ type Backend struct {
 
 // New creates a new no-op backend with the specified chain ID.
 func New(chainID int64) transaction.Backend {
-	return &Backend{
-		chainID: chainID,
-	}
+	_ = "STUB: not implemented"
+	return *new(transaction.Backend)
 }
 
-func (b *Backend) Metrics() []prometheus.Collector {
-	return nil
-}
+func (b *Backend) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }
 
 func (b *Backend) CallContract(context.Context, ethereum.CallMsg, *big.Int) ([]byte, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) HeaderByNumber(context.Context, *big.Int) (*types.Header, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) PendingNonceAt(context.Context, common.Address) (uint64, error) {
-	return 0, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (b *Backend) SuggestedFeeAndTip(ctx context.Context, gasPrice *big.Int, boostPercent int) (*big.Int, *big.Int, error) {
-	return nil, nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (b *Backend) SuggestGasTipCap(context.Context) (*big.Int, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) EstimateGas(ctx context.Context, msg ethereum.CallMsg) (uint64, error) {
-	return 0, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (b *Backend) SendTransaction(context.Context, *types.Transaction) error {
-	return postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (b *Backend) TransactionReceipt(context.Context, common.Hash) (*types.Receipt, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) TransactionByHash(context.Context, common.Hash) (tx *types.Transaction, isPending bool, err error) {
-	return nil, false, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, false, nil
 }
 
 func (b *Backend) BlockNumber(context.Context) (uint64, error) {
-	return 0, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (b *Backend) BalanceAt(context.Context, common.Address, *big.Int) (*big.Int, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) NonceAt(context.Context, common.Address, *big.Int) (uint64, error) {
-	return 0, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 func (b *Backend) FilterLogs(context.Context, ethereum.FilterQuery) ([]types.Log, error) {
-	return nil, postagecontract.ErrChainDisabled
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (b *Backend) ChainID(context.Context) (*big.Int, error) {
-	return big.NewInt(b.chainID), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (b *Backend) Close() {}
+func (b *Backend) Close() { _ = "STUB: not implemented"; return }

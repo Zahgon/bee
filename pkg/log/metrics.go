@@ -5,7 +5,6 @@
 package log
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -19,56 +18,7 @@ type metrics struct {
 }
 
 // Fire implements Hook interface.
-func (m metrics) Fire(v Level) error {
-	switch v {
-	case VerbosityError:
-		m.ErrorCount.Inc()
-	case VerbosityWarning:
-		m.WarnCount.Inc()
-	case VerbosityInfo:
-		m.InfoCount.Inc()
-	case VerbosityDebug:
-		m.DebugCount.Inc()
-	default:
-		m.TraceCount.Inc()
-	}
-	return nil
-}
+func (m metrics) Fire(v Level) error { _ = "STUB: not implemented"; return nil }
 
 // newLogMetrics returns pointer to a new metrics instance ready to use.
-func newLogMetrics() *metrics {
-	const subsystem = "log"
-
-	return &metrics{
-		ErrorCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "error_count",
-			Help:      "Number ERROR log messages.",
-		}),
-		WarnCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "warn_count",
-			Help:      "Number WARN log messages.",
-		}),
-		InfoCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "info_count",
-			Help:      "Number INFO log messages.",
-		}),
-		DebugCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "debug_count",
-			Help:      "Number DEBUG log messages.",
-		}),
-		TraceCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "trace_count",
-			Help:      "Number TRACE log messages.",
-		}),
-	}
-}
+func newLogMetrics() *metrics { _ = "STUB: not implemented"; return nil }

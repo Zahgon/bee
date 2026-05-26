@@ -4,12 +4,6 @@
 
 package ioutil
 
-import (
-	"errors"
-	"os"
-	"path/filepath"
-)
-
 // DB folders paths from bee datadir
 const (
 	DataPathLocalstore = "localstore"
@@ -24,30 +18,10 @@ type WriterFunc func([]byte) (int, error)
 
 // WriterFunc calls f(p).
 func (f WriterFunc) Write(p []byte) (n int, err error) {
-	return f(p)
+	_ = "STUB: not implemented"
+
+	// RemoveContent removes all files in path. Copied function from cmd/db.go
+	return 0, nil
 }
 
-// RemoveContent removes all files in path. Copied function from cmd/db.go
-func RemoveContent(path string) error {
-	dir, err := os.Open(path)
-	if errors.Is(err, os.ErrNotExist) {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-	defer dir.Close()
-
-	subpaths, err := dir.Readdirnames(0)
-	if err != nil {
-		return err
-	}
-
-	for _, sub := range subpaths {
-		err = os.RemoveAll(filepath.Join(path, sub))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+func RemoveContent(path string) error { _ = "STUB: not implemented"; return nil }

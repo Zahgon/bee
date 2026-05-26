@@ -6,7 +6,6 @@ package p2p
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
 
@@ -37,21 +36,26 @@ type ConnectionBackoffError struct {
 
 // NewConnectionBackoffError creates new `ConnectionBackoffError` with provided underlying error and `tryAfter` timestamp.
 func NewConnectionBackoffError(err error, tryAfter time.Time) error {
-	return &ConnectionBackoffError{err: err, tryAfter: tryAfter}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // TryAfter returns a tryAfter timestamp.
 func (e *ConnectionBackoffError) TryAfter() time.Time {
-	return e.tryAfter
+	_ = "STUB: not implemented"
+
+	// Unwrap returns an underlying error.
+	return *new(time.Time)
 }
 
-// Unwrap returns an underlying error.
-func (e *ConnectionBackoffError) Unwrap() error { return e.err }
+func (e *ConnectionBackoffError) Unwrap() error {
+	_ = "STUB: not implemented"
 
-// Error implements function of the standard go error interface.
-func (e *ConnectionBackoffError) Error() string {
-	return e.err.Error()
+	// Error implements function of the standard go error interface.
+	return nil
 }
+
+func (e *ConnectionBackoffError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // DisconnectError is an error that is specifically handled inside p2p. If returned by specific protocol
 // handler it causes peer disconnect.
@@ -61,19 +65,17 @@ type DisconnectError struct {
 
 // NewDisconnectError wraps error and creates a special error that is treated specially
 // by p2p. It causes peer to disconnect.
-func NewDisconnectError(err error) error {
-	return &DisconnectError{
-		err: err,
-	}
-}
+func NewDisconnectError(err error) error { _ = "STUB: not implemented"; return nil }
 
 // Unwrap returns an underlying error.
-func (e *DisconnectError) Unwrap() error { return e.err }
+func (e *DisconnectError) Unwrap() error {
+	_ = "STUB: not implemented"
 
-// Error implements function of the standard go error interface.
-func (e *DisconnectError) Error() string {
-	return e.err.Error()
+	// Error implements function of the standard go error interface.
+	return nil
 }
+
+func (e *DisconnectError) Error() string { _ = "STUB: not implemented"; return "" }
 
 type BlockPeerError struct {
 	duration time.Duration
@@ -83,28 +85,30 @@ type BlockPeerError struct {
 // NewBlockPeerError wraps error and creates a special error that is treated specially
 // by p2p. It causes peer to be disconnected and blocks any new connection for this peer for the provided duration.
 func NewBlockPeerError(duration time.Duration, err error) error {
-	return &BlockPeerError{
-		duration: duration,
-		err:      err,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Unwrap returns an underlying error.
-func (e *BlockPeerError) Unwrap() error { return e.err }
+func (e *BlockPeerError) Unwrap() error {
+	_ = "STUB: not implemented"
 
-// Error implements function of the standard go error interface.
-func (e *BlockPeerError) Error() string {
-	return e.err.Error()
+	// Error implements function of the standard go error interface.
+	return nil
 }
+
+func (e *BlockPeerError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Duration represents the period for which the peer will be blocked.
 // 0 duration is treated as infinity
 func (e *BlockPeerError) Duration() time.Duration {
-	return e.duration
+	_ = "STUB: not implemented"
+
+	// IncompatibleStreamError is the error that should be returned by p2p service
+	// NewStream method when the stream or its version is not supported.
+	return *new(time.Duration)
 }
 
-// IncompatibleStreamError is the error that should be returned by p2p service
-// NewStream method when the stream or its version is not supported.
 type IncompatibleStreamError struct {
 	err error
 }
@@ -113,13 +117,16 @@ type IncompatibleStreamError struct {
 // incompatibility with IncompatibleStreamError that it can be detected and
 // returns it.
 func NewIncompatibleStreamError(err error) *IncompatibleStreamError {
-	return &IncompatibleStreamError{err: err}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Unwrap returns an underlying error.
-func (e *IncompatibleStreamError) Unwrap() error { return e.err }
+func (e *IncompatibleStreamError) Unwrap() error {
+	_ = "STUB: not implemented"
 
-// Error implements function of the standard go error interface.
-func (e *IncompatibleStreamError) Error() string {
-	return fmt.Sprintf("incompatible stream: %v", e.err)
+	// Error implements function of the standard go error interface.
+	return nil
 }
+
+func (e *IncompatibleStreamError) Error() string { _ = "STUB: not implemented"; return "" }

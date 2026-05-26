@@ -8,11 +8,9 @@ import (
 	"context"
 	"errors"
 	"io"
-	"math/big"
 	"sync"
 	"time"
 
-	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethersphere/bee/v2/pkg/log"
@@ -56,229 +54,55 @@ type transactionWatch struct {
 }
 
 func NewMonitor(logger log.Logger, backend Backend, sender common.Address, pollingInterval time.Duration, cancellationDepth uint64) Monitor {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-
-	t := &transactionMonitor{
-		ctx:        ctx,
-		cancelFunc: cancelFunc,
-		logger:     logger.WithName(loggerName).Register(),
-		backend:    backend,
-		sender:     sender,
-
-		pollingInterval:   pollingInterval,
-		cancellationDepth: cancellationDepth,
-
-		watchesByNonce: make(map[uint64]map[common.Hash][]transactionWatch),
-		watchAdded:     make(chan struct{}, 1),
-	}
-
-	t.wg.Add(1)
-	go t.watchPending()
-
-	return t
+	_ = "STUB: not implemented"
+	return *new(Monitor)
 }
 
 func (tm *transactionMonitor) WatchTransaction(txHash common.Hash, nonce uint64) (<-chan types.Receipt, <-chan error, error) {
-	loggerV1 := tm.logger.V(1).Register()
-
-	tm.lock.Lock()
-	defer tm.lock.Unlock()
-
-	// these channels will be written to at most once
-	// buffer size is 1 to avoid blocking in the watch loop
-	receiptC := make(chan types.Receipt, 1)
-	errC := make(chan error, 1)
-
-	if _, ok := tm.watchesByNonce[nonce]; !ok {
-		tm.watchesByNonce[nonce] = make(map[common.Hash][]transactionWatch)
-	}
-
-	tm.watchesByNonce[nonce][txHash] = append(tm.watchesByNonce[nonce][txHash], transactionWatch{
-		start:    time.Now(),
-		receiptC: receiptC,
-		errC:     errC,
-	})
-
-	select {
-	case tm.watchAdded <- struct{}{}:
-	default:
-	}
-
-	loggerV1.Debug("starting to watch transaction", "tx", txHash, "nonce", nonce)
-
-	return receiptC, errC, nil
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
+
+// these channels will be written to at most once
+// buffer size is 1 to avoid blocking in the watch loop
 
 // main watch loop
-func (tm *transactionMonitor) watchPending() {
-	loggerV1 := tm.logger.V(1).Register()
+func (tm *transactionMonitor) watchPending() { _ = "STUB: not implemented"; return }
 
-	defer tm.wg.Done()
-	defer func() {
-		tm.lock.Lock()
-		defer tm.lock.Unlock()
+// flag if this iteration was triggered by the watchAdded channel
 
-		for _, watches := range tm.watchesByNonce {
-			for _, txMap := range watches {
-				for _, watch := range txMap {
-					select {
-					case watch.errC <- ErrMonitorClosed:
-					default:
-					}
-				}
-			}
-		}
-	}()
+// if a new watch has been added check again without waiting
 
-	var (
-		lastBlock uint64 = 0
-		added     bool   // flag if this iteration was triggered by the watchAdded channel
-	)
+// otherwise wait
 
-	for {
-		added = false
-		select {
-		// if a new watch has been added check again without waiting
-		case <-tm.watchAdded:
-			added = true
-		// otherwise wait
-		case <-time.After(tm.pollingInterval):
-		// if the main context is cancelled terminate
-		case <-tm.ctx.Done():
-			return
-		}
+// if the main context is cancelled terminate
 
-		// if there are no watched transactions there is nothing to do
-		if !tm.hasWatches() {
-			continue
-		}
+// if there are no watched transactions there is nothing to do
 
-		// switch to new head subscriptions once websockets are the norm
-		block, err := tm.backend.BlockNumber(tm.ctx)
-		if err != nil {
-			tm.logger.Error(err, "could not get block number")
-			continue
-		} else if block <= lastBlock && !added {
-			// if the block number is not higher than before there is nothing todo
-			// unless a watch was added in which case we will do the check anyway
-			// in the rare case where a block was reorged and the new one is the first to contain our tx we wait an extra block
-			continue
-		}
+// switch to new head subscriptions once websockets are the norm
 
-		if err := tm.checkPending(block); err != nil {
-			loggerV1.Debug("error while checking pending transactions", "error", err)
-			continue
-		}
-		lastBlock = block
-	}
-}
+// if the block number is not higher than before there is nothing todo
+// unless a watch was added in which case we will do the check anyway
+// in the rare case where a block was reorged and the new one is the first to contain our tx we wait an extra block
 
-func (tm *transactionMonitor) hasWatches() bool {
-	tm.lock.Lock()
-	defer tm.lock.Unlock()
-	return len(tm.watchesByNonce) > 0
-}
+func (tm *transactionMonitor) hasWatches() bool { _ = "STUB: not implemented"; return false }
 
 func watchStart(watches []transactionWatch) time.Time {
-	if len(watches) == 0 {
-		return time.Time{}
-	}
-	start := watches[0].start
-	for _, w := range watches[1:] {
-		if w.start.Before(start) {
-			start = w.start
-		}
-	}
-	return start
+	_ = "STUB: not implemented"
+	return *new(time.Time)
 }
 
 // checkPending checks the given block for confirmed or cancelled transactions.
 func (tm *transactionMonitor) checkPending(block uint64) error {
+	_ = "STUB: not implemented"
 	// Snapshot nonces and tx hashes to check (releases lock during slow RPC calls).
-	tm.lock.Lock()
-	snapshot := make(map[uint64]map[common.Hash]time.Time, len(tm.watchesByNonce))
-	for nonce, watchMap := range tm.watchesByNonce {
-		snapshot[nonce] = make(map[common.Hash]time.Time, len(watchMap))
-		for txHash, watches := range watchMap {
-			snapshot[nonce][txHash] = watchStart(watches)
-		}
-	}
-	tm.lock.Unlock()
-
-	// Check receipts without holding lock (RPC calls can be slow).
-	confirmedNonces := make(map[uint64]*types.Receipt)
-	for nonce, txMap := range snapshot {
-		for txHash, start := range txMap {
-			receipt, err := tm.backend.TransactionReceipt(tm.ctx, txHash)
-			if err != nil {
-				if errors.Is(err, ethereum.NotFound) && start.Before(time.Now().Add(5*tm.pollingInterval)) {
-					continue
-				}
-				return err
-			}
-			if receipt != nil {
-				confirmedNonces[nonce] = receipt
-			}
-		}
-	}
-
-	// Check for cancellations.
-	var cancelledNonces []uint64
-	for nonce := range snapshot {
-		if _, ok := confirmedNonces[nonce]; ok {
-			continue
-		}
-		oldNonce, err := tm.backend.NonceAt(tm.ctx, tm.sender, new(big.Int).SetUint64(block-tm.cancellationDepth))
-		if err != nil {
-			return err
-		}
-		if nonce < oldNonce {
-			cancelledNonces = append(cancelledNonces, nonce)
-		}
-	}
-
-	// Notify subscribers and cleanup.
-	tm.lock.Lock()
-	defer tm.lock.Unlock()
-
-	for nonce, receipt := range confirmedNonces {
-		for txHash, watches := range tm.watchesByNonce[nonce] {
-			if receipt.TxHash == txHash {
-				for _, watch := range watches {
-					select {
-					case watch.receiptC <- *receipt:
-					default:
-					}
-				}
-			} else {
-				for _, watch := range watches {
-					select {
-					case watch.errC <- ErrTransactionCancelled:
-					default:
-					}
-				}
-			}
-		}
-		delete(tm.watchesByNonce, nonce)
-	}
-
-	for _, nonce := range cancelledNonces {
-		for _, watches := range tm.watchesByNonce[nonce] {
-			for _, watch := range watches {
-				select {
-				case watch.errC <- ErrTransactionCancelled:
-				default:
-				}
-			}
-		}
-		delete(tm.watchesByNonce, nonce)
-	}
-
 	return nil
 }
 
-func (tm *transactionMonitor) Close() error {
-	tm.cancelFunc()
-	tm.wg.Wait()
-	return nil
-}
+// Check receipts without holding lock (RPC calls can be slow).
+
+// Check for cancellations.
+
+// Notify subscribers and cleanup.
+
+func (tm *transactionMonitor) Close() error { _ = "STUB: not implemented"; return nil }

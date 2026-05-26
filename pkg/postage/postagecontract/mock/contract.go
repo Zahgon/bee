@@ -22,27 +22,33 @@ type contractMock struct {
 }
 
 func (c *contractMock) CreateBatch(ctx context.Context, initialBalance *big.Int, depth uint8, immutable bool, label string) (common.Hash, []byte, error) {
-	return c.createBatch(ctx, initialBalance, depth, immutable, label)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil, nil
 }
 
 func (c *contractMock) TopUpBatch(ctx context.Context, batchID []byte, topupBalance *big.Int) (common.Hash, error) {
-	return c.topupBatch(ctx, batchID, topupBalance)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (c *contractMock) DiluteBatch(ctx context.Context, batchID []byte, newDepth uint8) (common.Hash, error) {
-	return c.diluteBatch(ctx, batchID, newDepth)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (c *contractMock) ExpireBatches(ctx context.Context) error {
-	return c.expireBatches(ctx)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (s *contractMock) Paused(ctx context.Context) (bool, error) {
-	return s.paused(ctx)
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 func (c *contractMock) MinimumValidityBlocks(ctx context.Context) (uint64, error) {
-	return c.minimumValidityBlocks(ctx)
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // Option is an option passed to New
@@ -50,47 +56,36 @@ type Option func(*contractMock)
 
 // New creates a new mock BatchStore.
 func New(opts ...Option) postagecontract.Interface {
-	bs := &contractMock{}
-
-	for _, o := range opts {
-		o(bs)
-	}
-
-	return bs
+	_ = "STUB: not implemented"
+	return *new(postagecontract.Interface)
 }
 
 func WithCreateBatchFunc(f func(ctx context.Context, initialBalance *big.Int, depth uint8, immutable bool, label string) (common.Hash, []byte, error)) Option {
-	return func(m *contractMock) {
-		m.createBatch = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithTopUpBatchFunc(f func(ctx context.Context, batchID []byte, amount *big.Int) (common.Hash, error)) Option {
-	return func(m *contractMock) {
-		m.topupBatch = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithDiluteBatchFunc(f func(ctx context.Context, batchID []byte, newDepth uint8) (common.Hash, error)) Option {
-	return func(m *contractMock) {
-		m.diluteBatch = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithExpiresBatchesFunc(f func(ctx context.Context) error) Option {
-	return func(m *contractMock) {
-		m.expireBatches = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPaused(f func(ctx context.Context) (bool, error)) Option {
-	return func(mock *contractMock) {
-		mock.paused = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithMinimumValidityBlocksFunc(f func(ctx context.Context) (uint64, error)) Option {
-	return func(mock *contractMock) {
-		mock.minimumValidityBlocks = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

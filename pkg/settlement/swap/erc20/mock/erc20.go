@@ -6,7 +6,6 @@ package mock
 
 import (
 	"context"
-	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -19,37 +18,25 @@ type Service struct {
 }
 
 func WithBalanceOfFunc(f func(ctx context.Context, address common.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.balanceOfFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithTransferFunc(f func(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.transferFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
-func New(opts ...Option) erc20.Service {
-	mock := new(Service)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
-}
+func New(opts ...Option) erc20.Service { _ = "STUB: not implemented"; return *new(erc20.Service) }
 
 func (s *Service) BalanceOf(ctx context.Context, address common.Address) (*big.Int, error) {
-	if s.balanceOfFunc != nil {
-		return s.balanceOfFunc(ctx, address)
-	}
-	return big.NewInt(0), errors.New("Error")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) Transfer(ctx context.Context, address common.Address, value *big.Int) (common.Hash, error) {
-	if s.transferFunc != nil {
-		return s.transferFunc(ctx, address, value)
-	}
-	return common.Hash{}, errors.New("Error")
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 // Option is the option passed to the mock Chequebook service
@@ -59,4 +46,4 @@ type Option interface {
 
 type optionFunc func(*Service)
 
-func (f optionFunc) apply(r *Service) { f(r) }
+func (f optionFunc) apply(r *Service) { _ = "STUB: not implemented"; return }

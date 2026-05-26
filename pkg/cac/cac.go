@@ -5,11 +5,8 @@
 package cac
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 
-	"github.com/ethersphere/bee/v2/pkg/bmtpool"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -20,76 +17,30 @@ var (
 
 // New creates a new content address chunk by initializing a span and appending the data to it.
 func New(data []byte) (swarm.Chunk, error) {
-	dataLength := len(data)
-
-	if err := validateDataLength(dataLength); err != nil {
-		return nil, err
-	}
-
-	span := make([]byte, swarm.SpanSize)
-	binary.LittleEndian.PutUint64(span, uint64(dataLength))
-
-	return newWithSpan(data, span)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // NewWithDataSpan creates a new chunk assuming that the span precedes the actual data.
 func NewWithDataSpan(data []byte) (swarm.Chunk, error) {
-	dataLength := len(data)
-
-	if err := validateDataLength(dataLength - swarm.SpanSize); err != nil {
-		return nil, err
-	}
-
-	return newWithSpan(data[swarm.SpanSize:], data[:swarm.SpanSize])
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // validateDataLength validates if data length (without span) is correct.
 func validateDataLength(dataLength int) error {
-	if dataLength < 0 { // dataLength could be negative when span size is subtracted
-		spanLength := swarm.SpanSize + dataLength
-		return fmt.Errorf("invalid CAC span length %d: %w", spanLength, ErrChunkSpanShort)
-	}
-	if dataLength > swarm.ChunkSize {
-		return fmt.Errorf("invalid CAC data length %d: %w", dataLength, ErrChunkDataLarge)
-	}
+	_ = "STUB: not implemented"
+	// dataLength could be negative when span size is subtracted
 	return nil
 }
 
 // newWithSpan creates a new chunk prepending the given span to the data.
 func newWithSpan(data, span []byte) (swarm.Chunk, error) {
-	hash, err := DoHash(data, span)
-	if err != nil {
-		return nil, err
-	}
-
-	cacData := make([]byte, len(data)+len(span))
-	copy(cacData, span)
-	copy(cacData[swarm.SpanSize:], data)
-
-	return swarm.NewChunk(swarm.NewAddress(hash), cacData), nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // Valid checks whether the given chunk is a valid content-addressed chunk.
-func Valid(c swarm.Chunk) bool {
-	data := c.Data()
+func Valid(c swarm.Chunk) bool { _ = "STUB: not implemented"; return false }
 
-	if validateDataLength(len(data)-swarm.SpanSize) != nil {
-		return false
-	}
-
-	hash, _ := DoHash(data[swarm.SpanSize:], data[:swarm.SpanSize])
-
-	return bytes.Equal(hash, c.Address().Bytes())
-}
-
-func DoHash(data, span []byte) ([]byte, error) {
-	hasher := bmtpool.Get()
-	defer bmtpool.Put(hasher)
-
-	hasher.SetHeader(span)
-	if _, err := hasher.Write(data); err != nil {
-		return nil, err
-	}
-
-	return hasher.Sum(nil), nil
-}
+func DoHash(data, span []byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

@@ -6,7 +6,6 @@ package monitormock
 
 import (
 	"context"
-	"errors"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -20,48 +19,41 @@ type transactionMonitorMock struct {
 }
 
 func (m *transactionMonitorMock) WatchTransaction(txHash common.Hash, nonce uint64) (<-chan types.Receipt, <-chan error, error) {
-	if m.watchTransaction != nil {
-		return m.watchTransaction(txHash, nonce)
-	}
-	return nil, nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (m *transactionMonitorMock) WaitBlock(ctx context.Context, block *big.Int) (*types.Block, error) {
-	if m.watchTransaction != nil {
-		return m.waitBlock(ctx, block)
-	}
-	return nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *transactionMonitorMock) Close() error {
+	_ = "STUB: not implemented"
+
+	// Option is the option passed to the mock Chequebook service
 	return nil
 }
 
-// Option is the option passed to the mock Chequebook service
 type Option interface {
 	apply(*transactionMonitorMock)
 }
 
 type optionFunc func(*transactionMonitorMock)
 
-func (f optionFunc) apply(r *transactionMonitorMock) { f(r) }
+func (f optionFunc) apply(r *transactionMonitorMock) { _ = "STUB: not implemented"; return }
 
 func WithWatchTransactionFunc(f func(txHash common.Hash, nonce uint64) (<-chan types.Receipt, <-chan error, error)) Option {
-	return optionFunc(func(s *transactionMonitorMock) {
-		s.watchTransaction = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithWaitBlockFunc(f func(ctx context.Context, block *big.Int) (*types.Block, error)) Option {
-	return optionFunc(func(s *transactionMonitorMock) {
-		s.waitBlock = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func New(opts ...Option) transaction.Monitor {
-	mock := new(transactionMonitorMock)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
+	_ = "STUB: not implemented"
+	return *new(transaction.Monitor)
 }

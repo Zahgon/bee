@@ -12,12 +12,8 @@ import (
 	"encoding"
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethersphere/bee/v2/pkg/crypto"
-	"github.com/ethersphere/bee/v2/pkg/soc"
-	"github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -36,29 +32,10 @@ const (
 	Epoch
 )
 
-func (t Type) String() string {
-	switch t {
-	case Sequence:
-		return "Sequence"
-	case Epoch:
-		return "Epoch"
-	default:
-		return ""
-	}
-}
+func (t Type) String() string { _ = "STUB: not implemented"; return "" }
 
 // FromString constructs the type from a string
-func (t *Type) FromString(s string) error {
-	switch s = strings.ToLower(s); s {
-	case "sequence":
-		*t = Sequence
-	case "epoch":
-		*t = Epoch
-	default:
-		return ErrFeedTypeNotFound
-	}
-	return nil
-}
+func (t *Type) FromString(s string) error { _ = "STUB: not implemented"; return nil }
 
 type id struct {
 	topic []byte
@@ -67,9 +44,7 @@ type id struct {
 
 var _ encoding.BinaryMarshaler = (*id)(nil)
 
-func (i *id) MarshalBinary() ([]byte, error) {
-	return crypto.LegacyKeccak256(append(append([]byte{}, i.topic...), i.index...))
-}
+func (i *id) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Feed is representing an epoch based feed
 type Feed struct {
@@ -79,9 +54,7 @@ type Feed struct {
 
 // New constructs an epoch based feed from a keccak256 digest of a plaintext
 // topic and an ether address.
-func New(topic []byte, owner common.Address) *Feed {
-	return &Feed{topic, owner}
-}
+func New(topic []byte, owner common.Address) *Feed { _ = "STUB: not implemented"; return nil }
 
 // Index is the interface for feed implementations.
 type Index interface {
@@ -97,58 +70,27 @@ type Update struct {
 }
 
 // Update called on a feed with an index and returns an Update
-func (f *Feed) Update(index Index) *Update {
-	return &Update{f, index}
-}
+func (f *Feed) Update(index Index) *Update { _ = "STUB: not implemented"; return nil }
 
 // NewUpdate creates an update from an index, timestamp, payload and signature
 func NewUpdate(f *Feed, idx Index, timestamp int64, payload, sig []byte) (swarm.Chunk, error) {
-	id, err := f.Update(idx).Id()
-	if err != nil {
-		return nil, fmt.Errorf("update: %w", err)
-	}
-	cac, err := toChunk(payload)
-	if err != nil {
-		return nil, fmt.Errorf("toChunk: %w", err)
-	}
-
-	ss, err := soc.NewSigned(id, cac, f.Owner.Bytes(), sig)
-	if err != nil {
-		return nil, fmt.Errorf("new signed soc: %w", err)
-	}
-
-	ch, err := ss.Chunk()
-	if err != nil {
-		return nil, fmt.Errorf("new chunk: %w", err)
-	}
-
-	if !soc.Valid(ch) {
-		return nil, storage.ErrInvalidChunk
-	}
-	return ch, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // Id calculates the identifier if a  feed update to be used in single owner chunks
 func (u *Update) Id() ([]byte, error) {
-	return Id(u.Topic, u.index)
+	_ = "STUB: not implemented"
+	return nil,
+
+		// Id calculates the feed id from a topic and an index
+		nil
 }
 
-// Id calculates the feed id from a topic and an index
-func Id(topic []byte, index Index) ([]byte, error) {
-	indexBytes, err := index.MarshalBinary()
-	if err != nil {
-		return nil, err
-	}
-	i := &id{topic, indexBytes}
-	return i.MarshalBinary()
-}
+func Id(topic []byte, index Index) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Address calculates the soc address of a feed update
 func (u *Update) Address() (swarm.Address, error) {
-	var addr swarm.Address
-	i, err := u.Id()
-	if err != nil {
-		return addr, err
-	}
-	return soc.CreateAddress(i, u.Owner[:])
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }

@@ -4,6 +4,4 @@
 
 package racedetection
 
-func IsOn() bool {
-	return On
-}
+func IsOn() bool { _ = "STUB: not implemented"; return false }

@@ -6,20 +6,14 @@ package swapprotocol
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"math/big"
-	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/p2p"
-	"github.com/ethersphere/bee/v2/pkg/p2p/protobuf"
 	"github.com/ethersphere/bee/v2/pkg/settlement/swap/chequebook"
-	swap "github.com/ethersphere/bee/v2/pkg/settlement/swap/headers"
 	"github.com/ethersphere/bee/v2/pkg/settlement/swap/priceoracle"
-	"github.com/ethersphere/bee/v2/pkg/settlement/swap/swapprotocol/pb"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -72,33 +66,16 @@ type Service struct {
 
 // New creates a new swap protocol Service.
 func New(streamer p2p.Streamer, logger log.Logger, beneficiary common.Address, priceOracle priceoracle.Service) *Service {
-	return &Service{
-		streamer:    streamer,
-		logger:      logger.WithName(loggerName).Register(),
-		beneficiary: beneficiary,
-		priceOracle: priceOracle,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // SetSwap sets the swap to notify.
-func (s *Service) SetSwap(swap Swap) {
-	s.swap = swap
-}
+func (s *Service) SetSwap(swap Swap) { _ = "STUB: not implemented"; return }
 
 func (s *Service) Protocol() p2p.ProtocolSpec {
-	return p2p.ProtocolSpec{
-		Name:    protocolName,
-		Version: protocolVersion,
-		StreamSpecs: []p2p.StreamSpec{
-			{
-				Name:    streamName,
-				Handler: s.handler,
-				Headler: s.headler,
-			},
-		},
-		ConnectOut: s.init,
-		ConnectIn:  s.init,
-	}
+	_ = "STUB: not implemented"
+	return *new(p2p.ProtocolSpec)
 }
 
 // init is called on outgoing connections and triggers handshake exchange
@@ -108,148 +85,39 @@ func (s *Service) init(ctx context.Context, p p2p.Peer) error {
 }
 
 func (s *Service) handler(ctx context.Context, p p2p.Peer, stream p2p.Stream) (err error) {
-	r := protobuf.NewReader(stream)
-	defer func() {
-		if err != nil {
-			_ = stream.Reset()
-		} else {
-			_ = stream.FullClose()
-		}
-	}()
-
-	var req pb.EmitCheque
-	if err := r.ReadMsgWithContext(ctx, &req); err != nil {
-		return fmt.Errorf("read request from peer %v: %w", p.Address, err)
-	}
-
-	responseHeaders := stream.ResponseHeaders()
-	exchangeRate, deduction, err := swap.ParseSettlementResponseHeaders(responseHeaders)
-	if err != nil {
-		if !errors.Is(err, swap.ErrNoDeductionHeader) {
-			return fmt.Errorf("parse settlement response headers: %w", err)
-		}
-		deduction = big.NewInt(0)
-	}
-
-	var signedCheque *chequebook.SignedCheque
-	err = json.Unmarshal(req.Cheque, &signedCheque)
-	if err != nil {
-		return fmt.Errorf("unmarshal cheque: %w", err)
-	}
-
-	// signature validation
-	if err := s.swap.ReceiveCheque(ctx, p.Address, signedCheque, exchangeRate, deduction); err != nil {
-		return fmt.Errorf("receive cheque: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
+// signature validation
+
 func (s *Service) headler(receivedHeaders p2p.Headers, peerAddress swarm.Address) (returnHeaders p2p.Headers) {
-	exchangeRate, deduction, err := s.priceOracle.CurrentRates()
-	if err != nil {
-		return p2p.Headers{}
-	}
-
-	checkPeer, err := s.swap.GetDeductionForPeer(peerAddress)
-	if err != nil {
-		return p2p.Headers{}
-	}
-
-	if checkPeer {
-		deduction = big.NewInt(0)
-	}
-
-	returnHeaders = swap.MakeSettlementHeaders(exchangeRate, deduction)
-	return
+	_ = "STUB: not implemented"
+	return *new(p2p.Headers)
 }
 
 // InitiateCheque attempts to send a cheque to a peer.
 func (s *Service) EmitCheque(ctx context.Context, peer swarm.Address, beneficiary common.Address, amount *big.Int, issue IssueFunc) (balance *big.Int, err error) {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	stream, err := s.streamer.NewStream(ctx, peer, nil, protocolName, protocolVersion, streamName)
-	if err != nil {
-		return nil, fmt.Errorf("new stream: %w", err)
-	}
-	defer func() {
-		if err != nil {
-			_ = stream.Reset()
-		} else {
-			_ = stream.FullClose()
-		}
-	}()
-
-	// reading exchangeRated headers
-	returnedHeaders := stream.Headers()
-	exchangeRate, deduction, err := swap.ParseSettlementResponseHeaders(returnedHeaders)
-	if err != nil {
-		if !errors.Is(err, swap.ErrNoDeductionHeader) {
-			return nil, fmt.Errorf("parse settlement response headers: %w", err)
-		}
-		deduction = big.NewInt(0)
-	}
-
-	// comparing received headers to known truth
-
-	// get whether peer have deducted in the past
-	checkPeer, err := s.swap.GetDeductionByPeer(peer)
-	if err != nil {
-		return nil, fmt.Errorf("get deduction by peer: %w", err)
-	}
-
-	// if peer is not entitled for deduction but sent non zero deduction value, return with error
-	if checkPeer && deduction.Cmp(big.NewInt(0)) != 0 {
-		return nil, ErrHaveDeduction
-	}
-
-	// get current global exchangeRate rate and deduction
-	checkExchangeRate, checkDeduction, err := s.priceOracle.CurrentRates()
-	if err != nil {
-		return nil, fmt.Errorf("get current rates: %w", err)
-	}
-
-	// exchangeRate rates should match
-	if exchangeRate.Cmp(checkExchangeRate) != 0 {
-		return nil, ErrNegotiateRate
-	}
-
-	// deduction values should match or be zero
-	if deduction.Cmp(checkDeduction) != 0 && deduction.Cmp(big.NewInt(0)) != 0 {
-		return nil, ErrNegotiateDeduction
-	}
-
-	paymentAmount := new(big.Int).Mul(amount, exchangeRate)
-	sentAmount := new(big.Int).Add(paymentAmount, deduction)
-
-	// issue cheque call with provided callback for sending cheque to finish transaction
-
-	balance, err = issue(ctx, beneficiary, sentAmount, func(cheque *chequebook.SignedCheque) error {
-		// for simplicity we use json marshaller. can be replaced by a binary encoding in the future.
-		encodedCheque, err := json.Marshal(cheque)
-		if err != nil {
-			return err
-		}
-
-		// sending cheque
-		s.logger.Debug("sending cheque message to peer", "peer_address", peer, "cheque", cheque)
-
-		w := protobuf.NewWriter(stream)
-		return w.WriteMsgWithContext(ctx, &pb.EmitCheque{
-			Cheque: encodedCheque,
-		})
-	})
-	if err != nil {
-		return nil, fmt.Errorf("call issue function: %w", err)
-	}
-
-	if deduction.Cmp(big.NewInt(0)) != 0 {
-		err = s.swap.AddDeductionByPeer(peer)
-		if err != nil {
-			return nil, fmt.Errorf("add deduction for peer: %w", err)
-		}
-	}
-
-	return balance, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// reading exchangeRated headers
+
+// comparing received headers to known truth
+
+// get whether peer have deducted in the past
+
+// if peer is not entitled for deduction but sent non zero deduction value, return with error
+
+// get current global exchangeRate rate and deduction
+
+// exchangeRate rates should match
+
+// deduction values should match or be zero
+
+// issue cheque call with provided callback for sending cheque to finish transaction
+
+// for simplicity we use json marshaller. can be replaced by a binary encoding in the future.
+
+// sending cheque

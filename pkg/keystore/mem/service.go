@@ -6,7 +6,6 @@ package mem
 
 import (
 	"crypto/ecdsa"
-	"fmt"
 	"sync"
 
 	"github.com/ethersphere/bee/v2/pkg/keystore"
@@ -25,59 +24,18 @@ type Service struct {
 }
 
 // New creates new memory-based keystore.Service implementation.
-func New() *Service {
-	return &Service{
-		m: make(map[string]key),
-	}
-}
+func New() *Service { _ = "STUB: not implemented"; return nil }
 
-func (s *Service) Exists(name string) (bool, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	_, ok := s.m[name]
-	return ok, nil
-}
+func (s *Service) Exists(name string) (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
 func (s *Service) SetKey(name, password string, edg keystore.EDG) (*ecdsa.PrivateKey, error) {
-	pk, err := edg.Generate()
-	if err != nil {
-		return nil, fmt.Errorf("generate key: %w", err)
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.m[name] = key{
-		pk:       pk,
-		password: password,
-	}
-
-	return pk, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) Key(name, password string, edg keystore.EDG) (pk *ecdsa.PrivateKey, created bool, err error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	k, ok := s.m[name]
-	if !ok {
-		pk, err := edg.Generate()
-		if err != nil {
-			return nil, false, fmt.Errorf("generate key: %w", err)
-		}
-
-		s.m[name] = key{
-			pk:       pk,
-			password: password,
-		}
-
-		return pk, true, err
-	}
-
-	if k.password != password {
-		return nil, false, keystore.ErrInvalidPassword
-	}
-
-	return k.pk, created, nil
+	_ = "STUB: not implemented"
+	return nil, false, nil
 }
 
 type key struct {

@@ -8,6 +8,6 @@ import "context"
 
 type mockSyncer struct{ rate float64 }
 
-func NewMockRateReporter(r float64) *mockSyncer { return &mockSyncer{r} }
-func (m *mockSyncer) SyncRate() float64         { return m.rate }
-func (m *mockSyncer) Start(context.Context)     {}
+func NewMockRateReporter(r float64) *mockSyncer { _ = "STUB: not implemented"; return nil }
+func (m *mockSyncer) SyncRate() float64         { _ = "STUB: not implemented"; return 0 }
+func (m *mockSyncer) Start(context.Context)     { _ = "STUB: not implemented"; return }

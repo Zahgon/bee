@@ -17,42 +17,6 @@ package swarm
 // binary representation of the x^y.
 //
 // (0 farthest, 255 closest, 256 self)
-func Proximity(one, other []byte) (ret uint8) {
-	b := MaxPO/8 + 1
-	if l := uint8(len(one)); b > l {
-		b = l
-	}
-	if l := uint8(len(other)); b > l {
-		b = l
-	}
-	var m uint8 = 8
-	for i := uint8(0); i < b; i++ {
-		oxo := one[i] ^ other[i]
-		for j := range m {
-			if (oxo>>(7-j))&0x01 != 0 {
-				return i*8 + j
-			}
-		}
-	}
-	return MaxPO
-}
+func Proximity(one, other []byte) (ret uint8) { _ = "STUB: not implemented"; return 0 }
 
-func ExtendedProximity(one, other []byte) (ret uint8) {
-	b := ExtendedPO/8 + 1
-	if l := uint8(len(one)); b > l {
-		b = l
-	}
-	if l := uint8(len(other)); b > l {
-		b = l
-	}
-	var m uint8 = 8
-	for i := uint8(0); i < b; i++ {
-		oxo := one[i] ^ other[i]
-		for j := range m {
-			if (oxo>>(7-j))&0x01 != 0 {
-				return i*8 + j
-			}
-		}
-	}
-	return ExtendedPO
-}
+func ExtendedProximity(one, other []byte) (ret uint8) { _ = "STUB: not implemented"; return 0 }

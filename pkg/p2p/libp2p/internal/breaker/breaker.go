@@ -56,103 +56,21 @@ type Options struct {
 	MaxBackoff   time.Duration
 }
 
-func NewBreaker(o Options) Interface {
-	return newBreakerWithCurrentTimeFn(o, time.Now)
-}
+func NewBreaker(o Options) Interface { _ = "STUB: not implemented"; return *new(Interface) }
 
 func newBreakerWithCurrentTimeFn(o Options, currentTimeFn currentTimeFn) Interface {
-	breaker := &breaker{
-		limit:         o.Limit,
-		backoff:       o.StartBackoff,
-		maxBackoff:    o.MaxBackoff,
-		failInterval:  o.FailInterval,
-		currentTimeFn: currentTimeFn,
-	}
-
-	if o.Limit == 0 {
-		breaker.limit = limit
-	}
-
-	if o.FailInterval == 0 {
-		breaker.failInterval = failInterval
-	}
-
-	if o.MaxBackoff == 0 {
-		breaker.maxBackoff = maxBackoff
-	}
-
-	if o.StartBackoff == 0 {
-		breaker.backoff = backoff
-	}
-
-	return breaker
+	_ = "STUB: not implemented"
+	return *new(Interface)
 }
 
-func (b *breaker) Execute(f func() error) error {
-	if err := b.beforef(); err != nil {
-		return err
-	}
+func (b *breaker) Execute(f func() error) error { _ = "STUB: not implemented"; return nil }
 
-	return b.afterf(f())
-}
+func (b *breaker) ClosedUntil() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
-func (b *breaker) ClosedUntil() time.Time {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+func (b *breaker) beforef() error { _ = "STUB: not implemented"; return nil }
 
-	if b.consFailedCalls >= b.limit {
-		return b.closedTimestamp.Add(b.backoff)
-	}
+// use currentTimeFn().Sub() instead of time.Since() so it can be deterministically mocked in tests
 
-	return b.currentTimeFn()
-}
+func (b *breaker) afterf(err error) error { _ = "STUB: not implemented"; return nil }
 
-func (b *breaker) beforef() error {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
-
-	// use currentTimeFn().Sub() instead of time.Since() so it can be deterministically mocked in tests
-	if b.consFailedCalls >= b.limit {
-		if b.closedTimestamp.IsZero() || b.currentTimeFn().Sub(b.closedTimestamp) < b.backoff {
-			return ErrClosed
-		}
-
-		b.resetFailed()
-		if newBackoff := b.backoff * 2; newBackoff <= b.maxBackoff {
-			b.backoff = newBackoff
-		} else {
-			b.backoff = b.maxBackoff
-		}
-	}
-
-	if !b.firstFailedTimestamp.IsZero() && b.currentTimeFn().Sub(b.firstFailedTimestamp) >= b.failInterval {
-		b.resetFailed()
-	}
-
-	return nil
-}
-
-func (b *breaker) afterf(err error) error {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
-	if err != nil {
-		if b.consFailedCalls == 0 {
-			b.firstFailedTimestamp = b.currentTimeFn()
-		}
-
-		b.consFailedCalls++
-		if b.consFailedCalls == b.limit {
-			b.closedTimestamp = b.currentTimeFn()
-		}
-
-		return err
-	}
-
-	b.resetFailed()
-	return nil
-}
-
-func (b *breaker) resetFailed() {
-	b.consFailedCalls = 0
-	b.firstFailedTimestamp = time.Time{}
-}
+func (b *breaker) resetFailed() { _ = "STUB: not implemented"; return }

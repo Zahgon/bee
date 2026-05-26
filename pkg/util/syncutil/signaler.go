@@ -14,13 +14,7 @@ type Signaler struct {
 }
 
 // NewSignaler initializes a new obj
-func NewSignaler() *Signaler {
-	return &Signaler{C: make(chan struct{})}
-}
+func NewSignaler() *Signaler { _ = "STUB: not implemented"; return nil }
 
 // Signal safely closes the blocking channel
-func (s *Signaler) Signal() {
-	s.once.Do(func() {
-		close(s.C)
-	})
-}
+func (s *Signaler) Signal() { _ = "STUB: not implemented"; return }

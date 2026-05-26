@@ -5,16 +5,8 @@
 package log
 
 import (
-	"bytes"
-	"fmt"
 	"io"
-	"os"
-	"reflect"
-	"strings"
-	"time"
 
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
-	"github.com/hashicorp/go-multierror"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -27,17 +19,7 @@ type levelHooks map[Level][]Hook
 // fire triggers all the hooks for the given level.
 // If level V is enabled in debug verbosity, then
 // the VerbosityAll hooks are triggered.
-func (lh levelHooks) fire(level Level) error {
-	if level > VerbosityDebug {
-		level = VerbosityAll
-	}
-	for _, hook := range lh[level] {
-		if err := hook.Fire(level); err != nil {
-			return err
-		}
-	}
-	return nil
-}
+func (lh levelHooks) fire(level Level) error { _ = "STUB: not implemented"; return nil }
 
 type builder struct {
 	l *logger
@@ -66,76 +48,30 @@ type builder struct {
 }
 
 // V implements the Builder interface V method.
-func (b *builder) V(level uint) Builder {
-	if level > 0 {
-		c := b.clone()
-		c.v += level
-		return c
-	}
-	return b
-}
+func (b *builder) V(level uint) Builder { _ = "STUB: not implemented"; return *new(Builder) }
 
 // WithName implements the Builder interface WithName method.
-func (b *builder) WithName(name string) Builder {
-	c := b.clone()
-	c.names = append(c.names, name)
-	return c
-}
+func (b *builder) WithName(name string) Builder { _ = "STUB: not implemented"; return *new(Builder) }
 
 // WithValues implements the Builder interface WithValues method.
 func (b *builder) WithValues(keysAndValues ...any) Builder {
-	c := b.clone()
-	c.values = append(c.values, keysAndValues...)
-	return c
+	_ = "STUB: not implemented"
+	return *new(Builder)
 }
 
 // Build implements the Builder interface Build method.
-func (b *builder) Build() Logger {
-	if !b.cloned && b.l.id != "" {
-		return b.l
-	}
+func (b *builder) Build() Logger { _ = "STUB: not implemented"; return *new(Logger) }
 
-	b.namesStr = strings.Join(b.names, "/")
-	// ~5 is the average length of an English word; 4 is the rune size.
-	bufCap := nextPowOf2(uint64(5 * 4 * len(b.values)))
-	buf := bytes.NewBuffer(make([]byte, 0, bufCap))
-	b.l.formatter.flatten(buf, b.values, false, false)
-	b.valuesStr = buf.String()
+// ~5 is the average length of an English word; 4 is the rune size.
 
-	key := hash(b.namesStr, b.v, b.valuesStr, b.l.sink)
-	if i, ok := loggers.Load(key); ok {
-		// Nothing to build, the instance exists.
-		return i.(*logger)
-	}
-	// A new child instance.
-	c := *b.l
-	b.l = &c
-	c.builder = b
-	c.cloned = false
-	c.id = key
+// Nothing to build, the instance exists.
 
-	return &c
-}
+// A new child instance.
 
 // Register implements the Builder interface Register method.
-func (b *builder) Register() Logger {
-	val := b.Build()
-	key := hash(b.namesStr, b.v, b.valuesStr, b.l.sink)
-	res, _ := loggers.LoadOrStore(key, val)
-	return res.(*logger)
-}
+func (b *builder) Register() Logger { _ = "STUB: not implemented"; return *new(Logger) }
 
-func (b *builder) clone() *builder {
-	if b.cloned {
-		return b
-	}
-
-	c := *b
-	c.cloned = true
-	c.names = append(make([]string, 0, len(c.names)), c.names...)
-	c.values = append(make([]any, 0, len(c.values)), c.values...)
-	return &c
-}
+func (b *builder) clone() *builder { _ = "STUB: not implemented"; return nil }
 
 // logger implements the Logger interface.
 type logger struct {
@@ -166,121 +102,54 @@ type logger struct {
 }
 
 // Metrics implements metrics.Collector interface.
-func (l *logger) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(l.metrics)
-}
+func (l *logger) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }
 
 // Verbosity implements the Logger interface Verbosity method.
 func (l *logger) Verbosity() Level {
-	return l.verbosity.get()
+	_ = "STUB: not implemented"
+	return *
+
+	// Debug implements the Logger interface Debug method.
+	new(Level)
 }
 
-// Debug implements the Logger interface Debug method.
-func (l *logger) Debug(msg string, keysAndValues ...any) {
-	if int(l.verbosity.get()) >= int(l.v) {
-		if err := l.log(VerbosityDebug, CategoryDebug, nil, msg, keysAndValues...); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	}
-}
+func (l *logger) Debug(msg string, keysAndValues ...any) { _ = "STUB: not implemented"; return }
 
 // Info implements the Logger interface Info method.
-func (l *logger) Info(msg string, keysAndValues ...any) {
-	if l.verbosity.get() >= VerbosityInfo {
-		if err := l.log(VerbosityInfo, CategoryInfo, nil, msg, keysAndValues...); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	}
-}
+func (l *logger) Info(msg string, keysAndValues ...any) { _ = "STUB: not implemented"; return }
 
 // Warning implements the Logger interface Warning method.
-func (l *logger) Warning(msg string, keysAndValues ...any) {
-	if l.verbosity.get() >= VerbosityWarning {
-		if err := l.log(VerbosityWarning, CategoryWarning, nil, msg, keysAndValues...); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	}
-}
+func (l *logger) Warning(msg string, keysAndValues ...any) { _ = "STUB: not implemented"; return }
 
 // Error implements the Logger interface Error method.
 func (l *logger) Error(err error, msg string, keysAndValues ...any) {
-	if l.verbosity.get() >= VerbosityError {
-		if err := l.log(VerbosityError, CategoryError, err, msg, keysAndValues...); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // setVerbosity changes the verbosity level or the logger.
 func (l *logger) setVerbosity(v Level) {
-	l.verbosity.set(v)
+	_ = "STUB: not implemented"
+
+	// log logs the given msg and key-value pairs with the given level
+	// and the given message category caller (if enabled) to the sink.
+	return
 }
 
-// log logs the given msg and key-value pairs with the given level
-// and the given message category caller (if enabled) to the sink.
 func (l *logger) log(vl Level, mc MessageCategory, err error, msg string, keysAndValues ...any) error {
-	base := make([]any, 0, 14+len(keysAndValues))
-	if l.formatter.opts.logTimestamp {
-		base = append(base, "time", time.Now().Format(l.formatter.opts.timestampLayout))
-	}
-	base = append(base, "level", vl.String(), "logger", l.namesStr)
-	if vl == VerbosityDebug && l.v > 0 {
-		base = append(base, "v", l.v)
-	}
-	if policy := l.formatter.opts.caller; policy == CategoryAll || policy == mc {
-		base = append(base, "caller", l.formatter.caller())
-	}
-	base = append(base, "msg", msg)
-	if vl == VerbosityError {
-		if err != nil {
-			base = append(base, "error", err.Error())
-		}
-	}
-	if len(l.values) > 0 {
-		base = append(base, l.values...)
-	}
-	buf := l.formatter.render(base, keysAndValues)
-
-	var merr *multierror.Error
-	if _, err = l.sink.Write(buf); err != nil {
-		merr = multierror.Append(
-			merr,
-			fmt.Errorf("log %s: failed to write message: %w", vl, err),
-		)
-	}
-	if err := l.levelHooks.fire(vl + Level(l.v)); err != nil {
-		merr = multierror.Append(
-			merr,
-			fmt.Errorf("log %s: failed to fire hooks: %w", vl, err),
-		)
-	}
-	return merr.ErrorOrNil()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // hash is a hashing function for creating unique identifiers.
 func hash(prefix string, v uint, values string, w io.Writer) string {
-	var sink uintptr
-	if reflect.ValueOf(w).Kind() == reflect.Pointer {
-		sink = reflect.ValueOf(w).Pointer()
-	} else {
-		sink = reflect.ValueOf(&w).Pointer()
-	}
-	return fmt.Sprintf("%s[%d][%s]>>%d", prefix, v, values, sink)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // nextPowOf2 rounds up n to the next highest power of 2.
 // See: https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-func nextPowOf2(n uint64) uint64 {
-	n--
-	n |= n >> 1
-	n |= n >> 2
-	n |= n >> 4
-	n |= n >> 8
-	n |= n >> 16
-	n |= n >> 32
-	n++
-	return n
-}
+func nextPowOf2(n uint64) uint64 { _ = "STUB: not implemented"; return 0 }
 
 // TODO:
 // - Implement the HTTP log middleware

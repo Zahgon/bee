@@ -4,20 +4,4 @@
 
 package cmd
 
-import (
-	"github.com/ethersphere/bee/v2"
-
-	"github.com/spf13/cobra"
-)
-
-func (c *command) initVersionCmd() {
-	v := &cobra.Command{
-		Use:   "version",
-		Short: "Print version number",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Println(bee.Version)
-		},
-	}
-	v.SetOut(c.root.OutOrStdout())
-	c.root.AddCommand(v)
-}
+func (c *command) initVersionCmd() { _ = "STUB: not implemented"; return }

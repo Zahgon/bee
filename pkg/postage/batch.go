@@ -5,7 +5,6 @@
 package postage
 
 import (
-	"encoding/binary"
 	"math/big"
 )
 
@@ -23,30 +22,8 @@ type Batch struct {
 // MarshalBinary implements BinaryMarshaller. It will attempt to serialize the
 // postage batch to a byte slice.
 // serialised as ID(32)|big endian value(32)|start block(8)|owner addr(20)|BucketDepth(1)|depth(1)|immutable(1)
-func (b *Batch) MarshalBinary() ([]byte, error) {
-	out := make([]byte, 95)
-	copy(out, b.ID)
-	value := b.Value.Bytes()
-	copy(out[64-len(value):], value)
-	binary.BigEndian.PutUint64(out[64:72], b.Start)
-	copy(out[72:], b.Owner)
-	out[92] = b.BucketDepth
-	out[93] = b.Depth
-	if b.Immutable {
-		out[94] = 1
-	}
-	return out, nil
-}
+func (b *Batch) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // UnmarshalBinary implements BinaryUnmarshaller. It will attempt deserialize
 // the given byte slice into the batch.
-func (b *Batch) UnmarshalBinary(buf []byte) error {
-	b.ID = buf[:32]
-	b.Value = big.NewInt(0).SetBytes(buf[32:64])
-	b.Start = binary.BigEndian.Uint64(buf[64:72])
-	b.Owner = buf[72:92]
-	b.BucketDepth = buf[92]
-	b.Depth = buf[93]
-	b.Immutable = buf[94] > 0
-	return nil
-}
+func (b *Batch) UnmarshalBinary(buf []byte) error { _ = "STUB: not implemented"; return nil }

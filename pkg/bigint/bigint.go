@@ -5,8 +5,6 @@
 package bigint
 
 import (
-	"encoding/json"
-	"fmt"
 	"math/big"
 )
 
@@ -14,49 +12,16 @@ type BigInt struct {
 	*big.Int
 }
 
-func (i *BigInt) MarshalJSON() ([]byte, error) {
-	if i.Int == nil {
-		return []byte("null"), nil
-	}
+func (i *BigInt) MarshalJSON() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	return fmt.Appendf(nil, `"%s"`, i.String()), nil
-}
-
-func (i *BigInt) UnmarshalJSON(b []byte) error {
-	var val string
-	err := json.Unmarshal(b, &val)
-	if err != nil {
-		return err
-	}
-
-	if i.Int == nil {
-		i.Int = new(big.Int)
-	}
-
-	i.SetString(val, 10)
-
-	return nil
-}
+func (i *BigInt) UnmarshalJSON(b []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Wrap wraps big.Int pointer into BigInt struct.
-func Wrap(i *big.Int) *BigInt {
-	return &BigInt{Int: i}
-}
+func Wrap(i *big.Int) *BigInt { _ = "STUB: not implemented"; return nil }
 
 // MarshalBinary implements encoding.BinaryMarshaler using Gob encoding.
 // Panics if the underlying *big.Int is nil, as this indicates a programmer error.
-func (i *BigInt) MarshalBinary() ([]byte, error) {
-	if i.Int == nil {
-		panic("bigint: MarshalBinary called on nil Int")
-	}
-	return i.GobEncode()
-}
+func (i *BigInt) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler using Gob decoding.
-func (i *BigInt) UnmarshalBinary(data []byte) error {
-	if len(data) == 0 {
-		return fmt.Errorf("bigint: UnmarshalBinary called with empty data")
-	}
-	i.Int = new(big.Int)
-	return i.GobDecode(data)
-}
+func (i *BigInt) UnmarshalBinary(data []byte) error { _ = "STUB: not implemented"; return nil }

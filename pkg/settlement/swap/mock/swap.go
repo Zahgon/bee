@@ -44,238 +44,162 @@ type Service struct {
 
 // WithSettlementSentFunc sets the mock settlement function
 func WithSettlementSentFunc(f func(swarm.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.settlementSentFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithSettlementRecvFunc(f func(swarm.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.settlementRecvFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSettlementsSentFunc sets the mock settlements function
 func WithSettlementsSentFunc(f func() (map[string]*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.settlementsSentFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithSettlementsRecvFunc(f func() (map[string]*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.settlementsRecvFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithReceiveChequeFunc(f func(context.Context, swarm.Address, *chequebook.SignedCheque, *big.Int, *big.Int) error) Option {
-	return optionFunc(func(s *Service) {
-		s.receiveChequeFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPayFunc(f func(context.Context, swarm.Address, *big.Int)) Option {
-	return optionFunc(func(s *Service) {
-		s.payFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithHandshakeFunc(f func(swarm.Address, common.Address) error) Option {
-	return optionFunc(func(s *Service) {
-		s.handshakeFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastSentChequeFunc(f func(swarm.Address) (*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastSentChequeFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastSentChequesFunc(f func() (map[string]*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastSentChequesFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastReceivedChequeFunc(f func(swarm.Address) (*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastReceivedChequeFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastReceivedChequesFunc(f func() (map[string]*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastReceivedChequesFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithCashChequeFunc(f func(ctx context.Context, peer swarm.Address) (common.Hash, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.cashChequeFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithCashoutStatusFunc(f func(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.cashoutStatusFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // New creates the mock swap implementation
-func New(opts ...Option) swap.Interface {
-	mock := new(Service)
-	mock.settlementsSent = make(map[string]*big.Int)
-	mock.settlementsRecv = make(map[string]*big.Int)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
-}
+func New(opts ...Option) swap.Interface { _ = "STUB: not implemented"; return *new(swap.Interface) }
 
 func NewSwap(opts ...Option) swapprotocol.Swap {
-	mock := new(Service)
-	mock.settlementsSent = make(map[string]*big.Int)
-	mock.settlementsRecv = make(map[string]*big.Int)
-	mock.deductionByPeers = make(map[string]struct{})
-	mock.deductionForPeers = make(map[string]struct{})
-
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
+	_ = "STUB: not implemented"
+	return *new(swapprotocol.Swap)
 }
 
 // Pay is the mock Pay function of swap.
 func (s *Service) Pay(ctx context.Context, peer swarm.Address, amount *big.Int) {
-	if s.payFunc != nil {
-		s.payFunc(ctx, peer, amount)
-		return
-	}
-	if settlement, ok := s.settlementsSent[peer.String()]; ok {
-		s.settlementsSent[peer.String()] = big.NewInt(0).Add(settlement, amount)
-	} else {
-		s.settlementsSent[peer.String()] = amount
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // TotalSent is the mock TotalSent function of swap.
 func (s *Service) TotalSent(peer swarm.Address) (totalSent *big.Int, err error) {
-	if s.settlementSentFunc != nil {
-		return s.settlementSentFunc(peer)
-	}
-	if v, ok := s.settlementsSent[peer.String()]; ok {
-		return v, nil
-	}
-	return big.NewInt(0), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // TotalReceived is the mock TotalReceived function of swap.
 func (s *Service) TotalReceived(peer swarm.Address) (totalReceived *big.Int, err error) {
-	if s.settlementRecvFunc != nil {
-		return s.settlementRecvFunc(peer)
-	}
-	if v, ok := s.settlementsRecv[peer.String()]; ok {
-		return v, nil
-	}
-	return big.NewInt(0), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SettlementsSent is the mock SettlementsSent function of swap.
 func (s *Service) SettlementsSent() (map[string]*big.Int, error) {
-	if s.settlementsSentFunc != nil {
-		return s.settlementsSentFunc()
-	}
-	return s.settlementsSent, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SettlementsReceived is the mock SettlementsReceived function of swap.
 func (s *Service) SettlementsReceived() (map[string]*big.Int, error) {
-	if s.settlementsRecvFunc != nil {
-		return s.settlementsRecvFunc()
-	}
-	return s.settlementsRecv, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Handshake is called by the swap protocol when a handshake is received.
 func (s *Service) Handshake(peer swarm.Address, beneficiary common.Address) error {
-	if s.handshakeFunc != nil {
-		return s.handshakeFunc(peer, beneficiary)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (s *Service) LastSentCheque(address swarm.Address) (*chequebook.SignedCheque, error) {
-	if s.lastSentChequeFunc != nil {
-		return s.lastSentChequeFunc(address)
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (s *Service) LastSentCheques() (map[string]*chequebook.SignedCheque, error) {
-	if s.lastSentChequesFunc != nil {
-		return s.lastSentChequesFunc()
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (s *Service) LastReceivedCheque(address swarm.Address) (*chequebook.SignedCheque, error) {
-	if s.lastReceivedChequeFunc != nil {
-		return s.lastReceivedChequeFunc(address)
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (s *Service) LastReceivedCheques() (map[string]*chequebook.SignedCheque, error) {
-	if s.lastReceivedChequesFunc != nil {
-		return s.lastReceivedChequesFunc()
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
-	if s.cashChequeFunc != nil {
-		return s.cashChequeFunc(ctx, peer)
-	}
-	return common.Hash{}, nil
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (s *Service) CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {
-	if s.cashoutStatusFunc != nil {
-		return s.cashoutStatusFunc(ctx, peer)
-	}
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque, exchangeRate, deduction *big.Int) (err error) {
-	defer func() {
-		if err == nil {
-			s.deductionForPeers[peer.String()] = struct{}{}
-		}
-	}()
-	if s.receiveChequeFunc != nil {
-		return s.receiveChequeFunc(ctx, peer, cheque, exchangeRate, deduction)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (s *Service) GetDeductionForPeer(peer swarm.Address) (bool, error) {
-	if _, ok := s.deductionForPeers[peer.String()]; ok {
-		return true, nil
-	}
+	_ = "STUB: not implemented"
 	return false, nil
 }
 
 func (s *Service) GetDeductionByPeer(peer swarm.Address) (bool, error) {
-	if _, ok := s.deductionByPeers[peer.String()]; ok {
-		return true, nil
-	}
+	_ = "STUB: not implemented"
 	return false, nil
 }
 
 func (s *Service) AddDeductionByPeer(peer swarm.Address) error {
-	s.deductionByPeers[peer.String()] = struct{}{}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -286,4 +210,4 @@ type Option interface {
 
 type optionFunc func(*Service)
 
-func (f optionFunc) apply(r *Service) { f(r) }
+func (f optionFunc) apply(r *Service) { _ = "STUB: not implemented"; return }

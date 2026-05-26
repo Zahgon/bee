@@ -19,17 +19,21 @@ type Steward struct {
 // Reupload implements steward.Interface Reupload method.
 // The given address is recorded.
 func (s *Steward) Reupload(_ context.Context, addr swarm.Address, _ postage.Stamper) error {
-	s.addr = addr
+	_ = "STUB: not implemented"
 	return nil
+
+	// IsRetrievable implements steward.Interface IsRetrievable method.
+	// The method always returns true.
 }
 
-// IsRetrievable implements steward.Interface IsRetrievable method.
-// The method always returns true.
 func (s *Steward) IsRetrievable(_ context.Context, addr swarm.Address) (bool, error) {
-	return addr.Equal(s.addr), nil
+	_ = "STUB: not implemented"
+	return false, nil
+
+	// LastAddress returns the last address given to the Reupload method call.
 }
 
-// LastAddress returns the last address given to the Reupload method call.
 func (s *Steward) LastAddress() swarm.Address {
-	return s.addr
+	_ = "STUB: not implemented"
+	return *new(swarm.Address)
 }

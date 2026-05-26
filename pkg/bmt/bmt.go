@@ -5,10 +5,7 @@
 package bmt
 
 import (
-	"encoding/binary"
 	"hash"
-
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
 var (
@@ -21,45 +18,26 @@ var SIMDOptIn func() bool = func() bool { return false }
 
 // SetSIMDOptIn sets the SIMD opt-in flag. Intended to be called once during
 // startup before the first NewPool call (cmd/bee calls it after flag parsing).
-func SetSIMDOptIn(b bool) { SIMDOptIn = func() bool { return b } }
+func SetSIMDOptIn(b bool) { _ = "STUB: not implemented"; return }
 
 // LengthToSpan creates a binary data span size representation.
 // It is required for calculating the BMT hash.
-func LengthToSpan(length int64) []byte {
-	span := make([]byte, SpanSize)
-	binary.LittleEndian.PutUint64(span, uint64(length))
-	return span
-}
+func LengthToSpan(length int64) []byte { _ = "STUB: not implemented"; return nil }
 
 // LengthFromSpan returns length from span.
-func LengthFromSpan(span []byte) uint64 {
-	return binary.LittleEndian.Uint64(span)
-}
+func LengthFromSpan(span []byte) uint64 { _ = "STUB: not implemented"; return 0 }
 
 // calculates the Keccak256 SHA3 hash of the data
-func sha3hash(data ...[]byte) ([]byte, error) {
-	return doHash(swarm.NewHasher(), data...)
-}
+func sha3hash(data ...[]byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // calculates Hash of the data
 func doHash(h hash.Hash, data ...[]byte) ([]byte, error) {
-	h.Reset()
-	for _, v := range data {
-		if _, err := h.Write(v); err != nil {
-			return nil, err
-		}
-	}
-	return h.Sum(nil), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // SEGMENT_SIZE is the keccak256 output size in bytes, also the BMT leaf segment size.
 const SEGMENT_SIZE = 32
 
 // sizeToParams calculates the depth (number of levels) and segment count in the BMT tree.
-func sizeToParams(n int) (c, d int) {
-	c = 2
-	for ; c < n; c *= 2 {
-		d++
-	}
-	return c, d + 1
-}
+func sizeToParams(n int) (c, d int) { _ = "STUB: not implemented"; return 0, 0 }

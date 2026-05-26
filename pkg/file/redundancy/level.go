@@ -4,13 +4,6 @@
 
 package redundancy
 
-import (
-	"errors"
-	"fmt"
-
-	"github.com/ethersphere/bee/v2/pkg/swarm"
-)
-
 // Level is the redundancy level
 // which carries information about how much redundancy should be added to data to remain retrievable with a 1-10^(-6) certainty
 // in different groups of expected chunk retrieval error rates (level values)
@@ -30,83 +23,35 @@ const (
 )
 
 // Validate validates the redundancy level
-func (l Level) Validate() bool {
-	return l >= NONE && l <= PARANOID
-}
+func (l Level) Validate() bool { _ = "STUB: not implemented"; return false }
 
 // GetParities returns number of parities based on appendix F table 5
-func (l Level) GetParities(shards int) int {
-	et, err := l.getErasureTable()
-	if err != nil {
-		return 0
-	}
-	return et.getParities(shards)
-}
+func (l Level) GetParities(shards int) int { _ = "STUB: not implemented"; return 0 }
 
 // GetMaxShards returns back the maximum number of effective data chunks
-func (l Level) GetMaxShards() int {
-	p := l.GetParities(swarm.Branches)
-	return swarm.Branches - p
-}
+func (l Level) GetMaxShards() int { _ = "STUB: not implemented"; return 0 }
 
 // GetEncParities returns number of parities for encrypted chunks based on appendix F table 6
-func (l Level) GetEncParities(shards int) int {
-	et, err := l.getEncErasureTable()
-	if err != nil {
-		return 0
-	}
-	return et.getParities(shards)
-}
+func (l Level) GetEncParities(shards int) int { _ = "STUB: not implemented"; return 0 }
 
 func (l Level) getErasureTable() (erasureTable, error) {
-	switch l {
-	case NONE:
-		return erasureTable{}, errors.New("redundancy: level NONE does not have erasure table")
-	case MEDIUM:
-		return mediumEt, nil
-	case STRONG:
-		return strongEt, nil
-	case INSANE:
-		return insaneEt, nil
-	case PARANOID:
-		return paranoidEt, nil
-	default:
-		return erasureTable{}, fmt.Errorf("redundancy: level value %d is not a legit redundancy level", l)
-	}
+	_ = "STUB: not implemented"
+	return *new(erasureTable), nil
 }
 
 func (l Level) getEncErasureTable() (erasureTable, error) {
-	switch l {
-	case NONE:
-		return erasureTable{}, errors.New("redundancy: level NONE does not have erasure table")
-	case MEDIUM:
-		return encMediumEt, nil
-	case STRONG:
-		return encStrongEt, nil
-	case INSANE:
-		return encInsaneEt, nil
-	case PARANOID:
-		return encParanoidEt, nil
-	default:
-		return erasureTable{}, fmt.Errorf("redundancy: level value %d is not a legit redundancy level", l)
-	}
+	_ = "STUB: not implemented"
+	return *new(erasureTable), nil
 }
 
 // GetMaxEncShards returns back the maximum number of effective encrypted data chunks
-func (l Level) GetMaxEncShards() int {
-	p := l.GetEncParities(swarm.EncryptedBranches)
-	return (swarm.Branches - p) / 2
-}
+func (l Level) GetMaxEncShards() int { _ = "STUB: not implemented"; return 0 }
 
 // GetReplicaCount returns back the dispersed replica number
-func (l Level) GetReplicaCount() int {
-	return replicaCounts[int(l)]
-}
+func (l Level) GetReplicaCount() int { _ = "STUB: not implemented"; return 0 }
 
 // Decrement returns a weaker redundancy level compare to the current one
-func (l Level) Decrement() Level {
-	return Level(uint8(l) - 1)
-}
+func (l Level) Decrement() Level { _ = "STUB: not implemented"; return *new(Level) }
 
 // TABLE INITS
 
@@ -163,10 +108,7 @@ var encParanoidEt = newErasureTable(
 )
 
 // GetReplicaCounts returns back the ascending dispersed replica counts for all redundancy levels
-func GetReplicaCounts() [5]int {
-	c := replicaCounts
-	return c
-}
+func GetReplicaCounts() [5]int { _ = "STUB: not implemented"; return nil }
 
 // the actual number of replicas needed to keep the error rate below 1/10^6
 // for the five levels of redundancy are 0, 2, 4, 5, 19

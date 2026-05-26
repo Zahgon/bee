@@ -7,9 +7,6 @@ package accesscontrol
 import (
 	"crypto/ecdsa"
 	"errors"
-	"fmt"
-
-	"github.com/ethersphere/bee/v2/pkg/crypto"
 )
 
 var (
@@ -34,34 +31,11 @@ type SessionStruct struct {
 
 // Key returns a derived key for each nonce.
 func (s *SessionStruct) Key(publicKey *ecdsa.PublicKey, nonces [][]byte) ([][]byte, error) {
-	if publicKey == nil {
-		return nil, ErrInvalidPublicKey
-	}
-	//nolint:staticcheck // SA1019: ecdsa fields are deprecated, but secp256k1 is not supported by crypto/ecdh
-	x, y := publicKey.ScalarMult(publicKey.X, publicKey.Y, s.key.D.Bytes())
-	if x == nil || y == nil {
-		return nil, ErrSecretKeyInfinity
-	}
-
-	if len(nonces) == 0 {
-		return [][]byte{(*x).Bytes()}, nil
-	}
-
-	keys := make([][]byte, 0, len(nonces))
-	for _, nonce := range nonces {
-		key, err := crypto.LegacyKeccak256(append(x.Bytes(), nonce...))
-		if err != nil {
-			return nil, fmt.Errorf("failed to get Keccak256 hash: %w", err)
-		}
-		keys = append(keys, key)
-	}
-
-	return keys, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+//nolint:staticcheck // SA1019: ecdsa fields are deprecated, but secp256k1 is not supported by crypto/ecdh
 
 // NewDefaultSession creates a new session from a private key.
-func NewDefaultSession(key *ecdsa.PrivateKey) *SessionStruct {
-	return &SessionStruct{
-		key: key,
-	}
-}
+func NewDefaultSession(key *ecdsa.PrivateKey) *SessionStruct { _ = "STUB: not implemented"; return nil }

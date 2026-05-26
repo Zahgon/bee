@@ -8,9 +8,6 @@ package bmt
 
 import (
 	"hash"
-
-	"github.com/ethersphere/bee/v2/pkg/keccak"
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
 // simdConf is the internal configuration for the SIMD BMT pool.
@@ -25,12 +22,7 @@ type simdConf struct {
 	batchWidth   int
 }
 
-func (c *simdConf) baseHasher() hash.Hash {
-	if len(c.prefix) > 0 {
-		return swarm.NewPrefixHasher(c.prefix)
-	}
-	return swarm.NewHasher()
-}
+func (c *simdConf) baseHasher() hash.Hash { _ = "STUB: not implemented"; return *new(hash.Hash) }
 
 // simdPool is the SIMD-batched BMT hasher pool.
 type simdPool struct {
@@ -39,63 +31,16 @@ type simdPool struct {
 }
 
 func newSIMDConf(prefix []byte, segmentCount, capacity int) *simdConf {
-	count, depth := sizeToParams(segmentCount)
-	segmentSize := SEGMENT_SIZE
-
-	c := &simdConf{
-		segmentSize:  segmentSize,
-		segmentCount: segmentCount,
-		capacity:     capacity,
-		maxSize:      count * segmentSize,
-		depth:        depth,
-		prefix:       prefix,
-		batchWidth:   keccak.BatchWidth(),
-	}
-
-	zerohashes := make([][]byte, depth+1)
-	zeros := make([]byte, segmentSize)
-	zerohashes[0] = zeros
-	var err error
-	for i := 1; i < depth+1; i++ {
-		if zeros, err = doHash(c.baseHasher(), zeros, zeros); err != nil {
-			panic(err.Error())
-		}
-		zerohashes[i] = zeros
-	}
-	c.zerohashes = zerohashes
-
-	return c
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newSIMDPool creates a SIMD BMT pool from a public Conf.
-func newSIMDPool(c *Conf) *simdPool {
-	sc := newSIMDConf(c.Prefix, c.SegmentCount, c.Capacity)
-	p := &simdPool{
-		simdConf: sc,
-		c:        make(chan *simdTree, sc.capacity),
-	}
-	for i := 0; i < sc.capacity; i++ {
-		p.c <- newSIMDTree(sc.maxSize, sc.depth, sc.baseHasher, sc.prefix)
-	}
-	return p
-}
+func newSIMDPool(c *Conf) *simdPool { _ = "STUB: not implemented"; return nil }
 
-func (p *simdPool) Get() Hasher {
-	t := <-p.c
-	return &simdHasher{
-		simdConf: p.simdConf,
-		span:     make([]byte, SpanSize),
-		bmt:      t,
-	}
-}
+func (p *simdPool) Get() Hasher { _ = "STUB: not implemented"; return *new(Hasher) }
 
-func (p *simdPool) Put(h Hasher) {
-	sh, ok := h.(*simdHasher)
-	if !ok {
-		panic("bmt: simdPool.Put called with non-simdHasher")
-	}
-	p.c <- sh.bmt
-}
+func (p *simdPool) Put(h Hasher) { _ = "STUB: not implemented"; return }
 
 // simdTree is the tree structure used by the SIMD hasher.
 type simdTree struct {
@@ -121,57 +66,13 @@ type simdNode struct {
 }
 
 func newSIMDNode(index int, parent *simdNode, size int) *simdNode {
-	return &simdNode{
-		parent: parent,
-		isLeft: index%2 == 0,
-		left:   make([]byte, size),
-		right:  make([]byte, size),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func newSIMDTree(maxsize, depth int, hashfunc func() hash.Hash, prefix []byte) *simdTree {
-	prefixLen := len(prefix)
-	hasher := hashfunc()
-	segSize := hasher.Size()
-	n := newSIMDNode(0, nil, segSize)
-	prevlevel := []*simdNode{n}
-	allLevels := [][]*simdNode{prevlevel}
-	count := 2
-	for level := depth - 2; level >= 0; level-- {
-		nodes := make([]*simdNode, count)
-		for i := 0; i < count; i++ {
-			parent := prevlevel[i/2]
-			nodes[i] = newSIMDNode(i, parent, segSize)
-		}
-		allLevels = append(allLevels, nodes)
-		prevlevel = nodes
-		count *= 2
-	}
-	// reverse so levels[0]=leaves, levels[len-1]=root
-	for i, j := 0, len(allLevels)-1; i < j; i, j = i+1, j-1 {
-		allLevels[i], allLevels[j] = allLevels[j], allLevels[i]
-	}
-	bufSize := prefixLen + 2*segSize
-	var concat [8][]byte
-	for i := range concat {
-		concat[i] = make([]byte, bufSize)
-		if prefixLen > 0 {
-			copy(concat[i][:prefixLen], prefix)
-		}
-	}
-	var leafConcat [8][]byte
-	for i := range leafConcat {
-		leafConcat[i] = make([]byte, prefixLen+2*segSize)
-		if prefixLen > 0 {
-			copy(leafConcat[i][:prefixLen], prefix)
-		}
-	}
-	return &simdTree{
-		leaves:     prevlevel,
-		levels:     allLevels,
-		buffer:     make([]byte, maxsize),
-		concat:     concat,
-		leafConcat: leafConcat,
-		hasher:     hasher,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// reverse so levels[0]=leaves, levels[len-1]=root

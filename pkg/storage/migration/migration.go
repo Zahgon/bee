@@ -5,13 +5,9 @@
 package migration
 
 import (
-	"encoding/binary"
 	"errors"
-	"fmt"
-	"sort"
 
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/storageutil"
 )
 
 type (
@@ -29,49 +25,12 @@ var errStorageVersionItemUnmarshalInvalidSize = errors.New("unmarshal StorageVer
 // The steps are separated by groups so different lists of steps can run individually, for example,
 // two groups of migrations that run before and after the storer is initialized.
 func Migrate(s storage.IndexStore, group string, sm Steps) error {
-	if err := ValidateVersions(sm); err != nil {
-		return err
-	}
-
-	currentVersion, err := Version(s, group)
-	if err != nil {
-		return err
-	}
-
-	for nextVersion := currentVersion + 1; ; nextVersion++ {
-		stepFn, ok := sm[nextVersion]
-		if !ok {
-			return nil
-		}
-		err := stepFn()
-		if err != nil {
-			return err
-		}
-		err = setVersion(s, nextVersion, group)
-		if err != nil {
-			return err
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ValidateVersions checks versions if they are in order n (where n min version value), n+1, n+2, n+3... (all values are increasing orders)
-func ValidateVersions(sm Steps) error {
-	if len(sm) == 0 {
-		return fmt.Errorf("steps map is empty")
-	}
-	versions := make([]int, len(sm))
-	i := 0
-	for version := range sm {
-		versions[i] = int(version)
-		i++
-	}
-	sort.Ints(versions)
-
-	if (versions[i-1] - versions[0]) == i-1 {
-		return nil
-	}
-	return fmt.Errorf("missing versions")
-}
+func ValidateVersions(sm Steps) error { _ = "STUB: not implemented"; return nil }
 
 var _ storage.Item = (*StorageVersionItem)(nil)
 
@@ -84,73 +43,38 @@ type StorageVersionItem struct {
 }
 
 // ID implements the storage.Item interface.
-func (s *StorageVersionItem) ID() string {
-	return "storage_version"
-}
+func (s *StorageVersionItem) ID() string { _ = "STUB: not implemented"; return "" }
 
 // Namespace implements the storage.Item interface.
 func (s StorageVersionItem) Namespace() string {
-	return s.Group
+	_ = "STUB: not implemented"
+
+	// Marshal implements the storage.Item interface.
+	return ""
 }
 
-// Marshal implements the storage.Item interface.
-func (s *StorageVersionItem) Marshal() ([]byte, error) {
-	buf := make([]byte, storageVersionItemSize)
-	binary.LittleEndian.PutUint64(buf, s.Version)
-	return buf, nil
-}
+func (s *StorageVersionItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Unmarshal implements the storage.Item interface.
-func (s *StorageVersionItem) Unmarshal(bytes []byte) error {
-	if len(bytes) != storageVersionItemSize {
-		return errStorageVersionItemUnmarshalInvalidSize
-	}
-	s.Version = binary.LittleEndian.Uint64(bytes)
-	return nil
-}
+func (s *StorageVersionItem) Unmarshal(bytes []byte) error { _ = "STUB: not implemented"; return nil }
 
 // Clone implements the storage.Item interface.
 func (s *StorageVersionItem) Clone() storage.Item {
-	if s == nil {
-		return nil
-	}
-	return &StorageVersionItem{
-		Version: s.Version,
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Item)
 }
 
 // Clone implements the storage.Item interface.
-func (s StorageVersionItem) String() string {
-	return storageutil.JoinFields(s.Namespace(), s.ID())
-}
+func (s StorageVersionItem) String() string { _ = "STUB: not implemented"; return "" }
 
 // Version returns the current version of the storage
 func Version(s storage.Reader, group string) (uint64, error) {
-	item := StorageVersionItem{Group: group}
-	err := s.Get(&item)
-	if err != nil {
-		if errors.Is(err, storage.ErrNotFound) {
-			return 0, nil
-		}
-		return 0, err
-	}
-	return item.Version, nil
+	_ = "STUB: not implemented"
+	return 0, nil
 }
 
 // setVersion sets the current version of the storage
-func setVersion(s storage.Writer, v uint64, g string) error {
-	return s.Put(&StorageVersionItem{Version: v, Group: g})
-}
+func setVersion(s storage.Writer, v uint64, g string) error { _ = "STUB: not implemented"; return nil }
 
 // LatestVersion returns latest version from supplied migration steps.
-func LatestVersion(sm Steps) uint64 {
-	var latest uint64
-
-	for version := range sm {
-		if version > latest {
-			latest = version
-		}
-	}
-
-	return latest
-}
+func LatestVersion(sm Steps) uint64 { _ = "STUB: not implemented"; return 0 }

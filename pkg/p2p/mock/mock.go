@@ -6,7 +6,6 @@ package mock
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/bzz"
@@ -32,159 +31,105 @@ type Service struct {
 
 // WithAddProtocolFunc sets the mock implementation of the AddProtocol function
 func WithAddProtocolFunc(f func(p2p.ProtocolSpec) error) Option {
-	return optionFunc(func(s *Service) {
-		s.addProtocolFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithConnectFunc sets the mock implementation of the Connect function
 func WithConnectFunc(f func(ctx context.Context, addr []ma.Multiaddr) (address *bzz.Address, err error)) Option {
-	return optionFunc(func(s *Service) {
-		s.connectFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithDisconnectFunc sets the mock implementation of the Disconnect function
 func WithDisconnectFunc(f func(overlay swarm.Address, reason string) error) Option {
-	return optionFunc(func(s *Service) {
-		s.disconnectFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPeersFunc sets the mock implementation of the Peers function
-func WithPeersFunc(f func() []p2p.Peer) Option {
-	return optionFunc(func(s *Service) {
-		s.peersFunc = f
-	})
-}
+func WithPeersFunc(f func() []p2p.Peer) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithBlocklistedPeersFunc sets the mock implementation of the BlocklistedPeers function
 func WithBlocklistedPeersFunc(f func() ([]p2p.BlockListedPeer, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.blocklistedPeersFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithAddressesFunc sets the mock implementation of the Addresses function
 func WithAddressesFunc(f func() ([]ma.Multiaddr, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.addressesFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithGetWelcomeMessageFunc sets the mock implementation of the GetWelcomeMessage function
 func WithGetWelcomeMessageFunc(f func() string) Option {
-	return optionFunc(func(s *Service) {
-		s.getWelcomeMessageFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSetWelcomeMessageFunc sets the mock implementation of the SetWelcomeMessage function
 func WithSetWelcomeMessageFunc(f func(string) error) Option {
-	return optionFunc(func(s *Service) {
-		s.setWelcomeMessageFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithBlocklistFunc(f func(swarm.Address, time.Duration, string) error) Option {
-	return optionFunc(func(s *Service) {
-		s.blocklistFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // New will create a new mock P2P Service with the given options
-func New(opts ...Option) *Service {
-	s := new(Service)
-	for _, o := range opts {
-		o.apply(s)
-	}
-	return s
-}
+func New(opts ...Option) *Service { _ = "STUB: not implemented"; return nil }
 
-func (s *Service) AddProtocol(spec p2p.ProtocolSpec) error {
-	if s.addProtocolFunc == nil {
-		return errors.New("function AddProtocol not configured")
-	}
-	return s.addProtocolFunc(spec)
-}
+func (s *Service) AddProtocol(spec p2p.ProtocolSpec) error { _ = "STUB: not implemented"; return nil }
 
 func (s *Service) Connect(ctx context.Context, addr []ma.Multiaddr) (address *bzz.Address, err error) {
-	if s.connectFunc == nil {
-		return nil, errors.New("function Connect not configured")
-	}
-	return s.connectFunc(ctx, addr)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) Disconnect(overlay swarm.Address, reason string) error {
-	if s.disconnectFunc == nil {
-		return errors.New("function Disconnect not configured")
-	}
-
-	if s.notifierFunc != nil {
-		s.notifierFunc.Disconnected(p2p.Peer{Address: overlay})
-	}
-
-	return s.disconnectFunc(overlay, reason)
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (s *Service) Addresses() ([]ma.Multiaddr, error) {
-	if s.addressesFunc == nil {
-		return nil, errors.New("function Addresses not configured")
-	}
-	return s.addressesFunc()
-}
+func (s *Service) Addresses() ([]ma.Multiaddr, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (s *Service) Peers() []p2p.Peer {
-	if s.peersFunc == nil {
-		return nil
-	}
-	return s.peersFunc()
-}
+func (s *Service) Peers() []p2p.Peer { _ = "STUB: not implemented"; return nil }
 
 func (s *Service) Blocklisted(overlay swarm.Address) (bool, error) {
+	_ = "STUB: not implemented"
 	return false, nil
 }
 
 func (s *Service) BlocklistedPeers() ([]p2p.BlockListedPeer, error) {
-	if s.blocklistedPeersFunc == nil {
-		return nil, nil
-	}
-
-	return s.blocklistedPeersFunc()
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *Service) SetWelcomeMessage(val string) error {
-	if s.setWelcomeMessageFunc != nil {
-		return s.setWelcomeMessageFunc(val)
-	}
-	s.welcomeMessage = val
+func (s *Service) SetWelcomeMessage(val string) error { _ = "STUB: not implemented"; return nil }
+
+func (s *Service) GetWelcomeMessage() string { _ = "STUB: not implemented"; return "" }
+
+func (s *Service) Halt() { _ = "STUB: not implemented"; return }
+
+func (s *Service) Blocklist(overlay swarm.Address, duration time.Duration, reason string) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (s *Service) GetWelcomeMessage() string {
-	if s.getWelcomeMessageFunc != nil {
-		return s.getWelcomeMessageFunc()
-	}
-	return s.welcomeMessage
-}
-
-func (s *Service) Halt() {}
-
-func (s *Service) Blocklist(overlay swarm.Address, duration time.Duration, reason string) error {
-	if s.blocklistFunc == nil {
-		return errors.New("function blocklist not configured")
-	}
-	return s.blocklistFunc(overlay, duration, reason)
-}
-
 func (s *Service) SetPickyNotifier(f p2p.PickyNotifier) {
-	s.notifierFunc = f
+	_ = "STUB: not implemented"
+
+	// NetworkStatus implements p2p.NetworkStatuser interface.
+	// It always returns p2p.NetworkStatusAvailable.
+	return
 }
 
-// NetworkStatus implements p2p.NetworkStatuser interface.
-// It always returns p2p.NetworkStatusAvailable.
 func (s *Service) NetworkStatus() p2p.NetworkStatus {
-	return p2p.NetworkStatusAvailable
+	_ = "STUB: not implemented"
+	return *new(p2p.NetworkStatus)
 }
 
 type Option interface {
@@ -192,4 +137,4 @@ type Option interface {
 }
 type optionFunc func(*Service)
 
-func (f optionFunc) apply(r *Service) { f(r) }
+func (f optionFunc) apply(r *Service) { _ = "STUB: not implemented"; return }

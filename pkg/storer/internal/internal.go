@@ -5,12 +5,9 @@
 package internal
 
 import (
-	"bytes"
 	"context"
 
 	"github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/inmemchunkstore"
-	"github.com/ethersphere/bee/v2/pkg/storage/inmemstore"
 	"github.com/ethersphere/bee/v2/pkg/storer/internal/transaction"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -28,32 +25,18 @@ var emptyAddr = make([]byte, swarm.HashSize)
 // AddressOrZero returns swarm.ZeroAddress if the buf is of zero bytes. The Zero byte
 // buffer is used by the items to serialize their contents and if valid swarm.ZeroAddress
 // entries are allowed.
-func AddressOrZero(buf []byte) swarm.Address {
-	if bytes.Equal(buf, emptyAddr) {
-		return swarm.ZeroAddress
-	}
-	return swarm.NewAddress(append(make([]byte, 0, swarm.HashSize), buf...))
-}
+func AddressOrZero(buf []byte) swarm.Address { _ = "STUB: not implemented"; return *new(swarm.Address) }
 
 // AddressBytesOrZero is a helper which creates a zero buffer of swarm.HashSize. This
 // is required during storing the items in the Store as their serialization formats
 // are strict.
-func AddressBytesOrZero(addr swarm.Address) []byte {
-	if addr.IsZero() {
-		return make([]byte, swarm.HashSize)
-	}
-	return addr.Bytes()
-}
+func AddressBytesOrZero(addr swarm.Address) []byte { _ = "STUB: not implemented"; return nil }
 
 // NewInmemStorage constructs a inmem Storage implementation which can be used
 // for the tests in the internal packages.
 func NewInmemStorage() transaction.Storage {
-	ts := &inmemStorage{
-		indexStore: inmemstore.New(),
-		chunkStore: inmemchunkstore.New(),
-	}
-
-	return ts
+	_ = "STUB: not implemented"
+	return *new(transaction.Storage)
 }
 
 type inmemStorage struct {
@@ -62,7 +45,8 @@ type inmemStorage struct {
 }
 
 func (t *inmemStorage) NewTransaction(ctx context.Context) (transaction.Transaction, func()) {
-	return &inmemTrx{t.indexStore, t.chunkStore}, func() {}
+	_ = "STUB: not implemented"
+	return *new(transaction.Transaction), nil
 }
 
 type inmemTrx struct {
@@ -70,16 +54,27 @@ type inmemTrx struct {
 	chunkStore storage.ChunkStore
 }
 
-func (t *inmemStorage) IndexStore() storage.Reader             { return t.indexStore }
-func (t *inmemStorage) ChunkStore() storage.ReadOnlyChunkStore { return t.chunkStore }
+func (t *inmemStorage) IndexStore() storage.Reader {
+	_ = "STUB: not implemented"
+	return *new(storage.Reader)
+}
+func (t *inmemStorage) ChunkStore() storage.ReadOnlyChunkStore {
+	_ = "STUB: not implemented"
+	return *new(storage.ReadOnlyChunkStore)
+}
 
-func (t *inmemTrx) IndexStore() storage.IndexStore { return t.indexStore }
-func (t *inmemTrx) ChunkStore() storage.ChunkStore { return t.chunkStore }
-func (t *inmemTrx) Commit() error                  { return nil }
+func (t *inmemTrx) IndexStore() storage.IndexStore {
+	_ = "STUB: not implemented"
+	return *new(storage.IndexStore)
+}
+func (t *inmemTrx) ChunkStore() storage.ChunkStore {
+	_ = "STUB: not implemented"
+	return *new(storage.ChunkStore)
+}
+func (t *inmemTrx) Commit() error { _ = "STUB: not implemented"; return nil }
 
-func (t *inmemStorage) Close() error { return nil }
+func (t *inmemStorage) Close() error { _ = "STUB: not implemented"; return nil }
 func (t *inmemStorage) Run(ctx context.Context, f func(s transaction.Store) error) error {
-	trx, done := t.NewTransaction(ctx)
-	defer done()
-	return f(trx)
+	_ = "STUB: not implemented"
+	return nil
 }

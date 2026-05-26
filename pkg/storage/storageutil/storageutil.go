@@ -4,11 +4,5 @@
 
 package storageutil
 
-import (
-	"strings"
-)
-
 // JoinFields joins the given fields with a slash.
-func JoinFields(fields ...string) string {
-	return strings.Join(fields, "/")
-}
+func JoinFields(fields ...string) string { _ = "STUB: not implemented"; return "" }

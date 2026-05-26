@@ -5,13 +5,8 @@
 package log
 
 import (
-	"fmt"
-	"io"
 	"os"
-	"regexp"
 	"sync"
-
-	"github.com/hashicorp/go-multierror"
 )
 
 // defaults specifies the default global options for log
@@ -36,14 +31,7 @@ var defaults = struct {
 // be modified only once, so further calls to this function will be ignored.
 // This function should be called before the first call to the NewLogger
 // factory constructor, otherwise it will have no effect.
-func ModifyDefaults(opts ...Option) {
-	defaults.pin.Do(func() {
-		for _, modify := range opts {
-			modify(defaults.options)
-		}
-		defaults.formatter = newFormatter(defaults.options.fmtOptions)
-	})
-}
+func ModifyDefaults(opts ...Option) { _ = "STUB: not implemented"; return }
 
 // loggers is the central register for Logger instances.
 var loggers = new(sync.Map)
@@ -54,89 +42,24 @@ var loggers = new(sync.Map)
 // The given options take precedence over the default options set
 // by the ModifyDefaults function.
 func NewLogger(name string, opts ...Option) Logger {
+	_ = "STUB: not implemented"
 	// Pin the default settings if
 	// they are not already pinned.
-	ModifyDefaults()
-
-	options := *defaults.options
-	for _, modify := range opts {
-		modify(&options)
-	}
-
-	if options.sink == io.Discard {
-		return Noop
-	}
-
-	formatter := defaults.formatter
-	if options.fmtOptions != defaults.options.fmtOptions {
-		formatter = newFormatter(options.fmtOptions)
-	}
-
-	val, ok := loggers.Load(hash(name, 0, "", options.sink))
-	if ok {
-		return val.(*logger)
-	}
-
-	l := &logger{
-		formatter:  formatter,
-		verbosity:  options.verbosity,
-		sink:       options.sink,
-		levelHooks: options.levelHooks,
-		metrics:    options.logMetrics,
-	}
-	l.builder = &builder{
-		l:        l,
-		names:    []string{name},
-		namesStr: name,
-	}
-	return l
+	return *new(Logger)
 }
 
 // SetVerbosity sets the level
 // of verbosity of the given logger.
-func SetVerbosity(l Logger, v Level) error {
-	bl := l.(*logger)
-	switch newLvl, maxValue := v.get(), Level(bl.v); {
-	case newLvl == VerbosityAll:
-		bl.setVerbosity(maxValue)
-	case newLvl > maxValue:
-		return fmt.Errorf("maximum verbosity %d exceeded for logger: %s", bl.v, bl.id)
-	default:
-		bl.setVerbosity(newLvl)
-	}
-	return nil
-}
+func SetVerbosity(l Logger, v Level) error { _ = "STUB: not implemented"; return nil }
 
 // SetVerbosityByExp sets all loggers to the given
 // verbosity level v that match the given expression
 // e, which can be a logger id or a regular expression.
 // An error is returned if e fails to compile.
-func SetVerbosityByExp(e string, v Level) error {
-	val, ok := loggers.Load(e)
-	if ok {
-		val.(*logger).setVerbosity(v)
-		return nil
-	}
-
-	rex, err := regexp.Compile(e)
-	if err != nil {
-		return err
-	}
-
-	var merr *multierror.Error
-	loggers.Range(func(key, val any) bool {
-		if rex.MatchString(key.(string)) {
-			merr = multierror.Append(merr, SetVerbosity(val.(*logger), v))
-		}
-		return true
-	})
-	return merr.ErrorOrNil()
-}
+func SetVerbosityByExp(e string, v Level) error { _ = "STUB: not implemented"; return nil }
 
 // RegistryIterate iterates through all registered loggers.
 func RegistryIterate(fn func(id, path string, verbosity Level, v uint) (next bool)) {
-	loggers.Range(func(_, val any) bool {
-		l := val.(*logger)
-		return fn(l.id, l.namesStr, l.verbosity.get(), l.v)
-	})
+	_ = "STUB: not implemented"
+	return
 }

@@ -5,10 +5,6 @@
 package libp2p
 
 import (
-	"errors"
-	"strings"
-
-	"github.com/coreos/go-semver/semver"
 	protocol "github.com/libp2p/go-libp2p/core/protocol"
 )
 
@@ -20,38 +16,6 @@ import (
 // the IDs are the same and if the semantic version of the base protocol is the
 // same or higher than that of the protocol ID provided.
 func (s *Service) protocolSemverMatcher(base protocol.ID) (func(protocol.ID) bool, error) {
-	parts := strings.Split(string(base), "/")
-	partsLen := len(parts)
-	if partsLen < 2 {
-		return nil, errors.New("invalid protocol id")
-	}
-	vers, err := semver.NewVersion(parts[partsLen-2])
-	if err != nil {
-		return nil, err
-	}
-
-	return func(check protocol.ID) bool {
-		chparts := strings.Split(string(check), "/")
-		chpartsLen := len(chparts)
-		if chpartsLen != partsLen {
-			return false
-		}
-
-		for i, v := range chparts {
-			if i == chpartsLen-2 {
-				continue
-			}
-			if parts[i] != v {
-				return false
-			}
-		}
-
-		chvers, err := semver.NewVersion(chparts[chpartsLen-2])
-		if err != nil {
-			s.logger.Debug("invalid protocol version", "version", check, "error", err)
-			return false
-		}
-
-		return vers.Major == chvers.Major && vers.Minor >= chvers.Minor
-	}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -20,49 +20,48 @@ type Service struct {
 }
 
 func WithReceiveChequeFunc(f func(ctx context.Context, cheque *chequebook.SignedCheque, exchangeRate *big.Int, deduction *big.Int) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.receiveCheque = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastChequeFunc(f func(chequebook common.Address) (*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastCheque = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithLastChequesFunc(f func() (map[common.Address]*chequebook.SignedCheque, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.lastCheques = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // NewChequeStore creates the mock chequeStore implementation
 func NewChequeStore(opts ...Option) chequebook.ChequeStore {
-	mock := new(Service)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
+	_ = "STUB: not implemented"
+	return *new(chequebook.ChequeStore)
 }
 
 func (s *Service) ReceiveCheque(ctx context.Context, cheque *chequebook.SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error) {
-	return s.receiveCheque(ctx, cheque, exchangeRate, deduction)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) LastCheque(chequebook common.Address) (*chequebook.SignedCheque, error) {
-	return s.lastCheque(chequebook)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) LastCheques() (map[common.Address]*chequebook.SignedCheque, error) {
-	return s.lastCheques()
+	_ = "STUB: not implemented"
+	return nil,
+
+		// Option is the option passed to the mock ChequeStore service
+		nil
 }
 
-// Option is the option passed to the mock ChequeStore service
 type Option interface {
 	apply(*Service)
 }
 
 type optionFunc func(*Service)
 
-func (f optionFunc) apply(r *Service) { f(r) }
+func (f optionFunc) apply(r *Service) { _ = "STUB: not implemented"; return }

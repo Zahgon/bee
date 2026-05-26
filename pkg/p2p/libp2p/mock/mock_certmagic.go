@@ -12,7 +12,6 @@ import (
 
 	"github.com/libp2p/go-libp2p/config"
 	"github.com/libp2p/go-libp2p/core/host"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 //go:embed testdata/cert.pem
@@ -26,68 +25,62 @@ type MockFileStorage struct {
 	path string
 }
 
-func NewMockFileStorage(path string) *MockFileStorage {
-	return &MockFileStorage{path: path}
-}
+func NewMockFileStorage(path string) *MockFileStorage { _ = "STUB: not implemented"; return nil }
 
 func (m *MockFileStorage) Store(_ context.Context, _ string, _ []byte) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (m *MockFileStorage) Load(_ context.Context, _ string) ([]byte, error) {
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (m *MockFileStorage) Delete(_ context.Context, _ string) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (m *MockFileStorage) Exists(_ context.Context, _ string) (bool, error) {
+	_ = "STUB: not implemented"
 	return false, nil
 }
 
 func (m *MockFileStorage) List(_ context.Context, _ string, _ bool) ([]string, error) {
+	_ = "STUB: not implemented"
 	return nil, nil
 }
 
 func (m *MockFileStorage) Lock(_ context.Context, _ string) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (m *MockFileStorage) Unlock(_ context.Context, _ string) error {
+	_ = "STUB: not implemented"
+
+	// MockCache is a minimal implementation of certmagic.Cache for testing.
 	return nil
 }
 
-// MockCache is a minimal implementation of certmagic.Cache for testing.
 type MockCache struct {
 	stopped bool
 	mu      sync.Mutex
 }
 
-func NewMockCache() *MockCache {
-	return &MockCache{}
-}
+func NewMockCache() *MockCache { _ = "STUB: not implemented"; return nil }
 
-func (m *MockCache) Stop() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.stopped = true
-}
+func (m *MockCache) Stop() { _ = "STUB: not implemented"; return }
 
 // MockConfig is a minimal implementation of certmagic.Config for testing.
 type MockConfig struct {
 	cache *MockCache
 }
 
-func NewMockConfig() *MockConfig {
-	return &MockConfig{cache: NewMockCache()}
-}
+func NewMockConfig() *MockConfig { _ = "STUB: not implemented"; return nil }
 
-func (m *MockConfig) TLSConfig() *tls.Config {
-	return &tls.Config{
-		MinVersion: tls.VersionTLS12,
-	}
-}
+func (m *MockConfig) TLSConfig() *tls.Config { _ = "STUB: not implemented"; return nil }
 
 // MockP2PForgeCertMgr is a mock implementation of p2pforge.P2PForgeCertMgr.
 type MockP2PForgeCertMgr struct {
@@ -99,61 +92,27 @@ type MockP2PForgeCertMgr struct {
 }
 
 func NewMockP2PForgeCertMgr(onCertLoaded func()) *MockP2PForgeCertMgr {
-	return &MockP2PForgeCertMgr{
-		cache:        NewMockCache(),
-		onCertLoaded: onCertLoaded,
-		ProvideHost:  func(_ host.Host) error { return nil },
-	}
-}
-
-func (m *MockP2PForgeCertMgr) Start() error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if m.started {
-		return nil
-	}
-	m.started = true
-	if m.onCertLoaded != nil {
-		go func() {
-			m.onCertLoaded()
-		}()
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (m *MockP2PForgeCertMgr) Stop() {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if !m.started {
-		return
-	}
-	m.started = false
-	m.cache.Stop()
-}
+func (m *MockP2PForgeCertMgr) Start() error { _ = "STUB: not implemented"; return nil }
+
+func (m *MockP2PForgeCertMgr) Stop() { _ = "STUB: not implemented"; return }
 
 func (m *MockP2PForgeCertMgr) TLSConfig() *tls.Config {
+	_ = "STUB: not implemented"
 	// Use tls.X509KeyPair to create a certificate from the hardcoded strings
-	cert, err := tls.X509KeyPair(certPEM, keyPEM)
-	if err != nil {
-		// This should not fail if the strings are pasted correctly
-		return nil
-	}
-
-	return &tls.Config{Certificates: []tls.Certificate{cert}}
+	return nil
 }
 
-func (m *MockP2PForgeCertMgr) SetOnCertLoaded(cb func()) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.onCertLoaded = cb
-}
+// This should not fail if the strings are pasted correctly
+
+func (m *MockP2PForgeCertMgr) SetOnCertLoaded(cb func()) { _ = "STUB: not implemented"; return }
 
 func (m *MockP2PForgeCertMgr) AddressFactory() config.AddrsFactory {
-	return func(addrs []ma.Multiaddr) []ma.Multiaddr {
-		return addrs
-	}
+	_ = "STUB: not implemented"
+	return *new(config.AddrsFactory)
 }
 
-func (m *MockP2PForgeCertMgr) GetCache() *MockCache {
-	return m.cache
-}
+func (m *MockP2PForgeCertMgr) GetCache() *MockCache { _ = "STUB: not implemented"; return nil }

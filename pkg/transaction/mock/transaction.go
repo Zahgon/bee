@@ -5,10 +5,7 @@
 package mock
 
 import (
-	"bytes"
 	"context"
-	"errors"
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -30,140 +27,115 @@ type transactionServiceMock struct {
 }
 
 func (m *transactionServiceMock) Send(ctx context.Context, request *transaction.TxRequest, boostPercent int) (txHash common.Hash, err error) {
-	if m.send != nil {
-		return m.send(ctx, request, boostPercent)
-	}
-	return common.Hash{}, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (m *transactionServiceMock) WaitForReceipt(ctx context.Context, txHash common.Hash) (receipt *types.Receipt, err error) {
-	if m.waitForReceipt != nil {
-		return m.waitForReceipt(ctx, txHash)
-	}
-	return nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *transactionServiceMock) WatchSentTransaction(txHash common.Hash) (<-chan types.Receipt, <-chan error, error) {
-	if m.watchSentTransaction != nil {
-		return m.watchSentTransaction(txHash)
-	}
-	return nil, nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 func (m *transactionServiceMock) Call(ctx context.Context, request *transaction.TxRequest) (result []byte, err error) {
-	if m.call != nil {
-		return m.call(ctx, request)
-	}
-	return nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *transactionServiceMock) PendingTransactions() ([]common.Hash, error) {
-	if m.pendingTransactions != nil {
-		return m.pendingTransactions()
-	}
-	return nil, errors.New("not implemented")
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *transactionServiceMock) ResendTransaction(ctx context.Context, txHash common.Hash) error {
-	if m.resendTransaction != nil {
-		return m.resendTransaction(ctx, txHash)
-	}
-	return errors.New("not implemented")
-}
-
-func (m *transactionServiceMock) StoredTransaction(txHash common.Hash) (*transaction.StoredTransaction, error) {
-	if m.storedTransaction != nil {
-		return m.storedTransaction(txHash)
-	}
-	return nil, errors.New("not implemented")
-}
-
-func (m *transactionServiceMock) CancelTransaction(ctx context.Context, originalTxHash common.Hash) (common.Hash, error) {
-	if m.cancelTransaction != nil {
-		return m.cancelTransaction(ctx, originalTxHash)
-	}
-	return common.Hash{}, errors.New("not implemented")
-}
-
-func (m *transactionServiceMock) Close() error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
-// TransactionFee returns fee of transaction
+func (m *transactionServiceMock) StoredTransaction(txHash common.Hash) (*transaction.StoredTransaction, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
+}
+
+func (m *transactionServiceMock) CancelTransaction(ctx context.Context, originalTxHash common.Hash) (common.Hash, error) {
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
+}
+
+func (m *transactionServiceMock) Close() error {
+	_ = "STUB: not implemented"
+
+	// TransactionFee returns fee of transaction
+	return nil
+}
+
 func (m *transactionServiceMock) TransactionFee(ctx context.Context, txHash common.Hash) (*big.Int, error) {
-	if m.transactionFee != nil {
-		return m.transactionFee(ctx, txHash)
-	}
-	return big.NewInt(0), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (m *transactionServiceMock) UnwrapABIError(_ context.Context, _ *transaction.TxRequest, err error, _ map[string]abi.Error) error {
-	return err
+	_ = "STUB: not implemented"
+
+	// Option is the option passed to the mock Chequebook service
+	return nil
 }
 
-// Option is the option passed to the mock Chequebook service
 type Option interface {
 	apply(*transactionServiceMock)
 }
 
 type optionFunc func(*transactionServiceMock)
 
-func (f optionFunc) apply(r *transactionServiceMock) { f(r) }
+func (f optionFunc) apply(r *transactionServiceMock) { _ = "STUB: not implemented"; return }
 
 func WithSendFunc(f func(context.Context, *transaction.TxRequest, int) (txHash common.Hash, err error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.send = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithWaitForReceiptFunc(f func(ctx context.Context, txHash common.Hash) (receipt *types.Receipt, err error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.waitForReceipt = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithCallFunc(f func(ctx context.Context, request *transaction.TxRequest) (result []byte, err error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.call = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithStoredTransactionFunc(f func(txHash common.Hash) (*transaction.StoredTransaction, error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.storedTransaction = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPendingTransactionsFunc(f func() ([]common.Hash, error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.pendingTransactions = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithResendTransactionFunc(f func(ctx context.Context, txHash common.Hash) error) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.resendTransaction = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithCancelTransactionFunc(f func(ctx context.Context, originalTxHash common.Hash) (common.Hash, error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.cancelTransaction = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithTransactionFeeFunc(f func(ctx context.Context, txHash common.Hash) (*big.Int, error)) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.transactionFee = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func New(opts ...Option) transaction.Service {
-	mock := new(transactionServiceMock)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
+	_ = "STUB: not implemented"
+	return *new(transaction.Service)
 }
 
 type Call struct {
@@ -175,71 +147,18 @@ type Call struct {
 }
 
 func ABICall(abi *abi.ABI, to common.Address, result []byte, method string, params ...any) Call {
-	return Call{
-		to:     to,
-		abi:    abi,
-		result: result,
-		method: method,
-		params: params,
-	}
+	_ = "STUB: not implemented"
+	return *new(Call)
 }
 
-func WithABICallSequence(calls ...Call) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.call = func(ctx context.Context, request *transaction.TxRequest) ([]byte, error) {
-			if len(calls) == 0 {
-				return nil, errors.New("unexpected call")
-			}
-
-			call := calls[0]
-
-			data, err := call.abi.Pack(call.method, call.params...)
-			if err != nil {
-				return nil, err
-			}
-
-			if !bytes.Equal(data, request.Data) {
-				return nil, fmt.Errorf("wrong data. wanted %x, got %x", data, request.Data)
-			}
-
-			if request.To == nil {
-				return nil, errors.New("call with no recipient")
-			}
-			if *request.To != call.to {
-				return nil, fmt.Errorf("wrong recipient. wanted %x, got %x", call.to, *request.To)
-			}
-
-			calls = calls[1:]
-
-			return call.result, nil
-		}
-	})
-}
+func WithABICallSequence(calls ...Call) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 func WithABICall(abi *abi.ABI, to common.Address, result []byte, method string, params ...any) Option {
-	return WithABICallSequence(ABICall(abi, to, result, method, params...))
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithABISend(abi *abi.ABI, txHash common.Hash, expectedAddress common.Address, expectedValue *big.Int, method string, params ...any) Option {
-	return optionFunc(func(s *transactionServiceMock) {
-		s.send = func(ctx context.Context, request *transaction.TxRequest, boost int) (common.Hash, error) {
-			data, err := abi.Pack(method, params...)
-			if err != nil {
-				return common.Hash{}, err
-			}
-
-			if !bytes.Equal(data, request.Data) {
-				return common.Hash{}, fmt.Errorf("wrong data. wanted %x, got %x", data, request.Data)
-			}
-
-			if request.To != nil && *request.To != expectedAddress {
-				return common.Hash{}, fmt.Errorf("sending to wrong contract. wanted %x, got %x", expectedAddress, request.To)
-			}
-			if request.Value.Cmp(expectedValue) != 0 {
-				return common.Hash{}, fmt.Errorf("sending with wrong value. wanted %d, got %d", expectedValue, request.Value)
-			}
-
-			return txHash, nil
-		}
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

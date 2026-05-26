@@ -24,60 +24,16 @@ type ChunkPipe struct {
 }
 
 // Creates a new ChunkPipe
-func NewChunkPipe() io.ReadWriteCloser {
-	r, w := io.Pipe()
-	return &ChunkPipe{
-		ReadCloser: r,
-		writer:     w,
-		data:       make([]byte, maxBufferSize),
-	}
-}
+func NewChunkPipe() io.ReadWriteCloser { _ = "STUB: not implemented"; return *new(io.ReadWriteCloser) }
 
 // Read implements io.Reader
-func (c *ChunkPipe) Read(b []byte) (int, error) {
-	return c.ReadCloser.Read(b)
-}
+func (c *ChunkPipe) Read(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
 // Writer implements io.Writer
-func (c *ChunkPipe) Write(b []byte) (int, error) {
-	nw := 0
+func (c *ChunkPipe) Write(b []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-	for nw < len(b) {
-
-		copied := copy(c.data[c.cursor:], b[nw:])
-		c.cursor += copied
-		nw += copied
-
-		if c.cursor >= swarm.ChunkSize {
-			// NOTE: the Write method contract requires all sent data to be
-			// written before returning (without error)
-			written, err := c.writer.Write(c.data[:swarm.ChunkSize])
-			if err != nil {
-				return nw, err
-			}
-			if swarm.ChunkSize != written {
-				return nw, io.ErrShortWrite
-			}
-
-			c.cursor -= swarm.ChunkSize
-
-			copy(c.data, c.data[swarm.ChunkSize:])
-		}
-	}
-
-	return nw, nil
-}
+// NOTE: the Write method contract requires all sent data to be
+// written before returning (without error)
 
 // Close implements io.Closer
-func (c *ChunkPipe) Close() error {
-	if c.cursor > 0 {
-		written, err := c.writer.Write(c.data[:c.cursor])
-		if err != nil {
-			return err
-		}
-		if c.cursor != written {
-			return io.ErrShortWrite
-		}
-	}
-	return c.writer.Close()
-}
+func (c *ChunkPipe) Close() error { _ = "STUB: not implemented"; return nil }

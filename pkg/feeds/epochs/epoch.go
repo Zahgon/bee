@@ -7,10 +7,6 @@
 package epochs
 
 import (
-	"encoding/binary"
-	"fmt"
-
-	"github.com/ethersphere/bee/v2/pkg/crypto"
 	"github.com/ethersphere/bee/v2/pkg/feeds"
 )
 
@@ -27,78 +23,39 @@ type epoch struct {
 	level uint8
 }
 
-func (e *epoch) String() string {
-	return fmt.Sprintf("%d/%d", e.start, e.level)
-}
+func (e *epoch) String() string { _ = "STUB: not implemented"; return "" }
 
 // MarshalBinary implements the BinaryMarshaler interface
-func (e *epoch) MarshalBinary() ([]byte, error) {
-	epochBytes := make([]byte, 8, 9)
-	binary.BigEndian.PutUint64(epochBytes, e.start)
-	return crypto.LegacyKeccak256(append(epochBytes, e.level))
-}
+func (e *epoch) MarshalBinary() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 func next(e feeds.Index, last int64, at uint64) feeds.Index {
-	if e == nil {
-		return &epoch{0, maxLevel}
-	}
-	return e.Next(last, at)
+	_ = "STUB: not implemented"
+	return *new(feeds.Index)
 }
 
 // Next implements feeds.Index advancement
 func (e *epoch) Next(last int64, at uint64) feeds.Index {
-	if e.start+e.length() > at {
-		return e.childAt(at)
-	}
-	return lca(at, uint64(last)).childAt(at)
+	_ = "STUB: not implemented"
+	return *new(feeds.Index)
 }
 
 // lca calculates the lowest common ancestor epoch given two unix times
-func lca(at, after uint64) *epoch {
-	if after == 0 {
-		return &epoch{0, maxLevel}
-	}
-	diff := at - after
-	length := uint64(1)
-	var level uint8
-	for level < maxLevel && (length < diff || at/length != after/length) {
-		length <<= 1
-		level++
-	}
-	start := (after / length) * length
-	return &epoch{start, level}
-}
+func lca(at, after uint64) *epoch { _ = "STUB: not implemented"; return nil }
 
 // parent returns the ancestor of an epoch
 // the call is unsafe in that it must not be called on a toplevel epoch
-func (e *epoch) parent() *epoch {
-	length := e.length() << 1
-	start := (e.start / length) * length
-	return &epoch{start, e.level + 1}
-}
+func (e *epoch) parent() *epoch { _ = "STUB: not implemented"; return nil }
 
 // left returns the left sister of an epoch
 // it is unsafe in that it must not be called on a left sister epoch
-func (e *epoch) left() *epoch {
-	return &epoch{e.start - e.length(), e.level}
-}
+func (e *epoch) left() *epoch { _ = "STUB: not implemented"; return nil }
 
 // at returns the left of right child epoch of an epoch depending on where `at` falls
 // it is unsafe in that it must not be called with an at that does not fall within the epoch
-func (e *epoch) childAt(at uint64) *epoch {
-	e = &epoch{e.start, e.level - 1}
-	if at&e.length() > 0 {
-		e.start |= e.length()
-	}
-	return e
-}
+func (e *epoch) childAt(at uint64) *epoch { _ = "STUB: not implemented"; return nil }
 
 // isLeft returns true if epoch is a left sister of its parent
-func (e *epoch) isLeft() bool {
-	return e.start&e.length() == 0
-}
+func (e *epoch) isLeft() bool { _ = "STUB: not implemented"; return false }
 
 // length returns the span of the epoch
-func (e *epoch) length() uint64 {
-	return 1 << e.level
-}
+func (e *epoch) length() uint64 { _ = "STUB: not implemented"; return 0 }

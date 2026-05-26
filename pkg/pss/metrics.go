@@ -5,7 +5,6 @@
 package pss
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -14,25 +13,6 @@ type metrics struct {
 	MessageMiningDuration    prometheus.Gauge
 }
 
-func newMetrics() metrics {
-	subsystem := "pss"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		TotalMessagesSentCounter: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "total_message_sent",
-			Help:      "Total messages sent.",
-		}),
-		MessageMiningDuration: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "mining_duration",
-			Help:      "Time duration to mine a message.",
-		}),
-	}
-}
-
-func (s *pss) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(s.metrics)
-}
+func (s *pss) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

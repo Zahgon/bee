@@ -7,9 +7,7 @@ package bmt
 import (
 	"errors"
 
-	"github.com/ethersphere/bee/v2/pkg/bmtpool"
 	"github.com/ethersphere/bee/v2/pkg/file/pipeline"
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
 var errInvalidData = errors.New("bmt: invalid data")
@@ -21,30 +19,16 @@ type bmtWriter struct {
 // NewBmtWriter returns a new bmtWriter. Partial writes are not supported.
 // Note: branching factor is the BMT branching factor, not the merkle trie branching factor.
 func NewBmtWriter(next pipeline.ChainWriter) pipeline.ChainWriter {
-	return &bmtWriter{
-		next: next,
-	}
+	_ = "STUB: not implemented"
+	return *new(pipeline.ChainWriter)
 }
 
 // ChainWrite writes data in chain. It assumes span has been prepended to the data.
 // The span can be encrypted or unencrypted.
 func (w *bmtWriter) ChainWrite(p *pipeline.PipeWriteArgs) error {
-	if len(p.Data) < swarm.SpanSize {
-		return errInvalidData
-	}
-	hasher := bmtpool.Get()
-	hasher.SetHeader(p.Data[:swarm.SpanSize])
-	if _, err := hasher.Write(p.Data[swarm.SpanSize:]); err != nil {
-		bmtpool.Put(hasher)
-		return err
-	}
-	p.Ref = hasher.Sum(nil)
-	bmtpool.Put(hasher)
-
-	return w.next.ChainWrite(p)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // sum calls the next writer for the cryptographic sum
-func (w *bmtWriter) Sum() ([]byte, error) {
-	return w.next.Sum()
-}
+func (w *bmtWriter) Sum() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

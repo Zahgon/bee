@@ -8,9 +8,7 @@
 package stabilization
 
 import (
-	"errors"
 	"io"
-	"math"
 	"sync"
 	"time"
 
@@ -48,18 +46,7 @@ type Subscriber interface {
 // RateState represents the detected state of the event rate stabilization.
 type RateState int
 
-func (rs RateState) String() string {
-	switch rs {
-	case StateIdle:
-		return "Idle"
-	case StateMonitoring:
-		return "Monitoring"
-	case StateStabilized:
-		return "Stabilized"
-	default:
-		return "Unknown"
-	}
-}
+func (rs RateState) String() string { _ = "STUB: not implemented"; return "" }
 
 // Config holds the configuration parameters for the rate stabilization detector.
 type Config struct {
@@ -110,208 +97,45 @@ type Detector struct {
 }
 
 // NewDetector creates a new rate stabilization detector.
-func NewDetector(cfg Config) (*Detector, error) {
-	if cfg.PeriodDuration <= 0 {
-		return nil, errors.New("PeriodDuration must be positive")
-	}
+func NewDetector(cfg Config) (*Detector, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	if cfg.NumPeriodsForStabilization < 2 {
-		return nil, errors.New("NumPeriodsForStabilization must be at least 2")
-	}
-
-	if cfg.StabilizationFactor < 0.0 {
-		return nil, errors.New("StabilizationFactor must be non-negative")
-	}
-
-	if cfg.MinimumPeriods < 0 {
-		return nil, errors.New("MinimumPeriods must be non-negative")
-	}
-
-	clock := cfg.Clock
-	if clock == nil {
-		clock = SystemClock
-	}
-
-	// minimumPeriods is the total number of periods to wait before checking for stabilization.
-	minimumPeriods := cfg.MinimumPeriods + cfg.NumPeriodsForStabilization
-
-	return &Detector{
-		periodDuration:             cfg.PeriodDuration,
-		numPeriodsForStabilization: cfg.NumPeriodsForStabilization,
-		stabilizationFactor:        cfg.StabilizationFactor,
-		minimumPeriods:             minimumPeriods,
-		warmupTime:                 cfg.WarmupTime,
-		clock:                      clock,
-		currentState:               StateIdle,
-		trigger:                    feed.NewTrigger[int](),
-		periodCounts:               make([]int, 0, minimumPeriods),
-	}, nil
-}
+// minimumPeriods is the total number of periods to wait before checking for stabilization.
 
 // Record signals that an event has occurred. It updates the internal state
 // and may trigger state transitions or callbacks.
 // Returns the timestamp when the event was recorded.
 // If the state is already Stabilized, this function does nothing and returns zero time.
-func (d *Detector) Record() time.Time {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
+func (d *Detector) Record() time.Time { _ = "STUB: not implemented"; return *new(time.Time) }
 
-	if d.currentState == StateStabilized {
-		return time.Time{}
-	}
+// remove old periods
 
-	d.totalCount++
-	t := d.clock.Now()
-
-	switch d.currentState {
-	case StateIdle:
-		d.currentState = StateMonitoring
-		d.currentPeriodStartTime = t
-		d.currentPeriodCount = 1
-		if d.OnMonitoringStart != nil {
-			d.OnMonitoringStart(t)
-		}
-		d.startWarmupTimer(t)
-
-	case StateMonitoring:
-		for t.Sub(d.currentPeriodStartTime) >= d.periodDuration {
-			completedPeriodEndTime := d.currentPeriodStartTime.Add(d.periodDuration)
-
-			d.periodCounts = append(d.periodCounts, d.currentPeriodCount)
-			if len(d.periodCounts) > d.minimumPeriods {
-				// remove old periods
-				d.periodCounts = d.periodCounts[len(d.periodCounts)-d.minimumPeriods:]
-			}
-
-			isStable, stDev := d.checkStabilized()
-
-			if d.OnPeriodComplete != nil {
-				d.OnPeriodComplete(completedPeriodEndTime, d.currentPeriodCount, stDev)
-			}
-
-			d.currentPeriodCount = 0                          // reset the count for the next period
-			d.currentPeriodStartTime = completedPeriodEndTime // start of the next period
-
-			if isStable {
-				d.setStabilized(t)
-				return t
-			}
-		}
-		d.currentPeriodCount++
-	}
-
-	return t
-}
+// reset the count for the next period
+// start of the next period
 
 // State returns the current detected rate state.
-func (d *Detector) State() RateState {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-	return d.currentState
-}
+func (d *Detector) State() RateState { _ = "STUB: not implemented"; return *new(RateState) }
 
 // Subscribe returns a channel (c) signaling stabilization and a cancel function.
 // The channel notifies when stabilization is triggered (or immediately if already stable).
 // Calling cancel() when the subscription is no longer needed is recommended
 // to unsubscribe and release associated resources promptly.
 func (d *Detector) Subscribe() (c <-chan struct{}, cancel func()) {
-	return d.trigger.Subscribe(subscriptionTopic)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // IsStabilized returns true if the detector is currently in the StateStabilized.
-func (d *Detector) IsStabilized() bool {
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
-	return d.currentState == StateStabilized
-}
+func (d *Detector) IsStabilized() bool { _ = "STUB: not implemented"; return false }
 
 // Close stops the detector and releases any resources.
-func (d *Detector) Close() error {
-	if d == nil {
-		return nil
-	}
+func (d *Detector) Close() error { _ = "STUB: not implemented"; return nil }
 
-	d.mutex.Lock()
-	defer d.mutex.Unlock()
+func (d *Detector) startWarmupTimer(t time.Time) { _ = "STUB: not implemented"; return }
 
-	if d.warmupTimer != nil {
-		d.warmupTimer.Stop()
-		d.warmupTimer = nil
-	}
+func (d *Detector) setStabilized(t time.Time) { _ = "STUB: not implemented"; return }
 
-	d.currentState = StateIdle
-	d.totalCount = 0
-	d.currentPeriodCount = 0
-	d.currentPeriodStartTime = time.Time{}
-	d.periodCounts = d.periodCounts[:0]
+func (d *Detector) checkStabilized() (bool, float64) { _ = "STUB: not implemented"; return false, 0 }
 
-	return nil
-}
+func calculateStDev(relevantCounts []int) float64 { _ = "STUB: not implemented"; return 0 }
 
-func (d *Detector) startWarmupTimer(t time.Time) {
-	if d.warmupTimer != nil {
-		d.warmupTimer.Stop()
-	}
-
-	d.warmupTimer = time.AfterFunc(d.warmupTime, func() {
-		d.mutex.Lock()
-		defer d.mutex.Unlock()
-
-		if d.currentState == StateMonitoring {
-			d.setStabilized(t)
-		}
-	})
-}
-
-func (d *Detector) setStabilized(t time.Time) {
-	if d.warmupTimer != nil {
-		d.warmupTimer.Stop()
-		d.warmupTimer = nil
-	}
-
-	if d.currentState == StateMonitoring {
-		d.currentState = StateStabilized
-		if d.OnStabilized != nil {
-			d.OnStabilized(t, d.totalCount)
-		}
-		d.trigger.Trigger(subscriptionTopic)
-	}
-}
-
-func (d *Detector) checkStabilized() (bool, float64) {
-	if len(d.periodCounts) < d.minimumPeriods {
-		return false, math.NaN()
-	}
-
-	startIndex := len(d.periodCounts) - d.numPeriodsForStabilization
-	relevantCounts := d.periodCounts[startIndex:]
-	stDev := calculateStDev(relevantCounts)
-
-	isStabilized := !math.IsNaN(stDev) && stDev < d.stabilizationFactor
-
-	return isStabilized, stDev
-}
-
-func calculateStDev(relevantCounts []int) float64 {
-	n := len(relevantCounts)
-	if n < 2 {
-		return math.NaN()
-	}
-
-	var sum float64
-	for _, count := range relevantCounts {
-		sum += float64(count)
-	}
-	mean := sum / float64(n)
-
-	sumSquaredDiff := 0.0
-	for _, count := range relevantCounts {
-		diff := float64(count) - mean
-		sumSquaredDiff += diff * diff
-	}
-
-	// sample variance
-	variance := sumSquaredDiff / float64(n-1)
-
-	return math.Sqrt(variance)
-}
+// sample variance

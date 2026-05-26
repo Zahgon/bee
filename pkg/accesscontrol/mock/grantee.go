@@ -21,35 +21,21 @@ type GranteeListStructMock struct {
 	grantees []*ecdsa.PublicKey
 }
 
-func (g *GranteeListStructMock) Get() []*ecdsa.PublicKey {
-	grantees := g.grantees
-	keys := make([]*ecdsa.PublicKey, len(grantees))
-	copy(keys, grantees)
-	return keys
-}
+func (g *GranteeListStructMock) Get() []*ecdsa.PublicKey { _ = "STUB: not implemented"; return nil }
 
 func (g *GranteeListStructMock) Add(addList []*ecdsa.PublicKey) error {
-	g.grantees = append(g.grantees, addList...)
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (g *GranteeListStructMock) Remove(removeList []*ecdsa.PublicKey) error {
-	for _, remove := range removeList {
-		for i, grantee := range g.grantees {
-			if *grantee == *remove {
-				g.grantees[i] = g.grantees[len(g.grantees)-1]
-				g.grantees = g.grantees[:len(g.grantees)-1]
-			}
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (g *GranteeListStructMock) Save() (swarm.Address, error) {
-	return swarm.EmptyAddress, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
-func NewGranteeList() *GranteeListStructMock {
-	return &GranteeListStructMock{grantees: []*ecdsa.PublicKey{}}
-}
+func NewGranteeList() *GranteeListStructMock { _ = "STUB: not implemented"; return nil }

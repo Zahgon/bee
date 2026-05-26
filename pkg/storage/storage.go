@@ -10,9 +10,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ethersphere/bee/v2/pkg/cac"
 	"github.com/ethersphere/bee/v2/pkg/sharky"
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -108,12 +106,7 @@ type Query struct {
 }
 
 // Validate checks if the query is a valid query.
-func (q Query) Validate() error {
-	if q.ItemProperty == QueryItem && q.Factory == nil {
-		return fmt.Errorf("missing Factory: %w", ErrInvalidQuery)
-	}
-	return nil
-}
+func (q Query) Validate() error { _ = "STUB: not implemented"; return nil }
 
 // Key represents the item identifiers.
 type Key interface {
@@ -226,12 +219,7 @@ type Descriptor struct {
 	BinID   uint64
 }
 
-func (d *Descriptor) String() string {
-	if d == nil {
-		return ""
-	}
-	return fmt.Sprintf("%s bin id %v", d.Address, d.BinID)
-}
+func (d *Descriptor) String() string { _ = "STUB: not implemented"; return "" }
 
 type PullSubscriber interface {
 	SubscribePull(ctx context.Context, bin uint8, since, until uint64) (c <-chan Descriptor, closed <-chan struct{}, stop func())
@@ -287,12 +275,8 @@ type Batcher interface {
 }
 
 func ChunkType(ch swarm.Chunk) swarm.ChunkType {
-	if cac.Valid(ch) {
-		return swarm.ChunkTypeContentAddressed
-	} else if soc.Valid(ch) {
-		return swarm.ChunkTypeSingleOwner
-	}
-	return swarm.ChunkTypeUnspecified
+	_ = "STUB: not implemented"
+	return *new(swarm.ChunkType)
 }
 
 // IdentityAddress returns the internally used address for the chunk
@@ -300,28 +284,8 @@ func ChunkType(ch swarm.Chunk) swarm.ChunkType {
 // but hashing the soc address and the wrapped chunk address is.
 // it is used in the reserve sampling and other places where a key is needed to represent a chunk.
 func IdentityAddress(chunk swarm.Chunk) (swarm.Address, error) {
-	if cac.Valid(chunk) {
-		return chunk.Address(), nil
-	}
-
-	// check the chunk is single owner chunk or cac
-	if sch, err := soc.FromChunk(chunk); err == nil {
-		socAddress, err := sch.Address()
-		if err != nil {
-			return swarm.ZeroAddress, err
-		}
-		h := swarm.NewHasher()
-		_, err = h.Write(socAddress.Bytes())
-		if err != nil {
-			return swarm.ZeroAddress, err
-		}
-		_, err = h.Write(sch.WrappedChunk().Address().Bytes())
-		if err != nil {
-			return swarm.ZeroAddress, err
-		}
-
-		return swarm.NewAddress(h.Sum(nil)), nil
-	}
-
-	return swarm.ZeroAddress, fmt.Errorf("identity address failed on chunk %s: %w", chunk, ErrUnknownChunkType)
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
+
+// check the chunk is single owner chunk or cac

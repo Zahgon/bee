@@ -5,20 +5,10 @@
 package leveldb
 
 import (
-	"encoding"
-	"encoding/json"
-	"errors"
-	"fmt"
-
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/storage"
 
-	ldberr "github.com/syndtr/goleveldb/leveldb/errors"
-
 	"github.com/syndtr/goleveldb/leveldb"
-	ldbs "github.com/syndtr/goleveldb/leveldb/storage"
-
-	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
 // loggerName is the tree path name of the logger for this package.
@@ -33,101 +23,33 @@ type Store struct {
 }
 
 func NewInMemoryStateStore(l log.Logger) (*Store, error) {
-	ldb, err := leveldb.Open(ldbs.NewMemStorage(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	s := &Store{
-		db:     ldb,
-		logger: l.WithName(loggerName).Register(),
-	}
-
-	return s, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // NewStateStore creates a new persistent state storage.
 func NewStateStore(path string, l log.Logger) (*Store, error) {
-	l = l.WithName(loggerName).Register()
-
-	db, err := leveldb.OpenFile(path, nil)
-	if err != nil {
-		if !ldberr.IsCorrupted(err) {
-			return nil, err
-		}
-
-		l.Warning("statestore open failed, attempting recovery", "error", err)
-		db, err = leveldb.RecoverFile(path, nil)
-		if err != nil {
-			return nil, fmt.Errorf("statestore recovery: %w", err)
-		}
-		l.Warning("statestore recovery done; you are kindly request to inform us about the steps that preceded the last bee shutdown")
-	}
-
-	s := &Store{
-		db:     db,
-		logger: l,
-	}
-
-	return s, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Get retrieves a value of the requested key. If no results are found,
 // storage.ErrNotFound will be returned.
-func (s *Store) Get(key string, i any) error {
-	data, err := s.db.Get([]byte(key), nil)
-	if err != nil {
-		if errors.Is(err, leveldb.ErrNotFound) {
-			return storage.ErrNotFound
-		}
-		return err
-	}
-
-	if unmarshaler, ok := i.(encoding.BinaryUnmarshaler); ok {
-		return unmarshaler.UnmarshalBinary(data)
-	}
-
-	return json.Unmarshal(data, i)
-}
+func (s *Store) Get(key string, i any) error { _ = "STUB: not implemented"; return nil }
 
 // Put stores a value for an arbitrary key. BinaryMarshaler
 // interface method will be called on the provided value
 // with fallback to JSON serialization.
-func (s *Store) Put(key string, i any) (err error) {
-	var bytes []byte
-	if marshaler, ok := i.(encoding.BinaryMarshaler); ok {
-		if bytes, err = marshaler.MarshalBinary(); err != nil {
-			return err
-		}
-	} else if bytes, err = json.Marshal(i); err != nil {
-		return err
-	}
-
-	return s.db.Put([]byte(key), bytes, nil)
-}
+func (s *Store) Put(key string, i any) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Delete removes entries stored under a specific key.
-func (s *Store) Delete(key string) (err error) {
-	return s.db.Delete([]byte(key), nil)
-}
+func (s *Store) Delete(key string) (err error) { _ = "STUB: not implemented"; return nil }
 
 // Iterate entries that match the supplied prefix.
 func (s *Store) Iterate(prefix string, iterFunc storage.StateIterFunc) (err error) {
-	iter := s.db.NewIterator(util.BytesPrefix([]byte(prefix)), nil)
-	defer iter.Release()
-	for iter.Next() {
-		stop, err := iterFunc(append([]byte(nil), iter.Key()...), append([]byte(nil), iter.Value()...))
-		if err != nil {
-			return err
-		}
-		if stop {
-			break
-		}
-	}
-	return iter.Error()
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Close releases the resources used by the store.
-func (s *Store) Close() error {
-	return s.db.Close()
-}
+func (s *Store) Close() error { _ = "STUB: not implemented"; return nil }

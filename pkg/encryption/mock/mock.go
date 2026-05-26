@@ -28,104 +28,53 @@ type Encryptor struct {
 }
 
 // New returns a new Encryptor configured with provided options.
-func New(opts ...Option) *Encryptor {
-	e := new(Encryptor)
-	for _, o := range opts {
-		o(e)
-	}
-	return e
-}
+func New(opts ...Option) *Encryptor { _ = "STUB: not implemented"; return nil }
 
 // Key has only bogus
-func (e *Encryptor) Key() encryption.Key {
-	if e.keyFunc == nil {
-		return nil
-	}
-	return e.keyFunc()
-}
+func (e *Encryptor) Key() encryption.Key { _ = "STUB: not implemented"; return *new(encryption.Key) }
 
 // Encrypt calls the configured encrypt function, or returns ErrNotImplemented
 // if it is not set.
 func (e *Encryptor) Encrypt(data []byte) ([]byte, error) {
-	if e.encryptFunc == nil {
-		return nil, ErrNotImplemented
-	}
-	return e.encryptFunc(data)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Decrypt calls the configured decrypt function, or returns ErrNotImplemented
 // if it is not set.
 func (e *Encryptor) Decrypt(data []byte) ([]byte, error) {
-	if e.decryptFunc == nil {
-		return nil, ErrNotImplemented
-	}
-	return e.decryptFunc(data)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Reset calls the configured reset function, if it is set.
-func (e *Encryptor) Reset() {
-	if e.resetFunc == nil {
-		return
-	}
-	e.resetFunc()
-}
+func (e *Encryptor) Reset() { _ = "STUB: not implemented"; return }
 
 // Option represents configures the Encryptor instance.
 type Option func(*Encryptor)
 
 // WithEncryptFunc sets the Encryptor Encrypt function.
 func WithEncryptFunc(f func([]byte) ([]byte, error)) Option {
-	return func(e *Encryptor) {
-		e.encryptFunc = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithDecryptFunc sets the Encryptor Decrypt function.
 func WithDecryptFunc(f func([]byte) ([]byte, error)) Option {
-	return func(e *Encryptor) {
-		e.decryptFunc = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithResetFunc sets the Encryptor Reset function.
-func WithResetFunc(f func()) Option {
-	return func(e *Encryptor) {
-		e.resetFunc = f
-	}
-}
+func WithResetFunc(f func()) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithKeyFunc sets the Encryptor Key function.
-func WithKeyFunc(f func() encryption.Key) Option {
-	return func(e *Encryptor) {
-		e.keyFunc = f
-	}
-}
+func WithKeyFunc(f func() encryption.Key) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 // WithXOREncryption sets Encryptor Encrypt and Decrypt functions with XOR
 // encryption function that uses the provided key for encryption.
-func WithXOREncryption(key []byte) Option {
-	f := newXORFunc(key)
-	return func(e *Encryptor) {
-		e.encryptFunc = f
-		e.decryptFunc = f
-	}
-}
+func WithXOREncryption(key []byte) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func newXORFunc(key []byte) func([]byte) ([]byte, error) {
-	return func(data []byte) ([]byte, error) {
-		return xor(data, key)
-	}
-}
+func newXORFunc(key []byte) func([]byte) ([]byte, error) { _ = "STUB: not implemented"; return nil }
 
-func xor(input, key []byte) ([]byte, error) {
-	keyLen := len(key)
-	if keyLen == 0 {
-		return nil, ErrInvalidXORKey
-	}
-	inputLen := len(input)
-	output := make([]byte, inputLen)
-	for i := range inputLen {
-		output[i] = input[i] ^ key[i%keyLen]
-	}
-	return output, nil
-}
+func xor(input, key []byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }

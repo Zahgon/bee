@@ -12,15 +12,6 @@ import (
 // WaitWithTimeout waits for the waitgroup to finish for the given timeout.
 // It returns true if the waitgroup finished before the timeout, false otherwise.
 func WaitWithTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
-	c := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(c)
-	}()
-	select {
-	case <-c:
-		return true
-	case <-time.After(timeout):
-		return false
-	}
+	_ = "STUB: not implemented"
+	return false
 }

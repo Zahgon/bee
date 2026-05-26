@@ -16,23 +16,14 @@ type MockChainWriter struct {
 	sumCalls        int
 }
 
-func NewChainWriter() *MockChainWriter {
-	return &MockChainWriter{}
-}
+func NewChainWriter() *MockChainWriter { _ = "STUB: not implemented"; return nil }
 
 func (c *MockChainWriter) ChainWrite(_ *pipeline.PipeWriteArgs) error {
-	c.Lock()
-	defer c.Unlock()
-	c.chainWriteCalls++
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (c *MockChainWriter) Sum() ([]byte, error) {
-	c.Lock()
-	defer c.Unlock()
-	c.sumCalls++
-	return nil, nil
-}
+func (c *MockChainWriter) Sum() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (c *MockChainWriter) ChainWriteCalls() int { c.Lock(); defer c.Unlock(); return c.chainWriteCalls }
-func (c *MockChainWriter) SumCalls() int        { c.Lock(); defer c.Unlock(); return c.sumCalls }
+func (c *MockChainWriter) ChainWriteCalls() int { _ = "STUB: not implemented"; return 0 }
+func (c *MockChainWriter) SumCalls() int        { _ = "STUB: not implemented"; return 0 }

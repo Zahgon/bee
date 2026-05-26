@@ -20,34 +20,16 @@ type DelayedStore struct {
 	mu    sync.Mutex
 }
 
-func NewDelayedStore(s storage.ChunkStore) *DelayedStore {
-	return &DelayedStore{
-		ChunkStore: s,
-		cache:      make(map[string]time.Duration),
-	}
-}
+func NewDelayedStore(s storage.ChunkStore) *DelayedStore { _ = "STUB: not implemented"; return nil }
 
 func (d *DelayedStore) Delay(addr swarm.Address, delay time.Duration) {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	d.cache[addr.String()] = delay
+	_ = "STUB: not implemented"
+	return
 }
 
 func (d *DelayedStore) Get(ctx context.Context, addr swarm.Address) (ch swarm.Chunk, err error) {
-	d.mu.Lock()
-	delay, ok := d.cache[addr.String()]
-	if ok && delay > 0 {
-		delete(d.cache, addr.String())
-		d.mu.Unlock()
-		select {
-		case <-time.After(delay):
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		}
-	} else {
-		d.mu.Unlock()
-	}
-	return d.ChunkStore.Get(ctx, addr)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 type ForgettingStore struct {
@@ -59,81 +41,40 @@ type ForgettingStore struct {
 }
 
 func NewForgettingStore(s storage.ChunkStore) *ForgettingStore {
-	return &ForgettingStore{ChunkStore: s, missed: make(map[string]struct{})}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (f *ForgettingStore) Stored() int64 {
-	return f.n.Load()
-}
+func (f *ForgettingStore) Stored() int64 { _ = "STUB: not implemented"; return 0 }
 
-func (f *ForgettingStore) Record() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.record.Store(true)
-}
+func (f *ForgettingStore) Record() { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) Unrecord() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.record.Store(false)
-}
+func (f *ForgettingStore) Unrecord() { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) Miss(addr swarm.Address) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.miss(addr)
-}
+func (f *ForgettingStore) Miss(addr swarm.Address) { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) Unmiss(addr swarm.Address) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.unmiss(addr)
-}
+func (f *ForgettingStore) Unmiss(addr swarm.Address) { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) miss(addr swarm.Address) {
-	f.missed[addr.String()] = struct{}{}
-}
+func (f *ForgettingStore) miss(addr swarm.Address) { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) unmiss(addr swarm.Address) {
-	delete(f.missed, addr.String())
-}
+func (f *ForgettingStore) unmiss(addr swarm.Address) { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) isMiss(addr swarm.Address) bool {
-	_, ok := f.missed[addr.String()]
-	return ok
-}
+func (f *ForgettingStore) isMiss(addr swarm.Address) bool { _ = "STUB: not implemented"; return false }
 
-func (f *ForgettingStore) Reset() {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.missed = make(map[string]struct{})
-}
+func (f *ForgettingStore) Reset() { _ = "STUB: not implemented"; return }
 
-func (f *ForgettingStore) Missed() int {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	return len(f.missed)
-}
+func (f *ForgettingStore) Missed() int { _ = "STUB: not implemented"; return 0 }
 
 // Get implements the ChunkStore interface.
 // if in recording phase, record the chunk address as miss and returns Get on the embedded store
 // if in forgetting phase, returns ErrNotFound if the chunk address is recorded as miss
 func (f *ForgettingStore) Get(ctx context.Context, addr swarm.Address) (ch swarm.Chunk, err error) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if f.record.Load() {
-		f.miss(addr)
-	} else if f.isMiss(addr) {
-		return nil, storage.ErrNotFound
-	}
-	return f.ChunkStore.Get(ctx, addr)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // Put implements the ChunkStore interface.
 func (f *ForgettingStore) Put(ctx context.Context, ch swarm.Chunk) (err error) {
-	f.n.Add(1)
-	if !f.record.Load() {
-		f.Unmiss(ch.Address())
-	}
-	return f.ChunkStore.Put(ctx, ch)
+	_ = "STUB: not implemented"
+	return nil
 }

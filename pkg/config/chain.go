@@ -73,18 +73,6 @@ var (
 )
 
 func GetByChainID(chainID int64) (ChainConfig, bool) {
-	switch chainID {
-	case Testnet.ChainID:
-		return Testnet, true
-	case Mainnet.ChainID:
-		return Mainnet, true
-	default:
-		return ChainConfig{
-			NativeTokenSymbol: Testnet.NativeTokenSymbol,
-			SwarmTokenSymbol:  Testnet.SwarmTokenSymbol,
-			StakingABI:        abi.TestnetStakingABI,
-			PostageStampABI:   abi.TestnetPostageStampABI,
-			RedistributionABI: abi.TestnetRedistributionABI,
-		}, false
-	}
+	_ = "STUB: not implemented"
+	return *new(ChainConfig), false
 }

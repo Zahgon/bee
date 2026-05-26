@@ -21,72 +21,37 @@ var ErrTimeout = errors.New("timeout")
 type Message = proto.Message
 
 func NewWriterAndReader(s p2p.Stream) (Writer, Reader) {
-	return NewWriter(s), NewReader(s)
+	_ = "STUB: not implemented"
+	return *new(Writer), *new(Reader)
 }
 
-func NewReader(r io.Reader) Reader {
-	return newReader(ggio.NewDelimitedReader(r, delimitedReaderMaxSize))
-}
+func NewReader(r io.Reader) Reader { _ = "STUB: not implemented"; return *new(Reader) }
 
-func NewWriter(w io.Writer) Writer {
-	return newWriter(ggio.NewDelimitedWriter(w))
-}
+func NewWriter(w io.Writer) Writer { _ = "STUB: not implemented"; return *new(Writer) }
 
 func ReadMessages(r io.Reader, newMessage func() Message) (m []Message, err error) {
-	pr := NewReader(r)
-	for {
-		msg := newMessage()
-		if err := pr.ReadMsg(msg); err != nil {
-			if errors.Is(err, io.EOF) {
-				break
-			}
-			return nil, err
-		}
-		m = append(m, msg)
-	}
-	return m, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 type Reader struct {
 	ggio.Reader
 }
 
-func newReader(r ggio.Reader) Reader {
-	return Reader{Reader: r}
-}
+func newReader(r ggio.Reader) Reader { _ = "STUB: not implemented"; return *new(Reader) }
 
 func (r Reader) ReadMsgWithContext(ctx context.Context, msg proto.Message) error {
-	errChan := make(chan error, 1)
-	go func() {
-		errChan <- r.ReadMsg(msg)
-	}()
-
-	select {
-	case err := <-errChan:
-		return err
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type Writer struct {
 	ggio.Writer
 }
 
-func newWriter(r ggio.Writer) Writer {
-	return Writer{Writer: r}
-}
+func newWriter(r ggio.Writer) Writer { _ = "STUB: not implemented"; return *new(Writer) }
 
 func (w Writer) WriteMsgWithContext(ctx context.Context, msg proto.Message) error {
-	errChan := make(chan error, 1)
-	go func() {
-		errChan <- w.WriteMsg(msg)
-	}()
-
-	select {
-	case err := <-errChan:
-		return err
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	_ = "STUB: not implemented"
+	return nil
 }

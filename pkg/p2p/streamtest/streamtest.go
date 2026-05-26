@@ -7,13 +7,11 @@ package streamtest
 import (
 	"context"
 	"errors"
-	"io"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/p2p"
-	"github.com/ethersphere/bee/v2/pkg/spinlock"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 	ma "github.com/multiformats/go-multiaddr"
 )
@@ -42,192 +40,80 @@ type Recorder struct {
 }
 
 func WithProtocols(protocols ...p2p.ProtocolSpec) Option {
-	return optionFunc(func(r *Recorder) {
-		r.protocols = append(r.protocols, protocols...)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPeerProtocols(protocolsWithPeers map[string]p2p.ProtocolSpec) Option {
-	return optionFunc(func(r *Recorder) {
-		r.protocolsWithPeers = protocolsWithPeers
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithMiddlewares(middlewares ...p2p.HandlerMiddleware) Option {
-	return optionFunc(func(r *Recorder) {
-		r.middlewares = append(r.middlewares, middlewares...)
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
-func WithBaseAddr(a swarm.Address) Option {
-	return optionFunc(func(r *Recorder) {
-		r.base = a
-	})
-}
+func WithBaseAddr(a swarm.Address) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func WithLightNode() Option {
-	return optionFunc(func(r *Recorder) {
-		r.fullNode = false
-	})
-}
+func WithLightNode() Option { _ = "STUB: not implemented"; return *new(Option) }
 
 func WithStreamError(streamErr func(swarm.Address, string, string, string) error) Option {
-	return optionFunc(func(r *Recorder) {
-		r.streamErr = streamErr
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPingErr(pingErr func(ma.Multiaddr) (time.Duration, error)) Option {
-	return optionFunc(func(r *Recorder) {
-		r.pingErr = pingErr
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithMessageLatency(latency time.Duration) Option {
-	return optionFunc(func(r *Recorder) {
-		r.messageLatency = latency
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
-func New(opts ...Option) *Recorder {
-	r := &Recorder{
-		records:  make(map[string][]*Record),
-		fullNode: true,
-	}
+func New(opts ...Option) *Recorder { _ = "STUB: not implemented"; return nil }
 
-	r.middlewares = append(r.middlewares, noopMiddleware)
+func (r *Recorder) Reset() { _ = "STUB: not implemented"; return }
 
-	for _, o := range opts {
-		o.apply(r)
-	}
-	return r
-}
-
-func (r *Recorder) Reset() {
-	r.recordsMu.Lock()
-	defer r.recordsMu.Unlock()
-
-	r.records = make(map[string][]*Record)
-}
-
-func (r *Recorder) SetProtocols(protocols ...p2p.ProtocolSpec) {
-	r.protocols = append(r.protocols, protocols...)
-}
+func (r *Recorder) SetProtocols(protocols ...p2p.ProtocolSpec) { _ = "STUB: not implemented"; return }
 
 func (r *Recorder) NewStream(ctx context.Context, addr swarm.Address, h p2p.Headers, protocolName, protocolVersion, streamName string) (p2p.Stream, error) {
-	if r.streamErr != nil {
-		err := r.streamErr(addr, protocolName, protocolVersion, streamName)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	recordIn := newRecord(r.messageLatency)
-	recordOut := newRecord(r.messageLatency)
-	streamOut := newStream(recordIn, recordOut)
-	streamIn := newStream(recordOut, recordIn)
-
-	var handler p2p.HandlerFunc
-	var headler p2p.HeadlerFunc
-	peerHandlers, ok := r.protocolsWithPeers[addr.String()]
-	if !ok {
-		for _, p := range r.protocols {
-			if p.Name == protocolName && p.Version == protocolVersion {
-				peerHandlers = p
-			}
-		}
-	}
-	for _, s := range peerHandlers.StreamSpecs {
-		if s.Name == streamName {
-			handler = s.Handler
-			headler = s.Headler
-		}
-	}
-	if handler == nil {
-		return nil, ErrStreamNotSupported
-	}
-	for i := len(r.middlewares) - 1; i >= 0; i-- {
-		handler = r.middlewares[i](handler)
-	}
-	if headler != nil {
-		streamOut.headers = headler(h, addr)
-	}
-	record := &Record{in: recordIn, out: recordOut, done: make(chan struct{})}
-	go func() {
-		defer close(record.done)
-
-		// pass a new context to handler,
-		streamIn.responseHeaders = streamOut.headers
-		// do not cancel it with the client stream context
-		err := handler(context.Background(), p2p.Peer{Address: r.base, FullNode: r.fullNode}, streamIn)
-		if err != nil && !errors.Is(err, io.EOF) {
-			record.setErr(err)
-		}
-	}()
-
-	id := addr.String() + p2p.NewSwarmStreamName(protocolName, protocolVersion, streamName)
-
-	r.recordsMu.Lock()
-	defer r.recordsMu.Unlock()
-
-	r.records[id] = append(r.records[id], record)
-	return streamOut, nil
+	_ = "STUB: not implemented"
+	return *new(p2p.Stream), nil
 }
 
+// pass a new context to handler,
+
+// do not cancel it with the client stream context
+
 func (r *Recorder) Ping(ctx context.Context, addr ma.Multiaddr) (rtt time.Duration, err error) {
-	if r.pingErr != nil {
-		return r.pingErr(addr)
-	}
-	return rtt, err
+	_ = "STUB: not implemented"
+	return *new(time.Duration), nil
 }
 
 func (r *Recorder) Records(addr swarm.Address, protocolName, protocolVersio, streamName string) ([]*Record, error) {
-	id := addr.String() + p2p.NewSwarmStreamName(protocolName, protocolVersio, streamName)
-
-	r.recordsMu.Lock()
-	defer r.recordsMu.Unlock()
-
-	records, ok := r.records[id]
-	if !ok {
-		return nil, ErrRecordsNotFound
-	}
-	// wait for all records goroutines to terminate
-	for _, r := range records {
-		<-r.done
-	}
-	return records, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// wait for all records goroutines to terminate
 
 // WaitRecords waits for some time for records to come into the recorder. If msgs is 0, the timeoutSec period is waited to verify
 // that _no_ messages arrive during this time period.
 func (r *Recorder) WaitRecords(t *testing.T, addr swarm.Address, proto, version, stream string, msgs, timeoutSec int) []*Record {
-	t.Helper()
-
-	var recs []*Record
-	err := spinlock.Wait(time.Second*time.Duration(timeoutSec), func() bool {
-		recs, _ = r.Records(addr, proto, version, stream)
-		if l := len(recs); l > msgs {
-			t.Fatalf("too many records. want %d got %d", msgs, l)
-		} else if msgs > 0 && l == msgs {
-			return true
-		}
-		return false
-		// we can be here if msgs == 0 && l == 0
-		// or msgs = x && l < x, both cases are fine
-		// and we should continue waiting
-	})
-	if err != nil && msgs > 0 {
-		t.Fatal("timed out while waiting for records")
-	}
-
-	return recs
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// we can be here if msgs == 0 && l == 0
+// or msgs = x && l < x, both cases are fine
+// and we should continue waiting
 
 // IsBee260 implements p2p.Bee260CompatibilityStreamer interface.
 // It always returns false.
-func (r *Recorder) IsBee260(overlay swarm.Address) bool {
-	return false
-}
+func (r *Recorder) IsBee260(overlay swarm.Address) bool { _ = "STUB: not implemented"; return false }
 
 type Record struct {
 	in    *record
@@ -237,27 +123,13 @@ type Record struct {
 	done  chan struct{}
 }
 
-func (r *Record) In() []byte {
-	return r.in.bytes()
-}
+func (r *Record) In() []byte { _ = "STUB: not implemented"; return nil }
 
-func (r *Record) Out() []byte {
-	return r.out.bytes()
-}
+func (r *Record) Out() []byte { _ = "STUB: not implemented"; return nil }
 
-func (r *Record) Err() error {
-	r.errMu.Lock()
-	defer r.errMu.Unlock()
+func (r *Record) Err() error { _ = "STUB: not implemented"; return nil }
 
-	return r.err
-}
-
-func (r *Record) setErr(err error) {
-	r.errMu.Lock()
-	defer r.errMu.Unlock()
-
-	r.err = err
-}
+func (r *Record) setErr(err error) { _ = "STUB: not implemented"; return }
 
 type stream struct {
 	in              *record
@@ -268,73 +140,23 @@ type stream struct {
 	lock            sync.Mutex
 }
 
-func newStream(in, out *record) *stream {
-	return &stream{in: in, out: out}
-}
+func newStream(in, out *record) *stream { _ = "STUB: not implemented"; return nil }
 
-func (s *stream) Read(p []byte) (int, error) {
-	if s.Closed() {
-		return 0, ErrStreamClosed
-	}
+func (s *stream) Read(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-	return s.out.Read(p)
-}
+func (s *stream) Write(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-func (s *stream) Write(p []byte) (int, error) {
-	if s.Closed() {
-		return 0, ErrStreamClosed
-	}
+func (s *stream) Headers() p2p.Headers { _ = "STUB: not implemented"; return *new(p2p.Headers) }
 
-	return s.in.Write(p)
-}
+func (s *stream) ResponseHeaders() p2p.Headers { _ = "STUB: not implemented"; return *new(p2p.Headers) }
 
-func (s *stream) Headers() p2p.Headers {
-	return s.headers
-}
+func (s *stream) Close() error { _ = "STUB: not implemented"; return nil }
 
-func (s *stream) ResponseHeaders() p2p.Headers {
-	return s.responseHeaders
-}
+func (s *stream) Closed() bool { _ = "STUB: not implemented"; return false }
 
-func (s *stream) Close() error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+func (s *stream) FullClose() error { _ = "STUB: not implemented"; return nil }
 
-	if s.closed {
-		return ErrStreamClosed
-	}
-
-	s.closed = true
-	s.in.close()
-
-	return nil
-}
-
-func (s *stream) Closed() bool {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	return s.closed
-}
-
-func (s *stream) FullClose() error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	if s.closed {
-		return ErrStreamClosed
-	}
-
-	s.closed = true
-	s.in.close()
-	s.out.close()
-
-	return nil
-}
-
-func (s *stream) Reset() (err error) {
-	return s.FullClose()
-}
+func (s *stream) Reset() (err error) { _ = "STUB: not implemented"; return nil }
 
 type record struct {
 	b        []byte
@@ -345,81 +167,24 @@ type record struct {
 	closed   bool
 }
 
-func newRecord(latency time.Duration) *record {
-	return &record{
-		dataSigC: make(chan struct{}, 16),
-		latency:  latency,
-	}
-}
+func newRecord(latency time.Duration) *record { _ = "STUB: not implemented"; return nil }
 
-func (r *record) Read(p []byte) (n int, err error) {
-	defer time.Sleep(r.latency)
+func (r *record) Read(p []byte) (n int, err error) { _ = "STUB: not implemented"; return 0, nil }
 
-	for r.c == r.bytesSize() {
-		_, ok := <-r.dataSigC
-		if !ok {
-			return 0, io.EOF
-		}
-	}
+func (r *record) Write(p []byte) (int, error) { _ = "STUB: not implemented"; return 0, nil }
 
-	r.lock.Lock()
-	defer r.lock.Unlock()
+func (r *record) close() { _ = "STUB: not implemented"; return }
 
-	end := min(r.c+len(p), len(r.b))
-	n = copy(p, r.b[r.c:end])
-	r.c += n
+func (r *record) bytes() []byte { _ = "STUB: not implemented"; return nil }
 
-	return n, nil
-}
-
-func (r *record) Write(p []byte) (int, error) {
-	defer time.Sleep(r.latency)
-
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	if r.closed {
-		return 0, ErrStreamClosed
-	}
-
-	r.b = append(r.b, p...)
-	r.dataSigC <- struct{}{}
-
-	return len(p), nil
-}
-
-func (r *record) close() {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-
-	if r.closed {
-		return
-	}
-
-	r.closed = true
-	close(r.dataSigC)
-}
-
-func (r *record) bytes() []byte {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	cp := make([]byte, len(r.b))
-	copy(cp, r.b)
-	return cp
-}
-
-func (r *record) bytesSize() int {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	return len(r.b)
-}
+func (r *record) bytesSize() int { _ = "STUB: not implemented"; return 0 }
 
 type Option interface {
 	apply(*Recorder)
 }
 type optionFunc func(*Recorder)
 
-func (f optionFunc) apply(r *Recorder) { f(r) }
+func (f optionFunc) apply(r *Recorder) { _ = "STUB: not implemented"; return }
 
 var _ p2p.StreamerDisconnecter = (*RecorderDisconnecter)(nil)
 
@@ -431,47 +196,33 @@ type RecorderDisconnecter struct {
 }
 
 func NewRecorderDisconnecter(r *Recorder) *RecorderDisconnecter {
-	return &RecorderDisconnecter{
-		Recorder:     r,
-		disconnected: make(map[string]struct{}),
-		blocklisted:  make(map[string]time.Duration),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (r *RecorderDisconnecter) Disconnect(overlay swarm.Address, _ string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.disconnected[overlay.String()] = struct{}{}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (r *RecorderDisconnecter) Blocklist(overlay swarm.Address, d time.Duration, _ string) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.blocklisted[overlay.String()] = d
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (r *RecorderDisconnecter) IsDisconnected(overlay swarm.Address) bool {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	_, yes := r.disconnected[overlay.String()]
-	return yes
+	_ = "STUB: not implemented"
+	return false
 }
 
 func (r *RecorderDisconnecter) IsBlocklisted(overlay swarm.Address) (bool, time.Duration) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	d, yes := r.blocklisted[overlay.String()]
-	return yes, d
+	_ = "STUB: not implemented"
+	return false, *new(time.Duration)
 }
 
 // NetworkStatus implements p2p.NetworkStatuser interface.
 // It always returns p2p.NetworkStatusAvailable.
 func (r *RecorderDisconnecter) NetworkStatus() p2p.NetworkStatus {
-	return p2p.NetworkStatusAvailable
+	_ = "STUB: not implemented"
+	return *new(p2p.NetworkStatus)
 }

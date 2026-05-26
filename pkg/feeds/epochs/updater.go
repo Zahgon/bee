@@ -24,25 +24,14 @@ type updater struct {
 
 // NewUpdater constructs a feed updater
 func NewUpdater(putter storage.Putter, signer crypto.Signer, topic []byte) (feeds.Updater, error) {
-	p, err := feeds.NewPutter(putter, signer, topic)
-	if err != nil {
-		return nil, err
-	}
-	return &updater{Putter: p}, nil
+	_ = "STUB: not implemented"
+	return *new(feeds.Updater), nil
 }
 
 // Update pushes an update to the feed through the chunk stores
 func (u *updater) Update(ctx context.Context, at int64, payload []byte) error {
-	e := next(u.epoch, u.last, uint64(at))
-	err := u.Put(ctx, e, payload)
-	if err != nil {
-		return err
-	}
-	u.last = at
-	u.epoch = e
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (u *updater) Feed() *feeds.Feed {
-	return u.Putter.Feed
-}
+func (u *updater) Feed() *feeds.Feed { _ = "STUB: not implemented"; return nil }

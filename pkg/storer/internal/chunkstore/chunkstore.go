@@ -6,15 +6,10 @@ package chunkstore
 
 import (
 	"context"
-	"encoding/binary"
 	"errors"
-	"fmt"
-	"slices"
-	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/sharky"
 	"github.com/ethersphere/bee/v2/pkg/storage"
-	"github.com/ethersphere/bee/v2/pkg/storage/storageutil"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
@@ -43,133 +38,49 @@ type Sharky interface {
 }
 
 func Get(ctx context.Context, r storage.Reader, s storage.Sharky, addr swarm.Address) (swarm.Chunk, error) {
-	rIdx := &RetrievalIndexItem{Address: addr}
-	err := r.Get(rIdx)
-	if err != nil {
-		return nil, fmt.Errorf("chunk store: failed reading retrievalIndex for address %s: %w", addr, err)
-	}
-	return readChunk(ctx, s, rIdx)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // helper to read chunk from retrievalIndex.
 func readChunk(ctx context.Context, s storage.Sharky, rIdx *RetrievalIndexItem) (swarm.Chunk, error) {
-	buf := make([]byte, rIdx.Location.Length)
-	err := s.Read(ctx, rIdx.Location, buf)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"chunk store: failed reading location: %v for chunk %s from sharky: %w",
-			rIdx.Location, rIdx.Address, err,
-		)
-	}
-
-	return swarm.NewChunk(rIdx.Address, buf), nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 func Has(_ context.Context, r storage.Reader, addr swarm.Address) (bool, error) {
-	return r.Has(&RetrievalIndexItem{Address: addr})
+	_ = "STUB: not implemented"
+	return false, nil
 }
 
 func Put(ctx context.Context, s storage.IndexStore, sh storage.Sharky, ch swarm.Chunk) error {
-	var (
-		rIdx = &RetrievalIndexItem{Address: ch.Address()}
-		loc  sharky.Location
-	)
-	err := s.Get(rIdx)
-	switch {
-	case errors.Is(err, storage.ErrNotFound):
-		// if this is the first instance of this address, we should store the chunk
-		// in sharky and create the new indexes.
-		loc, err = sh.Write(ctx, ch.Data())
-		if err != nil {
-			return fmt.Errorf("chunk store: write to sharky failed: %w", err)
-		}
-		rIdx.Location = loc
-		rIdx.Timestamp = uint64(time.Now().Unix())
-	case err != nil:
-		return fmt.Errorf("chunk store: failed to read: %w", err)
-	}
-
-	rIdx.RefCnt++
-
-	return s.Put(rIdx)
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// if this is the first instance of this address, we should store the chunk
+// in sharky and create the new indexes.
+
 func Replace(ctx context.Context, s storage.IndexStore, sh storage.Sharky, ch swarm.Chunk, emplace bool) error {
-	rIdx := &RetrievalIndexItem{Address: ch.Address()}
-	err := s.Get(rIdx)
-	if err != nil {
-		return fmt.Errorf("chunk store: failed to read retrievalIndex for address %s: %w", ch.Address(), err)
-	}
-
-	err = sh.Release(ctx, rIdx.Location)
-	if err != nil {
-		return fmt.Errorf("chunkstore: failed to release sharky location: %w", err)
-	}
-
-	loc, err := sh.Write(ctx, ch.Data())
-	if err != nil {
-		return fmt.Errorf("chunk store: write to sharky failed: %w", err)
-	}
-	rIdx.Location = loc
-	rIdx.Timestamp = uint64(time.Now().Unix())
-	if emplace {
-		rIdx.RefCnt++
-	}
-	return s.Put(rIdx)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func Delete(ctx context.Context, s storage.IndexStore, sh storage.Sharky, addr swarm.Address) error {
-	rIdx := &RetrievalIndexItem{Address: addr}
-	err := s.Get(rIdx)
-	switch {
-	case errors.Is(err, storage.ErrNotFound):
-		return nil
-	case err != nil:
-		return fmt.Errorf("chunk store: failed to read retrievalIndex for address %s: %w", addr, err)
-	default:
-		rIdx.RefCnt--
-	}
-
-	if rIdx.RefCnt > 0 { // If there are more references for this we don't delete it from sharky.
-		err = s.Put(rIdx)
-		if err != nil {
-			return fmt.Errorf("chunk store: failed updating retrievalIndex for address %s: %w", addr, err)
-		}
-		return nil
-	}
-
-	return errors.Join(
-		sh.Release(ctx, rIdx.Location),
-		s.Delete(rIdx),
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// If there are more references for this we don't delete it from sharky.
+
 func Iterate(ctx context.Context, s storage.IndexStore, sh storage.Sharky, fn storage.IterateChunkFn) error {
-	return s.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return new(RetrievalIndexItem) },
-		},
-		func(r storage.Result) (bool, error) {
-			ch, err := readChunk(ctx, sh, r.Entry.(*RetrievalIndexItem))
-			if err != nil {
-				return true, err
-			}
-			return fn(ch)
-		},
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func IterateChunkEntries(st storage.Reader, fn func(swarm.Address, uint32) (bool, error)) error {
-	return st.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return new(RetrievalIndexItem) },
-		},
-		func(r storage.Result) (bool, error) {
-			item := r.Entry.(*RetrievalIndexItem)
-			addr := item.Address
-			return fn(addr, item.RefCnt)
-		},
-	)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 type LocationResult struct {
@@ -187,46 +98,14 @@ func IterateLocations(
 	ctx context.Context,
 	st storage.Reader,
 ) <-chan LocationResult {
-	locationResultC := make(chan LocationResult)
-
-	go func() {
-		defer close(locationResultC)
-
-		err := st.Iterate(storage.Query{
-			Factory: func() storage.Item { return new(RetrievalIndexItem) },
-		}, func(r storage.Result) (bool, error) {
-			entry := r.Entry.(*RetrievalIndexItem)
-			result := LocationResult{Location: entry.Location}
-
-			select {
-			case <-ctx.Done():
-				return true, ctx.Err()
-			case locationResultC <- result:
-			}
-
-			return false, nil
-		})
-		if err != nil {
-			result := LocationResult{Err: fmt.Errorf("iterate retrieval index error: %w", err)}
-
-			select {
-			case <-ctx.Done():
-			case locationResultC <- result:
-			}
-		}
-	}()
-
-	return locationResultC
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Iterate iterates over entire retrieval index with a call back.
 func IterateItems(st storage.Store, callBackFunc func(*RetrievalIndexItem) error) error {
-	return st.Iterate(storage.Query{
-		Factory: func() storage.Item { return new(RetrievalIndexItem) },
-	}, func(r storage.Result) (bool, error) {
-		entry := r.Entry.(*RetrievalIndexItem)
-		return false, callBackFunc(entry)
-	})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // RetrievalIndexItem is the index which gives us the sharky location from the swarm.Address.
@@ -238,78 +117,19 @@ type RetrievalIndexItem struct {
 	RefCnt    uint32
 }
 
-func (r *RetrievalIndexItem) ID() string { return r.Address.ByteString() }
+func (r *RetrievalIndexItem) ID() string { _ = "STUB: not implemented"; return "" }
 
-func (RetrievalIndexItem) Namespace() string { return "retrievalIdx" }
+func (RetrievalIndexItem) Namespace() string { _ = "STUB: not implemented"; return "" }
 
 // Stored in bytes as:
 // |--Address(32)--|--Timestamp(8)--|--Location(7)--|--RefCnt(4)--|
-func (r *RetrievalIndexItem) Marshal() ([]byte, error) {
-	if r.Address.IsZero() {
-		return nil, errMarshalInvalidRetrievalIndexAddress
-	}
+func (r *RetrievalIndexItem) Marshal() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	buf := make([]byte, RetrievalIndexItemSize)
-	i := 0
-
-	locBuf, err := r.Location.MarshalBinary()
-	if err != nil {
-		return nil, errMarshalInvalidRetrievalIndexLocation
-	}
-
-	copy(buf[i:swarm.HashSize], r.Address.Bytes())
-	i += swarm.HashSize
-
-	binary.LittleEndian.PutUint64(buf[i:i+8], r.Timestamp)
-	i += 8
-
-	copy(buf[i:i+sharky.LocationSize], locBuf)
-	i += sharky.LocationSize
-
-	binary.LittleEndian.PutUint32(buf[i:], r.RefCnt)
-
-	return buf, nil
-}
-
-func (r *RetrievalIndexItem) Unmarshal(buf []byte) error {
-	if len(buf) != RetrievalIndexItemSize {
-		return errUnmarshalInvalidRetrievalIndexSize
-	}
-
-	i := 0
-	ni := new(RetrievalIndexItem)
-
-	ni.Address = swarm.NewAddress(slices.Clone(buf[i : i+swarm.HashSize]))
-	i += swarm.HashSize
-
-	ni.Timestamp = binary.LittleEndian.Uint64(buf[i : i+8])
-	i += 8
-
-	loc := new(sharky.Location)
-	if err := loc.UnmarshalBinary(buf[i : i+sharky.LocationSize]); err != nil {
-		return errUnmarshalInvalidRetrievalIndexLocationBytes
-	}
-	ni.Location = *loc
-	i += sharky.LocationSize
-
-	ni.RefCnt = binary.LittleEndian.Uint32(buf[i:])
-
-	*r = *ni
-	return nil
-}
+func (r *RetrievalIndexItem) Unmarshal(buf []byte) error { _ = "STUB: not implemented"; return nil }
 
 func (r *RetrievalIndexItem) Clone() storage.Item {
-	if r == nil {
-		return nil
-	}
-	return &RetrievalIndexItem{
-		Address:   r.Address.Clone(),
-		Timestamp: r.Timestamp,
-		Location:  r.Location,
-		RefCnt:    r.RefCnt,
-	}
+	_ = "STUB: not implemented"
+	return *new(storage.Item)
 }
 
-func (r RetrievalIndexItem) String() string {
-	return storageutil.JoinFields(r.Namespace(), r.ID())
-}
+func (r RetrievalIndexItem) String() string { _ = "STUB: not implemented"; return "" }

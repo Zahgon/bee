@@ -5,13 +5,9 @@
 package redistribution
 
 import (
-	"encoding/binary"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethersphere/bee/v2/pkg/bmt"
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	"github.com/ethersphere/bee/v2/pkg/storer"
-	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
 
 type ChunkInclusionProofs struct {
@@ -55,51 +51,15 @@ type SOCProof struct {
 
 // NewChunkInclusionProof transforms arguments to ChunkInclusionProof object
 func NewChunkInclusionProof(proofp1, proofp2, proofp3 bmt.Proof, sampleItem storer.SampleItem) (ChunkInclusionProof, error) {
-	socProof, err := makeSOCProof(sampleItem)
-	if err != nil {
-		return ChunkInclusionProof{}, err
-	}
-
-	return ChunkInclusionProof{
-		ProofSegments:  toCommonHash(proofp1.ProofSegments),
-		ProveSegment:   common.BytesToHash(proofp1.ProveSegment),
-		ProofSegments2: toCommonHash(proofp2.ProofSegments),
-		ProveSegment2:  common.BytesToHash(proofp2.ProveSegment),
-		ChunkSpan:      binary.LittleEndian.Uint64(proofp2.Span[:swarm.SpanSize]), // should be uint64 on the other size; copied from pkg/api/bytes.go
-		ProofSegments3: toCommonHash(proofp3.ProofSegments),
-		PostageProof: PostageProof{
-			Signature: sampleItem.Stamp.Sig(),
-			PostageId: common.BytesToHash(sampleItem.Stamp.BatchID()),
-			Index:     binary.BigEndian.Uint64(sampleItem.Stamp.Index()),
-			TimeStamp: binary.BigEndian.Uint64(sampleItem.Stamp.Timestamp()),
-		},
-		SocProof: socProof,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(ChunkInclusionProof), nil
 }
 
-func toCommonHash(hashes [][]byte) []common.Hash {
-	output := make([]common.Hash, len(hashes))
-	for i, s := range hashes {
-		output[i] = common.BytesToHash(s)
-	}
-	return output
-}
+// should be uint64 on the other size; copied from pkg/api/bytes.go
+
+func toCommonHash(hashes [][]byte) []common.Hash { _ = "STUB: not implemented"; return nil }
 
 func makeSOCProof(sampleItem storer.SampleItem) ([]SOCProof, error) {
-	ch := swarm.NewChunk(sampleItem.ChunkAddress, sampleItem.ChunkData)
-	if !soc.Valid(ch) {
-		return []SOCProof{}, nil
-	}
-
-	socCh, err := soc.FromChunk(ch)
-	if err != nil {
-		return []SOCProof{}, err
-	}
-
-	return []SOCProof{{
-		Signer:     common.BytesToAddress(socCh.OwnerAddress()),
-		Signature:  socCh.Signature(),
-		Identifier: common.BytesToHash(socCh.ID()),
-		ChunkAddr:  common.BytesToHash(socCh.WrappedChunk().Address().Bytes()),
-	}}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

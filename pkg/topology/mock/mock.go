@@ -6,7 +6,6 @@ package mock
 
 import (
 	"context"
-	"maps"
 	"sync"
 	"time"
 
@@ -32,216 +31,93 @@ type mock struct {
 
 var _ topology.Driver = (*mock)(nil)
 
-func WithPeers(peers ...swarm.Address) Option {
-	return optionFunc(func(d *mock) {
-		d.peers = peers
-	})
-}
+func WithPeers(peers ...swarm.Address) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func WithAddPeersErr(err error) Option {
-	return optionFunc(func(d *mock) {
-		d.addPeersErr = err
-	})
-}
+func WithAddPeersErr(err error) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func WithNeighborhoodDepth(dd uint8) Option {
-	return optionFunc(func(d *mock) {
-		d.depth = dd
-	})
-}
+func WithNeighborhoodDepth(dd uint8) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func WithClosestPeer(addr swarm.Address) Option {
-	return optionFunc(func(d *mock) {
-		d.closestPeer = addr
-	})
-}
+func WithClosestPeer(addr swarm.Address) Option { _ = "STUB: not implemented"; return *new(Option) }
 
-func WithClosestPeerErr(err error) Option {
-	return optionFunc(func(d *mock) {
-		d.closestPeerErr = err
-	})
-}
+func WithClosestPeerErr(err error) Option { _ = "STUB: not implemented"; return *new(Option) }
 
 func WithMarshalJSONFunc(f func() ([]byte, error)) Option {
-	return optionFunc(func(d *mock) {
-		d.marshalJSONFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithIsWithinFunc(f func(swarm.Address) bool) Option {
-	return optionFunc(func(d *mock) {
-		d.isWithinFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithSelectRecorder records the topology.Select most recently passed to
 // EachConnectedPeer or EachConnectedPeerRev into out. Tests use this to assert
 // callers opt in to filtering flags (e.g. IncludeBootnodes).
 func WithSelectRecorder(out *topology.Select) Option {
-	return optionFunc(func(d *mock) {
-		d.selectRecorder = out
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
-func NewTopologyDriver(opts ...Option) *mock {
-	d := new(mock)
-	for _, o := range opts {
-		o.apply(d)
-	}
+func NewTopologyDriver(opts ...Option) *mock { _ = "STUB: not implemented"; return nil }
 
-	d.health = map[string]bool{}
-
-	return d
-}
-
-func (d *mock) AddPeers(addrs ...swarm.Address) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	d.peers = append(d.peers, addrs...)
-}
+func (d *mock) AddPeers(addrs ...swarm.Address) { _ = "STUB: not implemented"; return }
 
 func (d *mock) Connected(ctx context.Context, peer p2p.Peer, _ bool) error {
-	d.AddPeers(peer.Address)
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (d *mock) Disconnected(peer p2p.Peer) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	d.peers = swarm.RemoveAddress(d.peers, peer.Address)
-}
+func (d *mock) Disconnected(peer p2p.Peer) { _ = "STUB: not implemented"; return }
 
 func (d *mock) Announce(_ context.Context, _ swarm.Address, _ bool) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (d *mock) AnnounceTo(_ context.Context, _, _ swarm.Address, _ bool) error {
+	_ = "STUB: not implemented"
 	return nil
 }
 
 func (d *mock) UpdatePeerHealth(peer swarm.Address, health bool, pingDur time.Duration) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	d.health[peer.ByteString()] = health
+	_ = "STUB: not implemented"
+	return
 }
 
-func (d *mock) PeersHealth() map[string]bool {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	return maps.Clone(d.health)
-}
+func (d *mock) PeersHealth() map[string]bool { _ = "STUB: not implemented"; return nil }
 
-func (d *mock) Peers() []swarm.Address {
-	return d.peers
-}
+func (d *mock) Peers() []swarm.Address { _ = "STUB: not implemented"; return nil }
 
 func (d *mock) ClosestPeer(addr swarm.Address, wantSelf bool, _ topology.Select, skipPeers ...swarm.Address) (peerAddr swarm.Address, err error) {
-	if len(skipPeers) == 0 {
-		if d.closestPeerErr != nil {
-			return d.closestPeer, d.closestPeerErr
-		}
-		if !d.closestPeer.Equal(swarm.ZeroAddress) {
-			return d.closestPeer, nil
-		}
-	}
-
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	if len(d.peers) == 0 {
-		return peerAddr, topology.ErrNotFound
-	}
-
-	skipPeer := false
-	for _, p := range d.peers {
-		for _, a := range skipPeers {
-			if a.Equal(p) {
-				skipPeer = true
-				break
-			}
-		}
-		if skipPeer {
-			skipPeer = false
-			continue
-		}
-
-		if peerAddr.IsZero() {
-			peerAddr = p
-		}
-
-		if closer, _ := p.Closer(addr, peerAddr); closer {
-			peerAddr = p
-		}
-	}
-
-	if peerAddr.IsZero() {
-		if wantSelf {
-			return peerAddr, topology.ErrWantSelf
-		} else {
-			return peerAddr, topology.ErrNotFound
-		}
-	}
-
-	return peerAddr, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
-func (m *mock) IsReachable() bool {
-	return true
-}
+func (m *mock) IsReachable() bool { _ = "STUB: not implemented"; return false }
 
 func (d *mock) SubscribeTopologyChange() (c <-chan struct{}, unsubscribe func()) {
-	return c, unsubscribe
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (m *mock) NeighborhoodDepth() uint8 {
-	return m.depth
+func (m *mock) NeighborhoodDepth() uint8 { _ = "STUB: not implemented"; return 0 }
+
+func (m *mock) SetStorageRadius(uint8) {
+	_ = "STUB: not implemented"
+
+	// EachConnectedPeer implements topology.PeerIterator interface.
+	return
 }
 
-func (m *mock) SetStorageRadius(uint8) {}
-
-// EachConnectedPeer implements topology.PeerIterator interface.
 func (d *mock) EachConnectedPeer(f topology.EachPeerFunc, s topology.Select) (err error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	d.lastSelect = s
-	if d.selectRecorder != nil {
-		*d.selectRecorder = s
-	}
-
-	if d.peersErr != nil {
-		return d.peersErr
-	}
-
-	for i, p := range d.peers {
-		_, _, err = f(p, uint8(i))
-		if err != nil {
-			return
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // EachConnectedPeerRev implements topology.PeerIterator interface.
 func (d *mock) EachConnectedPeerRev(f topology.EachPeerFunc, s topology.Select) (err error) {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-
-	d.lastSelect = s
-	if d.selectRecorder != nil {
-		*d.selectRecorder = s
-	}
-
-	for i := len(d.peers) - 1; i >= 0; i-- {
-		_, _, err = f(d.peers[i], uint8(i))
-		if err != nil {
-			return
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -249,17 +125,14 @@ func (d *mock) EachConnectedPeerRev(f topology.EachPeerFunc, s topology.Select) 
 // EachConnectedPeer or EachConnectedPeerRev. Intended for tests that assert
 // callers opt in to filtering flags (e.g. IncludeBootnodes).
 func (d *mock) LastSelect() topology.Select {
-	d.mtx.Lock()
-	defer d.mtx.Unlock()
-	return d.lastSelect
+	_ = "STUB: not implemented"
+	return *new(topology.Select)
 }
 
-func (d *mock) Snapshot() *topology.KadParams {
-	return new(topology.KadParams)
-}
+func (d *mock) Snapshot() *topology.KadParams { _ = "STUB: not implemented"; return nil }
 
-func (d *mock) Halt()        {}
-func (d *mock) Close() error { return nil }
+func (d *mock) Halt()        { _ = "STUB: not implemented"; return }
+func (d *mock) Close() error { _ = "STUB: not implemented"; return nil }
 
 type Option interface {
 	apply(*mock)
@@ -267,4 +140,4 @@ type Option interface {
 
 type optionFunc func(*mock)
 
-func (f optionFunc) apply(r *mock) { f(r) }
+func (f optionFunc) apply(r *mock) { _ = "STUB: not implemented"; return }

@@ -22,86 +22,79 @@ type stakingContractMock struct {
 }
 
 func (s *stakingContractMock) DepositStake(ctx context.Context, stakedAmount *big.Int) (common.Hash, error) {
-	return s.depositStake(ctx, stakedAmount)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (s *stakingContractMock) ChangeStakeOverlay(_ context.Context, h common.Hash) (common.Hash, error) {
-	return h, nil
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (s *stakingContractMock) UpdateHeight(ctx context.Context) (common.Hash, bool, error) {
-	if s.updateHeight != nil {
-		return s.updateHeight(ctx)
-	}
-	return common.Hash{}, false, nil
+	_ = "STUB: not implemented"
+	return *new(common.Hash), false, nil
 }
 
 func (s *stakingContractMock) GetPotentialStake(ctx context.Context) (*big.Int, error) {
-	return s.getStake(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *stakingContractMock) GetWithdrawableStake(ctx context.Context) (*big.Int, error) {
-	return s.getStake(ctx)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *stakingContractMock) WithdrawStake(ctx context.Context) (common.Hash, error) {
-	return s.withdrawAllStake(ctx)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (s *stakingContractMock) MigrateStake(ctx context.Context) (common.Hash, error) {
-	return s.migrateStake(ctx)
+	_ = "STUB: not implemented"
+	return *new(common.Hash), nil
 }
 
 func (s *stakingContractMock) IsOverlayFrozen(ctx context.Context, block uint64) (bool, error) {
-	return s.isFrozen(ctx, block)
+	_ = "STUB: not implemented"
+	return false,
+
+		// Option is an option passed to New
+		nil
 }
 
-// Option is an option passed to New
 type Option func(mock *stakingContractMock)
 
 // New creates a new mock BatchStore.
-func New(opts ...Option) staking.Contract {
-	bs := &stakingContractMock{}
-
-	for _, o := range opts {
-		o(bs)
-	}
-
-	return bs
-}
+func New(opts ...Option) staking.Contract { _ = "STUB: not implemented"; return *new(staking.Contract) }
 
 func WithDepositStake(f func(ctx context.Context, stakedAmount *big.Int) (common.Hash, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.depositStake = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithGetStake(f func(ctx context.Context) (*big.Int, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.getStake = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithWithdrawStake(f func(ctx context.Context) (common.Hash, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.withdrawAllStake = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithMigrateStake(f func(ctx context.Context) (common.Hash, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.migrateStake = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithIsFrozen(f func(ctx context.Context, block uint64) (bool, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.isFrozen = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithUpdateHeight(f func(ctx context.Context) (common.Hash, bool, error)) Option {
-	return func(mock *stakingContractMock) {
-		mock.updateHeight = f
-	}
+	_ = "STUB: not implemented"
+	return *new(Option)
 }

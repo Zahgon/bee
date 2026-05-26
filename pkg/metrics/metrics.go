@@ -5,8 +5,6 @@
 package metrics
 
 import (
-	"reflect"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -19,14 +17,6 @@ type Collector interface {
 }
 
 func PrometheusCollectorsFromFields(i any) (cs []prometheus.Collector) {
-	v := reflect.Indirect(reflect.ValueOf(i))
-	for _, field := range v.Fields() {
-		if !field.CanInterface() {
-			continue
-		}
-		if u, ok := field.Interface().(prometheus.Collector); ok {
-			cs = append(cs, u)
-		}
-	}
-	return cs
+	_ = "STUB: not implemented"
+	return nil
 }

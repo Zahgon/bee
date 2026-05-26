@@ -5,11 +5,8 @@
 package postage
 
 import (
-	"bytes"
 	"context"
-	"encoding/hex"
 	"errors"
-	"fmt"
 	"io"
 	"math/big"
 	"sync"
@@ -68,289 +65,78 @@ type service struct {
 // NewService constructs a new Service. wasClean indicates whether the previous
 // shutdown was graceful; if false, bucket counts are recovered from the stamp store.
 func NewService(logger log.Logger, store storage.Store, postageStore Storer, chainID int64, wasClean bool) (Service, error) {
-	s := &service{
-		logger:       logger.WithName(loggerName).Register(),
-		store:        store,
-		postageStore: postageStore,
-		chainID:      chainID,
-		quit:         make(chan struct{}),
-		done:         make(chan struct{}),
-	}
-
-	err := s.store.Iterate(
-		storage.Query{
-			Factory: func() storage.Item {
-				return new(StampIssuerItem)
-			},
-		}, func(result storage.Result) (bool, error) {
-			issuer := result.Entry.(*StampIssuerItem).Issuer
-			_ = s.add(issuer)
-			return false, nil
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	if !wasClean {
-		s.logger.Info("recovering bucket counts from stamper store")
-		if err := s.recoverBuckets(); err != nil {
-			s.logger.Error(err, "postage stamper store recovery failed")
-		}
-	}
-
-	go s.run()
-
-	return s, nil
+	_ = "STUB: not implemented"
+	return *new(Service), nil
 }
 
-func (s *service) recoverBuckets() error {
-	s.mtx.Lock()
-	defer s.mtx.Unlock()
-
-	return s.store.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return new(StampItem) },
-		}, func(result storage.Result) (bool, error) {
-			item := result.Entry.(*StampItem)
-			for _, issuer := range s.issuers {
-				if bytes.Equal(issuer.data.BatchID, item.BatchID) {
-					if err := issuer.recover(item.BatchIndex); err != nil {
-						s.logger.Error(err, "postage recovery of bucket count failed")
-					} else {
-						issuer.dirty = true
-					}
-					break
-				}
-			}
-			return false, nil
-		})
-}
+func (s *service) recoverBuckets() error { _ = "STUB: not implemented"; return nil }
 
 func (s *service) run() {
-	defer close(s.done)
+	_ = "STUB: not implemented"
+
 	// using 1 minute to significantly reduce disk writes
-	ticker := time.NewTicker(stampIssuerSaveInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-s.quit:
-			return
-		case <-ticker.C:
-			s.mtx.Lock()
-			issuers := make([]*StampIssuer, len(s.issuers))
-			copy(issuers, s.issuers)
-			s.mtx.Unlock()
-
-			for _, issuer := range issuers {
-				if issuer.isDirty() {
-					if err := s.save(issuer); err != nil {
-						s.logger.Error(err, "failed to save stamp issuer")
-					}
-				}
-			}
-		}
-	}
+	return
 }
 
 // Add adds a stamp issuer to the active issuers.
-func (ps *service) Add(st *StampIssuer) error {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-
-	if !ps.add(st) {
-		return nil
-	}
-	return ps.save(st)
-}
+func (ps *service) Add(st *StampIssuer) error { _ = "STUB: not implemented"; return nil }
 
 // HandleCreate implements the BatchEventListener interface. This is fired on receiving
 // a batch creation event from the blockchain listener to ensure that if a stamp
 // issuer was not created initially, we will create it here.
 func (ps *service) HandleCreate(b *Batch, amount *big.Int) error {
-	return ps.Add(NewStampIssuer(
-		"recovered",
-		string(b.Owner),
-		b.ID,
-		amount,
-		b.Depth,
-		b.BucketDepth,
-		b.Start,
-		b.Immutable,
-	))
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // HandleTopUp implements the BatchEventListener interface. This is fired on receiving
 // a batch topup event from the blockchain to update stampissuer details
-func (ps *service) HandleTopUp(batchID []byte, amount *big.Int) {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-
-	for _, v := range ps.issuers {
-		if bytes.Equal(v.data.BatchID, batchID) {
-			v.data.BatchAmount.Add(v.data.BatchAmount, amount)
-			return
-		}
-	}
-}
+func (ps *service) HandleTopUp(batchID []byte, amount *big.Int) { _ = "STUB: not implemented"; return }
 
 func (ps *service) HandleDepthIncrease(batchID []byte, newDepth uint8) {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-
-	for _, v := range ps.issuers {
-		if bytes.Equal(batchID, v.data.BatchID) {
-			if newDepth > v.data.BatchDepth {
-				v.data.BatchDepth = newDepth
-			}
-			return
-		}
-	}
+	_ = "STUB: not implemented"
+	return
 }
 
 // StampIssuers returns the currently active stamp issuers.
-func (ps *service) StampIssuers() []*StampIssuer {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-	return ps.issuers
-}
+func (ps *service) StampIssuers() []*StampIssuer { _ = "STUB: not implemented"; return nil }
 
-func (ps *service) IssuerUsable(st *StampIssuer) bool {
-	cs := ps.postageStore.GetChainState()
+func (ps *service) IssuerUsable(st *StampIssuer) bool { _ = "STUB: not implemented"; return false }
 
-	// this checks at least threshold blocks are seen on the blockchain after
-	// the batch creation, before we start using a stamp issuer. The threshold
-	// is meant to allow enough time for upstream peers to see the batch and
-	// hence validate the stamps issued
-	if cs.Block < st.data.BlockNumber || (cs.Block-st.data.BlockNumber) < blockThreshold {
-		return false
-	}
-	return true
-}
+// this checks at least threshold blocks are seen on the blockchain after
+// the batch creation, before we start using a stamp issuer. The threshold
+// is meant to allow enough time for upstream peers to see the batch and
+// hence validate the stamps issued
 
 // GetStampIssuer finds a stamp issuer by batch ID.
 func (ps *service) GetStampIssuer(batchID []byte) (*StampIssuer, func() error, error) {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-
-	for _, st := range ps.issuers {
-		if bytes.Equal(batchID, st.data.BatchID) {
-			if !ps.IssuerUsable(st) {
-				return nil, nil, ErrNotUsable
-			}
-			return st, func() error {
-				st.setDirty(true)
-				return nil
-			}, nil
-		}
-	}
-	return nil, nil, ErrNotFound
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
 
 // save persists the specified stamp issuer to the stamperstore.
-func (ps *service) save(st *StampIssuer) error {
-	st.mtx.Lock()
-	defer st.mtx.Unlock()
+func (ps *service) save(st *StampIssuer) error { _ = "STUB: not implemented"; return nil }
 
-	if err := ps.store.Put(&StampIssuerItem{
-		Issuer: st,
-	}); err != nil {
-		return err
-	}
-	st.dirty = false
-	return nil
-}
-
-func (ps *service) Close() error {
-	close(ps.quit)
-	<-ps.done
-
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-	var err error
-	for _, issuer := range ps.issuers {
-		if issuer.isDirty() {
-			err = errors.Join(err, ps.save(issuer))
-		}
-	}
-	return err
-}
+func (ps *service) Close() error { _ = "STUB: not implemented"; return nil }
 
 // HandleStampExpiry handles stamp expiry for a given id.
 func (ps *service) HandleStampExpiry(ctx context.Context, id []byte) error {
-	exists, err := ps.removeIssuer(id)
-	if err != nil {
-		return err
-	}
-
-	if exists {
-		return ps.removeStampItems(ctx, id)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // removeStampItems removes all stamp items belonging to the given batch.
 func (ps *service) removeStampItems(ctx context.Context, batchID []byte) error {
-	ps.logger.Debug("removing expired stamp items", "batchID", hex.EncodeToString(batchID))
-
-	var toDelete []*StampItem
-
-	err := ps.store.Iterate(
-		storage.Query{
-			Factory: func() storage.Item { return new(StampItem) },
-			Prefix:  string(batchID),
-		}, func(result storage.Result) (bool, error) {
-			if err := ctx.Err(); err != nil {
-				return false, err
-			}
-			toDelete = append(toDelete, result.Entry.(*StampItem))
-			return false, nil
-		})
-	if err != nil {
-		return err
-	}
-
-	var firstErr error
-	for _, item := range toDelete {
-		if err := ps.store.Delete(item); err != nil && firstErr == nil {
-			firstErr = fmt.Errorf("remove expired stamp items batch %s: %w", hex.EncodeToString(batchID), err)
-		}
-	}
-	if firstErr != nil {
-		return firstErr
-	}
-
-	ps.logger.Debug("removed expired stamps", "batchID", hex.EncodeToString(batchID), "count", len(toDelete))
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // SetExpired removes all expired batches from the stamp issuers.
 func (ps *service) removeIssuer(batchID []byte) (bool, error) {
-	ps.mtx.Lock()
-	defer ps.mtx.Unlock()
-
-	for i, issuer := range ps.issuers {
-		if bytes.Equal(batchID, issuer.data.BatchID) {
-			if err := ps.store.Delete(&StampIssuerItem{Issuer: issuer}); err != nil {
-				return true, fmt.Errorf("set expired: delete stamp data for batch %s: %w", hex.EncodeToString(issuer.ID()), err)
-			}
-			ps.issuers = append(ps.issuers[:i], ps.issuers[i+1:]...)
-			return true, nil
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return false, nil
 }
 
 // add adds a stamp issuer to the active issuers and returns false if it is already present.
 // Must be mutex locked before usage.
-func (ps *service) add(st *StampIssuer) bool {
-	for _, v := range ps.issuers {
-		if bytes.Equal(st.data.BatchID, v.data.BatchID) {
-			return false
-		}
-	}
-	ps.issuers = append(ps.issuers, st)
-	return true
-}
+func (ps *service) add(st *StampIssuer) bool { _ = "STUB: not implemented"; return false }

@@ -5,7 +5,6 @@
 package lightnode
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -16,26 +15,7 @@ type metrics struct {
 }
 
 // newMetrics is a convenient constructor for creating new metrics.
-func newMetrics() metrics {
-	const subsystem = "lightnode"
-
-	return metrics{
-		CurrentlyConnectedPeers: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "currently_connected_peers",
-			Help:      "Number of currently connected peers.",
-		}),
-		CurrentlyDisconnectedPeers: prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "currently_disconnected_peers",
-			Help:      "Number of currently disconnected peers.",
-		}),
-	}
-}
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
 // Metrics returns set of prometheus collectors.
-func (c *Container) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(c.metrics)
-}
+func (c *Container) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

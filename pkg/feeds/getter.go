@@ -7,10 +7,7 @@ package feeds
 import (
 	"context"
 	"errors"
-	"fmt"
-	"time"
 
-	"github.com/ethersphere/bee/v2/pkg/soc"
 	storage "github.com/ethersphere/bee/v2/pkg/storage"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 )
@@ -21,9 +18,7 @@ type WrappedChunkNotFoundError struct {
 	Ref []byte
 }
 
-func (e WrappedChunkNotFoundError) Error() string {
-	return fmt.Sprintf("feed pointing to the wrapped chunk not found: %x", e.Ref)
-}
+func (e WrappedChunkNotFoundError) Error() string { _ = "STUB: not implemented"; return "" }
 
 // Lookup is the interface for time based feed lookup
 type Lookup interface {
@@ -37,76 +32,44 @@ type Getter struct {
 }
 
 // NewGetter constructs a feed Getter
-func NewGetter(getter storage.Getter, feed *Feed) *Getter {
-	return &Getter{getter, feed}
-}
+func NewGetter(getter storage.Getter, feed *Feed) *Getter { _ = "STUB: not implemented"; return nil }
 
 // Latest looks up the latest update of the feed
 // after is a unix time hint of the latest known update
 func Latest(ctx context.Context, l Lookup, after uint64) (swarm.Chunk, error) {
-	c, _, _, err := l.At(ctx, time.Now().Unix(), after)
-	return c, err
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // Get creates an update of the underlying feed at the given epoch
 // and looks it up in the chunk Getter based on its address
 func (f *Getter) Get(ctx context.Context, i Index) (swarm.Chunk, error) {
-	addr, err := f.Feed.Update(i).Address()
-	if err != nil {
-		return nil, err
-	}
-	return f.getter.Get(ctx, addr)
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 func GetWrappedChunk(ctx context.Context, getter storage.Getter, ch swarm.Chunk, legacyResolve bool) (swarm.Chunk, error) {
-	wc, err := FromChunk(ch)
-	if err != nil {
-		return nil, err
-	}
-	// try to split the timestamp and reference
-	// possible values right now:
-	// unencrypted ref: span+timestamp+ref => 8+8+32=48
-	// encrypted ref: span+timestamp+ref+decryptKey => 8+8+64=80
-	if legacyResolve {
-		ref, err := legacyPayload(wc)
-		if err != nil {
-			return nil, err
-		}
-		wc, err = getter.Get(ctx, ref)
-		if err != nil {
-			return nil, WrappedChunkNotFoundError{Ref: ref.Bytes()}
-		}
-	}
-
-	return wc, nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
+
+// try to split the timestamp and reference
+// possible values right now:
+// unencrypted ref: span+timestamp+ref => 8+8+32=48
+// encrypted ref: span+timestamp+ref+decryptKey => 8+8+64=80
 
 // FromChunk parses out the wrapped chunk
 func FromChunk(ch swarm.Chunk) (swarm.Chunk, error) {
-	s, err := soc.FromChunk(ch)
-	if err != nil {
-		return nil, fmt.Errorf("soc unmarshal: %w", err)
-	}
-	return s.WrappedChunk(), nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Chunk), nil
 }
 
 // legacyPayload returns back the referenced chunk and datetime from the legacy feed payload
 func legacyPayload(wrappedChunk swarm.Chunk) (swarm.Address, error) {
-	cacData := wrappedChunk.Data()
-	if !isV1Length(len(cacData)) {
-		return swarm.ZeroAddress, ErrNotLegacyPayload
-	}
-	return swarm.NewAddress(cacData[16:]), nil
+	_ = "STUB: not implemented"
+	return *new(swarm.Address), nil
 }
 
-func IsV1Payload(ch swarm.Chunk) (bool, error) {
-	cc, err := FromChunk(ch)
-	if err != nil {
-		return false, err
-	}
-	return isV1Length(len(cc.Data())), nil
-}
+func IsV1Payload(ch swarm.Chunk) (bool, error) { _ = "STUB: not implemented"; return false, nil }
 
-func isV1Length(length int) bool {
-	return length == 16+swarm.HashSize || length == 16+swarm.HashSize*2
-}
+func isV1Length(length int) bool { _ = "STUB: not implemented"; return false }

@@ -30,67 +30,26 @@ type listener struct {
 }
 
 // New returns a new GSOC listener service.
-func New(logger log.Logger) Listener {
-	return &listener{
-		logger:   logger,
-		handlers: make(map[string][]*Handler),
-		quit:     make(chan struct{}),
-	}
-}
+func New(logger log.Logger) Listener { _ = "STUB: not implemented"; return *new(Listener) }
 
 // Subscribe allows the definition of a Handler func on a specific GSOC address.
 func (l *listener) Subscribe(address swarm.Address, handler Handler) (cleanup func()) {
-	l.handlersMu.Lock()
-	defer l.handlersMu.Unlock()
-
-	l.handlers[address.ByteString()] = append(l.handlers[address.ByteString()], &handler)
-
-	return func() {
-		l.handlersMu.Lock()
-		defer l.handlersMu.Unlock()
-
-		h := l.handlers[address.ByteString()]
-		for i := range h {
-			if h[i] == &handler {
-				l.handlers[address.ByteString()] = append(h[:i], h[i+1:]...)
-				return
-			}
-		}
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Handle is called by push/pull sync and passes the chunk its registered handler
-func (l *listener) Handle(c *soc.SOC) {
-	addr, err := c.Address()
-	if err != nil {
-		return // no handler
-	}
-	h := l.getHandlers(addr)
-	if h == nil {
-		return // no handler
-	}
-	l.logger.Debug("new incoming GSOC message", "GSOC Address", addr, "wrapped chunk address", c.WrappedChunk().Address())
+func (l *listener) Handle(c *soc.SOC) { _ = "STUB: not implemented"; return }
 
-	for _, hh := range h {
-		go func(hh Handler) {
-			hh(c.WrappedChunk().Data()[swarm.SpanSize:])
-		}(*hh)
-	}
-}
+// no handler
+
+// no handler
 
 func (p *listener) getHandlers(address swarm.Address) []*Handler {
-	p.handlersMu.Lock()
-	defer p.handlersMu.Unlock()
-
-	return p.handlers[address.ByteString()]
-}
-
-func (l *listener) Close() error {
-	close(l.quit)
-	l.handlersMu.Lock()
-	defer l.handlersMu.Unlock()
-
-	l.handlers = make(map[string][]*Handler) // unset handlers on shutdown
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+func (l *listener) Close() error { _ = "STUB: not implemented"; return nil }
+
+// unset handlers on shutdown

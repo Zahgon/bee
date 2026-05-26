@@ -46,204 +46,123 @@ type creditAction struct {
 
 // WithPrepareDebitFunc sets the mock PrepareDebit function
 func WithPrepareDebitFunc(f func(peer swarm.Address, price uint64) (accounting.Action, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.prepareDebitFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithPrepareCreditFunc sets the mock PrepareCredit function
 func WithPrepareCreditFunc(f func(peer swarm.Address, price uint64, originated bool) (accounting.Action, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.prepareCreditFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithBalanceFunc sets the mock Balance function
 func WithBalanceFunc(f func(swarm.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.balanceFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithBalancesFunc sets the mock Balances function
 func WithBalancesFunc(f func() (map[string]*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.balancesFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithCompensatedBalanceFunc sets the mock Balance function
 func WithCompensatedBalanceFunc(f func(swarm.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.compensatedBalanceFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithCompensatedBalancesFunc sets the mock Balances function
 func WithCompensatedBalancesFunc(f func() (map[string]*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.compensatedBalancesFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // WithBalanceSurplusFunc sets the mock SurplusBalance function
 func WithBalanceSurplusFunc(f func(swarm.Address) (*big.Int, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.balanceSurplusFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 func WithPeerAccountingFunc(f func() (map[string]accounting.PeerInfo, error)) Option {
-	return optionFunc(func(s *Service) {
-		s.peerAccountingFunc = f
-	})
+	_ = "STUB: not implemented"
+	return *new(Option)
 }
 
 // NewAccounting creates the mock accounting implementation
-func NewAccounting(opts ...Option) *Service {
-	mock := new(Service)
-	mock.balances = make(map[string]*big.Int)
-	for _, o := range opts {
-		o.apply(mock)
-	}
-	return mock
-}
+func NewAccounting(opts ...Option) *Service { _ = "STUB: not implemented"; return nil }
 
 func (s *Service) MakeCreditAction(peer swarm.Address, price uint64) accounting.Action {
-	return &creditAction{
-		accounting: s,
-		price:      new(big.Int).SetUint64(price),
-		peer:       peer,
-		applied:    false,
-	}
+	_ = "STUB: not implemented"
+	return *new(accounting.Action)
 }
 
 // Debit is the mock function wrapper that calls the set implementation
 func (s *Service) PrepareDebit(_ context.Context, peer swarm.Address, price uint64) (accounting.Action, error) {
-	if s.prepareDebitFunc != nil {
-		return s.prepareDebitFunc(peer, price)
-	}
-
-	bigPrice := new(big.Int).SetUint64(price)
-	return &debitAction{
-		accounting: s,
-		price:      bigPrice,
-		peer:       peer,
-		applied:    false,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(accounting.Action), nil
 }
 
 func (s *Service) PrepareCredit(_ context.Context, peer swarm.Address, price uint64, originated bool) (accounting.Action, error) {
-	if s.prepareCreditFunc != nil {
-		return s.prepareCreditFunc(peer, price, originated)
-	}
-
-	return s.MakeCreditAction(peer, price), nil
+	_ = "STUB: not implemented"
+	return *new(accounting.Action), nil
 }
 
-func (a *debitAction) Apply() error {
-	a.accounting.lock.Lock()
-	defer a.accounting.lock.Unlock()
+func (a *debitAction) Apply() error { _ = "STUB: not implemented"; return nil }
 
-	if bal, ok := a.accounting.balances[a.peer.String()]; ok {
-		a.accounting.balances[a.peer.String()] = new(big.Int).Add(bal, new(big.Int).Set(a.price))
-	} else {
-		a.accounting.balances[a.peer.String()] = new(big.Int).Set(a.price)
-	}
+func (a *creditAction) Cleanup() { _ = "STUB: not implemented"; return }
 
-	return nil
+func (a *creditAction) Apply() error { _ = "STUB: not implemented"; return nil }
+
+func (a *debitAction) Cleanup() {
+	_ = "STUB: not implemented"
+
+	// Balance is the mock function wrapper that calls the set implementation
+	return
 }
 
-func (a *creditAction) Cleanup() {}
-
-func (a *creditAction) Apply() error {
-	a.accounting.lock.Lock()
-	defer a.accounting.lock.Unlock()
-
-	if bal, ok := a.accounting.balances[a.peer.String()]; ok {
-		a.accounting.balances[a.peer.String()] = new(big.Int).Sub(bal, new(big.Int).Set(a.price))
-	} else {
-		a.accounting.balances[a.peer.String()] = new(big.Int).Neg(a.price)
-	}
-
-	return nil
-}
-
-func (a *debitAction) Cleanup() {}
-
-// Balance is the mock function wrapper that calls the set implementation
 func (s *Service) Balance(peer swarm.Address) (*big.Int, error) {
-	if s.balanceFunc != nil {
-		return s.balanceFunc(peer)
-	}
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	if bal, ok := s.balances[peer.String()]; ok {
-		return bal, nil
-	} else {
-		return big.NewInt(0), nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) ShadowBalance(peer swarm.Address) (*big.Int, error) {
-	if s.shadowBalanceFunc != nil {
-		return s.shadowBalanceFunc(peer)
-	}
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	if bal, ok := s.balances[peer.String()]; ok {
-		return new(big.Int).Neg(bal), nil
-	} else {
-		return big.NewInt(0), nil
-	}
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Balances is the mock function wrapper that calls the set implementation
 func (s *Service) Balances() (map[string]*big.Int, error) {
-	if s.balancesFunc != nil {
-		return s.balancesFunc()
-	}
-	return s.balances, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CompensatedBalance is the mock function wrapper that calls the set implementation
 func (s *Service) CompensatedBalance(peer swarm.Address) (*big.Int, error) {
-	if s.compensatedBalanceFunc != nil {
-		return s.compensatedBalanceFunc(peer)
-	}
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	return s.balances[peer.String()], nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // CompensatedBalances is the mock function wrapper that calls the set implementation
 func (s *Service) CompensatedBalances() (map[string]*big.Int, error) {
-	if s.compensatedBalancesFunc != nil {
-		return s.compensatedBalancesFunc()
-	}
-	return s.balances, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 func (s *Service) PeerAccounting() (map[string]accounting.PeerInfo, error) {
-	if s.peerAccountingFunc != nil {
-		return s.peerAccountingFunc()
-	}
-	return map[string]accounting.PeerInfo{}, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
-func (s *Service) Connect(peer swarm.Address, full bool) {
-}
+func (s *Service) Connect(peer swarm.Address, full bool) { _ = "STUB: not implemented"; return }
 
-func (s *Service) Disconnect(peer swarm.Address) {
-}
+func (s *Service) Disconnect(peer swarm.Address) { _ = "STUB: not implemented"; return }
 
 func (s *Service) SurplusBalance(peer swarm.Address) (*big.Int, error) {
-	if s.balanceFunc != nil {
-		return s.balanceSurplusFunc(peer)
-	}
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	return big.NewInt(0), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Option is the option passed to the mock accounting service
@@ -253,4 +172,4 @@ type Option interface {
 
 type optionFunc func(*Service)
 
-func (f optionFunc) apply(r *Service) { f(r) }
+func (f optionFunc) apply(r *Service) { _ = "STUB: not implemented"; return }

@@ -5,7 +5,6 @@
 package pingpong
 
 import (
-	m "github.com/ethersphere/bee/v2/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -19,37 +18,6 @@ type metrics struct {
 	PongReceivedCount prometheus.Counter
 }
 
-func newMetrics() metrics {
-	subsystem := "pingpong"
+func newMetrics() metrics { _ = "STUB: not implemented"; return *new(metrics) }
 
-	return metrics{
-		PingSentCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "ping_sent_count",
-			Help:      "Number ping requests sent.",
-		}),
-		PongSentCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "pong_sent_count",
-			Help:      "Number of pong responses sent.",
-		}),
-		PingReceivedCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "ping_received_count",
-			Help:      "Number ping requests received.",
-		}),
-		PongReceivedCount: prometheus.NewCounter(prometheus.CounterOpts{
-			Namespace: m.Namespace,
-			Subsystem: subsystem,
-			Name:      "pong_received_count",
-			Help:      "Number of pong responses received.",
-		}),
-	}
-}
-
-func (s *Service) Metrics() []prometheus.Collector {
-	return m.PrometheusCollectorsFromFields(s.metrics)
-}
+func (s *Service) Metrics() []prometheus.Collector { _ = "STUB: not implemented"; return nil }

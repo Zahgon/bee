@@ -6,18 +6,14 @@ package status
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/ethersphere/bee/v2/pkg/log"
 	"github.com/ethersphere/bee/v2/pkg/p2p"
-	"github.com/ethersphere/bee/v2/pkg/p2p/protobuf"
 	"github.com/ethersphere/bee/v2/pkg/postage"
 	"github.com/ethersphere/bee/v2/pkg/status/internal/pb"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
 	"github.com/ethersphere/bee/v2/pkg/topology"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/expfmt"
 )
 
 // loggerName is the tree path name of the logger for this package.
@@ -78,169 +74,36 @@ func NewService(
 	reserve Reserve,
 	metricsRegistry *prometheus.Registry,
 ) *Service {
-	return &Service{
-		logger:          logger.WithName(loggerName).Register(),
-		streamer:        streamer,
-		topologyDriver:  topology,
-		beeMode:         beeMode,
-		chainState:      chainState,
-		reserve:         reserve,
-		metricsRegistry: metricsRegistry,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // LocalSnapshot returns the current status snapshot of this node.
-func (s *Service) LocalSnapshot() (*Snapshot, error) {
-	var (
-		storageRadius           uint8
-		syncRate                float64
-		reserveSize             uint64
-		reserveSizeWithinRadius uint64
-		connectedPeers          uint64
-		neighborhoodSize        uint64
-		committedDepth          uint8
-	)
+func (s *Service) LocalSnapshot() (*Snapshot, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	if s.reserve != nil {
-		storageRadius = s.reserve.StorageRadius()
-		reserveSize = uint64(s.reserve.ReserveSize())
-		reserveSizeWithinRadius = s.reserve.ReserveSizeWithinRadius()
-		committedDepth = s.reserve.CommittedDepth()
-	}
-
-	if s.sync != nil {
-		syncRate = s.sync.SyncRate()
-	}
-
-	commitment, err := s.chainState.Commitment()
-	if err != nil {
-		return nil, fmt.Errorf("batchstore commitment: %w", err)
-	}
-
-	err = s.topologyDriver.EachConnectedPeer(
-		func(_ swarm.Address, po uint8) (bool, bool, error) {
-			connectedPeers++
-			if po >= storageRadius {
-				neighborhoodSize++
-			}
-			return false, false, nil
-		},
-		topology.Select{IncludeBootnodes: true},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("iterate connected peers: %w", err)
-	}
-
-	metrics, err := s.encodeMetrics()
-	if err != nil {
-		return nil, fmt.Errorf("encode metrics: %w", err)
-	}
-
-	return &Snapshot{
-		BeeMode:                 s.beeMode,
-		ReserveSize:             reserveSize,
-		ReserveSizeWithinRadius: reserveSizeWithinRadius,
-		PullsyncRate:            syncRate,
-		StorageRadius:           uint32(storageRadius),
-		ConnectedPeers:          connectedPeers,
-		NeighborhoodSize:        neighborhoodSize + 1, // include self
-		BatchCommitment:         commitment,
-		IsReachable:             s.topologyDriver.IsReachable(),
-		LastSyncedBlock:         s.chainState.GetChainState().Block,
-		CommittedDepth:          uint32(committedDepth),
-		Metrics:                 metrics,
-	}, nil
-}
+// include self
 
 // PeerSnapshot sends request for status snapshot to the peer.
 func (s *Service) PeerSnapshot(ctx context.Context, peer swarm.Address) (*Snapshot, error) {
-	stream, err := s.streamer.NewStream(ctx, peer, nil, protocolName, protocolVersion, streamName)
-	if err != nil {
-		return nil, fmt.Errorf("new stream: %w", err)
-	}
-	defer func() {
-		go stream.FullClose()
-	}()
-
-	w, r := protobuf.NewWriterAndReader(stream)
-
-	if err := w.WriteMsgWithContext(ctx, new(pb.Get)); err != nil {
-		return nil, fmt.Errorf("write message failed: %w", err)
-	}
-
-	ss := new(pb.Snapshot)
-	if err := r.ReadMsgWithContext(ctx, ss); err != nil {
-		return nil, fmt.Errorf("read message failed: %w", err)
-	}
-	return (*Snapshot)(ss), nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // Protocol returns the protocol specification.
 func (s *Service) Protocol() p2p.ProtocolSpec {
-	return p2p.ProtocolSpec{
-		Name:    protocolName,
-		Version: protocolVersion,
-		StreamSpecs: []p2p.StreamSpec{{
-			Name:    streamName,
-			Handler: s.handler,
-		}},
-	}
+	_ = "STUB: not implemented"
+	return *new(p2p.ProtocolSpec)
 }
 
 // handler handles the status stream request/response.
 func (s *Service) handler(ctx context.Context, _ p2p.Peer, stream p2p.Stream) error {
-	loggerV2 := s.logger.V(2).Register()
-
-	w, r := protobuf.NewWriterAndReader(stream)
-	defer func() {
-		if err := stream.FullClose(); err != nil {
-			loggerV2.Debug("stream full close failed: %v", "error", err)
-		}
-	}()
-
-	var msgGet pb.Get
-	if err := r.ReadMsgWithContext(ctx, &msgGet); err != nil {
-		loggerV2.Debug("read message failed", "error", err)
-		return fmt.Errorf("read message: %w", err)
-	}
-
-	snapshot, err := s.LocalSnapshot()
-	if err != nil {
-		loggerV2.Debug("local snapshot failed", "error", err)
-		return fmt.Errorf("local snapshot: %w", err)
-	}
-
-	if err := w.WriteMsgWithContext(ctx, (*pb.Snapshot)(snapshot)); err != nil {
-		loggerV2.Debug("write message failed", "error", err)
-		return fmt.Errorf("write message: %w", err)
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
-func (s *Service) SetSync(sync SyncReporter) {
-	s.sync = sync
-}
+func (s *Service) SetSync(sync SyncReporter) { _ = "STUB: not implemented"; return }
 
 func (s *Service) encodeMetrics() (map[string]string, error) {
-	if s.metricsRegistry == nil {
-		return nil, nil
-	}
-
-	metricFamilies, err := s.metricsRegistry.Gather()
-	if err != nil {
-		return nil, fmt.Errorf("gather metrics: %w", err)
-	}
-
-	metrics := make(map[string]string, len(metricFamilies))
-	for _, m := range metricFamilies {
-		var metricsBuilder strings.Builder
-		encoder := expfmt.NewEncoder(&metricsBuilder, expfmt.NewFormat(expfmt.TypeTextPlain))
-		if err := encoder.Encode(m); err != nil {
-			return nil, fmt.Errorf("encode metric %s: %w", m.GetName(), err)
-		}
-		metrics[m.GetName()] = metricsBuilder.String()
-	}
-
-	return metrics, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }

@@ -7,16 +7,12 @@
 package metrics
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/ethersphere/bee/v2/pkg/p2p"
 	"github.com/ethersphere/bee/v2/pkg/shed"
 	"github.com/ethersphere/bee/v2/pkg/swarm"
-	"github.com/syndtr/goleveldb/leveldb"
 )
 
 const ewmaSmoothing = 0.1
@@ -34,13 +30,7 @@ const (
 type RecordOp func(*Counters)
 
 // IsBootnode will mark the peer metric as bootnode based on the bool arg.
-func IsBootnode(b bool) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-		cs.IsBootnode = b
-	}
-}
+func IsBootnode(b bool) RecordOp { _ = "STUB: not implemented"; return *new(RecordOp) }
 
 // PeerLogIn will first update the current last seen to the give time t and as
 // the second it'll set the direction of the session connection to the given
@@ -48,94 +38,38 @@ func IsBootnode(b bool) RecordOp {
 // The time is set as Unix timestamp ignoring the timezone. The operation will
 // panic if the given time is before the Unix epoch.
 func PeerLogIn(t time.Time, dir PeerConnectionDirection) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-
-		if cs.isLoggedIn {
-			return // Ignore when the peer is already logged in.
-		}
-		cs.isLoggedIn = true
-
-		ls := t.UnixNano()
-		if ls < 0 {
-			panic(fmt.Errorf("time before unix epoch: %s", t))
-		}
-		cs.sessionConnDirection = dir
-		cs.lastSeenTimestamp = ls
-	}
+	_ = "STUB: not implemented"
+	return *new(RecordOp)
 }
+
+// Ignore when the peer is already logged in.
 
 // PeerLogOut will first update the connection session and total duration with
 // the difference of the given time t and the current last seen value. As the
 // second it'll also update the last seen peer metrics to the given time t.
 // The time is set as Unix timestamp ignoring the timezone. The operation will
 // panic if the given time is before the Unix epoch.
-func PeerLogOut(t time.Time) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
+func PeerLogOut(t time.Time) RecordOp { _ = "STUB: not implemented"; return *new(RecordOp) }
 
-		if !cs.isLoggedIn {
-			return // Ignore when the peer is not logged in.
-		}
-		cs.isLoggedIn = false
-
-		curLs := cs.lastSeenTimestamp
-		newLs := t.UnixNano()
-		if newLs < 0 {
-			panic(fmt.Errorf("time before unix epoch: %s", t))
-		}
-
-		cs.sessionConnDuration = time.Duration(newLs - curLs)
-		cs.connTotalDuration += cs.sessionConnDuration
-		cs.lastSeenTimestamp = newLs
-	}
-}
+// Ignore when the peer is not logged in.
 
 // IncSessionConnectionRetry increments the session connection retry
 // counter by 1.
-func IncSessionConnectionRetry() RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-
-		cs.sessionConnRetry++
-	}
-}
+func IncSessionConnectionRetry() RecordOp { _ = "STUB: not implemented"; return *new(RecordOp) }
 
 // PeerLatency records the average peer latency.
-func PeerLatency(t time.Duration) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-		// short circuit the first measurement
-		if cs.latencyEWMA == 0 {
-			cs.latencyEWMA = t
-			return
-		}
-		v := (ewmaSmoothing * float64(t)) + (1-ewmaSmoothing)*float64(cs.latencyEWMA)
-		cs.latencyEWMA = time.Duration(v)
-	}
-}
+func PeerLatency(t time.Duration) RecordOp { _ = "STUB: not implemented"; return *new(RecordOp) }
+
+// short circuit the first measurement
 
 // PeerReachability updates the last reachability status.
 func PeerReachability(s p2p.ReachabilityStatus) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-		cs.ReachabilityStatus = s
-	}
+	_ = "STUB: not implemented"
+	return *new(RecordOp)
 }
 
 // PeerHealth updates the last health status of a peers.
-func PeerHealth(isHealty bool) RecordOp {
-	return func(cs *Counters) {
-		cs.Lock()
-		defer cs.Unlock()
-		cs.Healthy = isHealty
-	}
-}
+func PeerHealth(isHealty bool) RecordOp { _ = "STUB: not implemented"; return *new(RecordOp) }
 
 // Snapshot represents a snapshot of peers' metrics counters.
 type Snapshot struct {
@@ -180,86 +114,16 @@ type Counters struct {
 }
 
 // UnmarshalJSON unmarshal just the persistent counters.
-func (cs *Counters) UnmarshalJSON(b []byte) (err error) {
-	var val persistentCounters
-	if err := json.Unmarshal(b, &val); err != nil {
-		return err
-	}
-	cs.Lock()
-	cs.peerAddress = val.PeerAddress
-	cs.lastSeenTimestamp = val.LastSeenTimestamp
-	cs.connTotalDuration = val.ConnTotalDuration
-	cs.IsBootnode = val.IsBootnode
-	cs.Unlock()
-	return nil
-}
+func (cs *Counters) UnmarshalJSON(b []byte) (err error) { _ = "STUB: not implemented"; return nil }
 
 // MarshalJSON marshals just the persistent counters.
-func (cs *Counters) MarshalJSON() ([]byte, error) {
-	cs.Lock()
-	val := persistentCounters{
-		PeerAddress:       cs.peerAddress,
-		LastSeenTimestamp: cs.lastSeenTimestamp,
-		ConnTotalDuration: cs.connTotalDuration,
-		IsBootnode:        cs.IsBootnode,
-	}
-	cs.Unlock()
-	return json.Marshal(val)
-}
+func (cs *Counters) MarshalJSON() ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // snapshot returns current snapshot of counters referenced to the given t.
-func (cs *Counters) snapshot(t time.Time) *Snapshot {
-	cs.Lock()
-	defer cs.Unlock()
-
-	connTotalDuration := cs.connTotalDuration
-	sessionConnDuration := cs.sessionConnDuration
-	if cs.isLoggedIn {
-		sessionConnDuration = t.Sub(time.Unix(0, cs.lastSeenTimestamp))
-		connTotalDuration += sessionConnDuration
-	}
-
-	return &Snapshot{
-		LastSeenTimestamp:          cs.lastSeenTimestamp,
-		SessionConnectionRetry:     cs.sessionConnRetry,
-		ConnectionTotalDuration:    connTotalDuration,
-		SessionConnectionDuration:  sessionConnDuration,
-		SessionConnectionDirection: cs.sessionConnDirection,
-		LatencyEWMA:                cs.latencyEWMA,
-		Reachability:               cs.ReachabilityStatus,
-		Healthy:                    cs.Healthy,
-		IsBootnode:                 cs.IsBootnode,
-	}
-}
+func (cs *Counters) snapshot(t time.Time) *Snapshot { _ = "STUB: not implemented"; return nil }
 
 // NewCollector is a convenient constructor for creating new Collector.
-func NewCollector(db *shed.DB) (*Collector, error) {
-	const name = "kademlia-counters"
-
-	c := new(Collector)
-
-	val, err := db.NewStructField(name)
-	if err != nil {
-		return nil, fmt.Errorf("field initialization for %q failed: %w", name, err)
-	}
-	c.persistence = &val
-
-	counters := make(map[string]persistentCounters)
-	if err := val.Get(&counters); err != nil && !errors.Is(err, leveldb.ErrNotFound) {
-		return nil, err
-	}
-
-	for _, val := range counters {
-		c.counters.Store(val.PeerAddress.ByteString(), &Counters{
-			peerAddress:       val.PeerAddress,
-			lastSeenTimestamp: val.LastSeenTimestamp,
-			connTotalDuration: val.ConnTotalDuration,
-			IsBootnode:        val.IsBootnode,
-		})
-	}
-
-	return c, nil
-}
+func NewCollector(db *shed.DB) (*Collector, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // Collector collects various metrics about
 // peers specified be the swarm.Address.
@@ -269,12 +133,7 @@ type Collector struct {
 }
 
 // Record records a set of metrics for peer specified by the given address.
-func (c *Collector) Record(addr swarm.Address, rop ...RecordOp) {
-	val, _ := c.counters.LoadOrStore(addr.ByteString(), &Counters{peerAddress: addr})
-	for _, op := range rop {
-		op(val.(*Counters))
-	}
-}
+func (c *Collector) Record(addr swarm.Address, rop ...RecordOp) { _ = "STUB: not implemented"; return }
 
 // Snapshot returns the current state of the metrics collector for peer(s).
 // The given time t is used to calculate the duration of the current session,
@@ -285,134 +144,41 @@ func (c *Collector) Record(addr swarm.Address, rop ...RecordOp) {
 // the peer is logged out, then the session counters will reflect its last
 // session.
 func (c *Collector) Snapshot(t time.Time, addresses ...swarm.Address) map[string]*Snapshot {
-	snapshot := make(map[string]*Snapshot)
-
-	for _, addr := range addresses {
-		val, ok := c.counters.Load(addr.ByteString())
-		if !ok {
-			continue
-		}
-		cs := val.(*Counters)
-		snapshot[addr.ByteString()] = cs.snapshot(t)
-	}
-
-	if len(addresses) == 0 {
-		c.counters.Range(func(key, val any) bool {
-			cs := val.(*Counters)
-			snapshot[cs.peerAddress.ByteString()] = cs.snapshot(t)
-			return true
-		})
-	}
-
-	return snapshot
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // IsUnreachable returns true if the peer is unreachable.
-func (c *Collector) IsUnreachable(addr swarm.Address) bool {
-	val, ok := c.counters.Load(addr.ByteString())
-	if !ok {
-		return true
-	}
-	cs := val.(*Counters)
-
-	cs.Lock()
-	defer cs.Unlock()
-
-	return cs.ReachabilityStatus != p2p.ReachabilityStatusPublic
-}
+func (c *Collector) IsUnreachable(addr swarm.Address) bool { _ = "STUB: not implemented"; return false }
 
 // ExcludeOp is a function type used to filter peers on certain fields.
 type ExcludeOp func(*Counters) bool
 
 // Bootnode is used to filter bootnode peers.
-func Bootnode() ExcludeOp {
-	return func(cs *Counters) bool {
-		return cs.IsBootnode
-	}
-}
+func Bootnode() ExcludeOp { _ = "STUB: not implemented"; return *new(ExcludeOp) }
 
 // Reachable is used to filter reachable or unreachable peers based on r.
 func Reachability(filterReachable bool) ExcludeOp {
-	return func(cs *Counters) bool {
-		reachble := cs.ReachabilityStatus == p2p.ReachabilityStatusPublic
-		if filterReachable {
-			return reachble
-		}
-		return !reachble
-	}
+	_ = "STUB: not implemented"
+	return *new(ExcludeOp)
 }
 
 // Unreachable is used to filter unhealthy peers.
-func Health(filterHealthy bool) ExcludeOp {
-	return func(cs *Counters) bool {
-		if filterHealthy {
-			return cs.Healthy
-		}
-		return !cs.Healthy
-	}
-}
+func Health(filterHealthy bool) ExcludeOp { _ = "STUB: not implemented"; return *new(ExcludeOp) }
 
 // Exclude returns false if the addr passes all exclusion operations.
 func (c *Collector) Exclude(addr swarm.Address, fop ...ExcludeOp) bool {
-	val, ok := c.counters.Load(addr.ByteString())
-	if !ok {
-		return true
-	}
-	cs := val.(*Counters)
-	cs.Lock()
-	defer cs.Unlock()
-
-	for _, f := range fop {
-		if f(cs) {
-			return true
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return false
 }
 
 // Inspect allows inspecting current snapshot for the given
 // peer address by executing the inspection function.
-func (c *Collector) Inspect(addr swarm.Address) *Snapshot {
-	snapshots := c.Snapshot(time.Now(), addr)
-	return snapshots[addr.ByteString()]
-}
+func (c *Collector) Inspect(addr swarm.Address) *Snapshot { _ = "STUB: not implemented"; return nil }
 
 // Flush sync the dirty in memory counters for all peers by flushing their
 // values to the underlying storage.
-func (c *Collector) Flush() error {
-	counters := make(map[string]any)
-	c.counters.Range(func(key, val any) bool {
-		cs := val.(*Counters)
-		counters[cs.peerAddress.ByteString()] = val
-		return true
-	})
-
-	if err := c.persistence.Put(counters); err != nil {
-		return fmt.Errorf("unable to persist counters: %w", err)
-	}
-	return nil
-}
+func (c *Collector) Flush() error { _ = "STUB: not implemented"; return nil }
 
 // Finalize tries to log out all ongoing peer sessions.
-func (c *Collector) Finalize(t time.Time, remove bool) error {
-	c.counters.Range(func(_, val any) bool {
-		cs := val.(*Counters)
-		PeerLogOut(t)(cs)
-		return true
-	})
-
-	if err := c.Flush(); err != nil {
-		return err
-	}
-
-	if remove {
-		c.counters.Range(func(_, val any) bool {
-			cs := val.(*Counters)
-			c.counters.Delete(cs.peerAddress.ByteString())
-			return true
-		})
-	}
-
-	return nil
-}
+func (c *Collector) Finalize(t time.Time, remove bool) error { _ = "STUB: not implemented"; return nil }
